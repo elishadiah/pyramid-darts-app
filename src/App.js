@@ -4,14 +4,15 @@ import Home from "./pages/Home";
 import Ranking from "./pages/Ranking";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Header from "./components/Header";
+// import Header from "./components/Header";
+import Navbar from "./components/Navbar";
 
 import "./App.css";
 
 function App() {
   return (
     <div className="App">
-      <Header />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
