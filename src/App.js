@@ -11,7 +11,7 @@ import "./App.css";
 
 function App() {
   return (
-    <div className="App">
+    <div className="App  h-screen overflow-auto">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
