@@ -4,13 +4,12 @@ import Home from "./pages/Home";
 import Ranking from "./pages/Ranking";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-// import Navbar from "./components/Navbar";
 
 import "./App.css";
 
 function App() {
   return (
-    <div className="App  h-screen overflow-auto bg-gray-100 dark:bg-main-bg-color">
+    <div className="App">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
