@@ -9,7 +9,7 @@ const Navbar = () => {
       <div className="p-4 flex h-16 items-center justify-between bg-main-color">
         <button type="button" onClick={() => setOpen(true)}>
           <Bars3Icon
-            className="block h-6 w-6 text-white font-bold cursor-pointer"
+            className="block h-6 w-6 text-black dark:text-white font-bold cursor-pointer"
             aria-hidden="true"
           />
         </button>
