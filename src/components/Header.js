@@ -9,13 +9,13 @@ const navigation = [
   { name: "Home", to: "/", current: 1 },
   { name: "Rankings", to: "/ranking", current: 2 },
   // { name: "Spieler", to: "/players", current: 3 },
-  // { name: "Infos", to: "/infos", current: 4 },
+  { name: "Infos", to: "/infos", current: 3 },
 ];
 
 const userMenuItems = [
   { name: "Your Profile", to: "#" },
   { name: "Settings", to: "#" },
-  { name: "Sign out", to: "#" },
+  { name: "Sign out", to: "/login" },
 ];
 
 function classNames(...classes) {
@@ -24,7 +24,7 @@ function classNames(...classes) {
 
 export default function Header({ current }) {
   return (
-    <Disclosure as="nav" className="bg-indio-50 dark:bg-gray-800 mb-24">
+    <Disclosure as="nav" className="bg-indio-50 dark:bg-gray-800 mb-12 border border-gray-200 dark:border-gray-700">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">

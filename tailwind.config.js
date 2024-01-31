@@ -11,7 +11,7 @@ module.exports = {
         'main-bg-color': 'rgb(48, 48, 48)',
         'divider-color': 'rgb(73, 73, 73)',
         'form-color': '#2196f3'
-      }
+      },
     },
   },
   plugins: [],

@@ -1,58 +1,81 @@
 import Header from "../../components/Header";
-import { BackgroundImage } from "../../components/BackgroundImage";
 
 const Home = () => {
+  const texts = [
+    "Alles was du besitzt, besitzt irgendwann dich.",
+    "Von dem Geld, das wir nicht haben, kaufen wir Dinge, die wir nicht brauchen, um Leuten zu imponieren, die wir nicht mögen.",
+    "Wir sind Konsumenten. Wir sind Abfallprodukte der allgemeinen Lifestyle-Obsessionen!",
+    "Wenn Menschen denken, dass du stirbst, hören sie dir richtig zu.",
+    "Zuerst musst du wissen, nicht fürchten, sondern wissen, dass du einmal sterben wirst.",
+    "Erst nachdem wir alles verloren haben, haben wir die Freiheit, alles zu tun.",
+    "Kleine Benimmfrage: Wenn ich vorbei gehe… Wende ich Ihnen den Arsch oder den Schritt zu?",
+    "Ich will, dass du mich schlägst, so hart wie du nur kannst!",
+    "Wir wurden durch das Fernsehen aufgezogen in dem Glauben, dass wir alle irgendwann mal Millionäre werden, Filmgötter, Rockstars. Werden wir aber nicht! Und das wird uns langsam klar! Und wir sind kurz, ganz kurz vorm Ausrasten.",
+    "Wir sind die Zweitgeborenen der Geschichte, Leute. Männer ohne Zweck, ohne Ziel. Wir haben keinen großen Krieg, keine große Depression. Unser großer Krieg ist kein spiritueller, unsere große Depression ist unser Leben.",
+    "Du hast mich in einer seltsamen Phase meines Lebens getroffen…",
+    "Willkommen im Fight Club! Die erste Regel des Fight Club lautet: Ihr verliert kein Wort über den Fight Club! Die zweite Regel des Fight Club lautet: Ihr verliert kein Wort über den Fight Club!",
+  ];
   return (
-    <div className="relative sm:pb-24">
-      <BackgroundImage className="-bottom-14 -top-36" />
+    <div className="relative sm:pb-24 bg-indigo-50 dark:bg-gray-800">
       <div className="relative">
         <Header current={1} />
         <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
-          <h1 className="font-display text-5xl font-bold tracking-tighter text-blue-600 sm:text-7xl">
-            <span className="sr-only">DeceptiConf - </span> Welkom bij de
-            ultieme dartspeluitdaging!
+          <h1 className="font-display text-5xl font-bold tracking-tighter text-blue-600 sm:text-7xl dark:text-gray-200">
+            <span className="sr-only">DeceptiConf - </span> Willkommen zur
+            ultimativen Dartspiel-Herausforderung!
           </h1>
-          <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-blue-900">
+          <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-blue-900 text-left dark:text-gray-300">
+            <p>Alles was du nicht checkst, checkt irgendwann dich</p>
             <p>
-              Ben je klaar om je nauwkeurigheid, precisie en strategie op het
-              dartbord te testen? Zoek niet verder! Onze dartspeluitdaging is
-              ontworpen om je vaardigheden tot het uiterste te drijven en je een
-              onvergetelijke ervaring te bezorgen.
+              Von dem Geld, das wir nicht haben, kaufen wir Dinge, die wir nicht
+              brauchen, um ein Niveau zu erreichen, das niemandem imponiert.
             </p>
             <p>
-              Of je nu een beginner of een doorgewinterde professional bent, ons
-              spel is ontworpen voor alle vaardigheidsniveaus. Scherp je doel en
-              gooi je pijlen met precisie om de roos te raken. Daag jezelf uit
-              om de hoogste scores te halen en te concurreren met vrienden,
-              familie of zelfs spelers van over de hele wereld.
+              Wir sind Dartspieler. Wir sind Abfallprodukte der allgemeinen
+              Leistungssport-Obsessionen!
             </p>
             <p>
-              Dus, ben jij klaar om de Challenge aan te gaan? Pak je darts,
-              richt goed en laat het spel beginnen! Maak je klaar om de sensatie
-              te ervaren van het raken van de roos, het veroveren van piramides
-              en het worden van een dartlegende. Begin vandaag nog aan je reis
-              en kijk of jij het in je hebt om naar de top te stijgen in de
-              wereld van Challenge!
+              Wenn Menschen denken, dass du checkst, passen sie erst richtig
+              auf.
+            </p>
+            <p>
+              Zuerst musst du wissen, nicht fürchten, wissen, dass du einmal das
+              große Singlefeld verpassen wirst.
+            </p>
+            <p>
+              Erst nachdem wir das Spiel verloren haben, haben wir die Freiheit,
+              alles zu checken
+            </p>
+            <p>
+              Kleine Benimmfrage: Wenn ich zum Handshake gehe, habe ich da meine
+              Darts schon geholt oder stecken die noch?
+            </p>
+            <p>Ich will, dass du scorest, so hart wie du nur kannst</p>
+            <p>
+              Wir wurden durch das Fernsehen aufgezogen in dem Glauben, dass wir
+              alle irgendwann mal Profis werden, Bühnenspieler, Rockstars.
+              Werden wir aber nicht! Und das wird uns langsam klar! Und wir sind
+              kurz, ganz kurz vorm Ausrasten.
+            </p>
+            <p>
+              Wir sind die Zweitgeborenen der Geschichte, Leute. Menschen ohne
+              Zweck, ohne Ziel. Wir haben keinen großen Krieg, keine große
+              Depression. Unser großer Krieg ist ein mentaler, unsere große
+              Depression ist die doppel 1.
+            </p>
+            <p>
+              Darts hat mich in einer seltsamen Phase meines Lebens getroffen…
+            </p>
+            <p>
+              Willkommen im Darts Fight Club! Die erste Regel des Fight
+              DartsClub lautet: Ihr verliert ab und zu mal ein Wort über den
+              Darts Fight Club. Die zweite Regel des Fight Club lautet: : Ihr
+              verliert ab und zu mal EIN WORT über den Darts Fight Club.
             </p>
           </div>
-
-          {/* <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 sm:mt-16 sm:gap-x-16 sm:gap-y-10 sm:text-center lg:auto-cols-auto lg:grid-flow-col lg:grid-cols-none lg:justify-start lg:text-left">
-            {[
-              ["Speakers", "18"],
-              ["People Attending", "2,091"],
-              ["Venue", "Staples Center"],
-              ["Location", "Los Angeles"],
-            ].map(([name, value]) => (
-              <div key={name}>
-                <dt className="font-mono text-sm text-blue-600">{name}</dt>
-                <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-blue-900">
-                  {value}
-                </dd>
-              </div>
-            ))}
-          </dl> */}
         </div>
       </div>
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white" />
     </div>
   );
 };

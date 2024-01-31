@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 import "./App.css";
+import Infos from "./pages/Infos";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/ranking" element={<Ranking />} />
+        <Route path="/infos" element={<Infos />} />
       </Routes>
     </div>
   );
