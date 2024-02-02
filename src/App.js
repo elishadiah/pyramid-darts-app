@@ -4,9 +4,11 @@ import Home from "./pages/Home";
 import Ranking from "./pages/Ranking";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 
 import "./App.css";
 import Infos from "./pages/Infos";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/infos" element={<Infos />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </div>
   );

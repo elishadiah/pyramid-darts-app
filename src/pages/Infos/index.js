@@ -49,7 +49,7 @@ const Infos = () => {
         <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
           <div className="mb-12">
             <div className="flex justify-center mb-4">
-              <h3 className="font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-900 py-2 px-8 rounded-md">
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 bg-white border border-gray-200 shadow-md shadow-gray-300 dark:bg-gray-900 dark:shadow-gray-700 dark:border-gray-800 py-2 px-8 rounded-md">
                 Regel
               </h3>
             </div>
@@ -70,8 +70,8 @@ const Infos = () => {
           </div>
           <div>
             <div className="flex justify-center mb-4">
-              <h3 className="font-bold text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-900 py-2 px-8 rounded-md">
-                Zusatz:
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 bg-white border border-gray-200 shadow-md shadow-gray-300 dark:bg-gray-900 dark:shadow-gray-700 dark:border-gray-800 py-2 px-8 rounded-md">
+                Zusatz
               </h3>
             </div>
             <ul className="space-y-3">

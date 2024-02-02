@@ -13,8 +13,8 @@ const navigation = [
 ];
 
 const userMenuItems = [
-  { name: "Your Profile", to: "#" },
-  { name: "Settings", to: "#" },
+  { name: "Your Profile", to: "/profile" },
+  { name: "Settings", to: "/settings" },
   { name: "Sign out", to: "/login" },
 ];
 
