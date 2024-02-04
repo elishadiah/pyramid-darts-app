@@ -43,14 +43,14 @@ const Infos = () => {
     "4. Jeden 28. im Monat wird der Clubchef unter den Top 4 ermittelt.",
   ];
   return (
-    <div className="relative sm:pb-24 bg-indigo-50 dark:bg-gray-800">
+    <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
         <Header current={3} />
         <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
           <div className="mb-12">
             <div className="flex justify-center mb-4">
               <h3 className="font-bold text-gray-800 dark:text-gray-100 bg-white border border-gray-200 shadow-md shadow-gray-300 dark:bg-gray-900 dark:shadow-gray-700 dark:border-gray-800 py-2 px-8 rounded-md">
-                Regel
+                Regeln
               </h3>
             </div>
             <ul className="space-y-3">

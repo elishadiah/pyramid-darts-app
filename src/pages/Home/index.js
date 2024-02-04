@@ -1,8 +1,6 @@
 import Header from "../../components/Header";
 import logoImg from "../../assets/img/fc_logo.png";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { useEffect, useState } from "react";
 
 const Home = () => {
   const texts = [
@@ -96,19 +94,21 @@ const Home = () => {
         "Die zweite Regel des Fight Club lautet: Ihr verliert ab und zu mal EIN WORT über den Darts Fight Club.",
     },
   ];
-  const settings = {
-    dots: false,
-    arrows: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 5000,
+
+  const getRandomInt = (min, max) => {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
   };
 
+  const [quote, setQuote] = useState(texts[0]);
+
+  useEffect(() => {
+    setQuote(texts[getRandomInt(0, texts.length)]);
+  }, []);
+
   return (
-    <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-100 dark:bg-gray-800 h-screen">
+    <div className="relative sm:pb-24 text-gray-900 dark:text-gray-100 dark:bg-gray-800 h-screen">
       <div className="relative">
         <Header current={1} />
         <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
@@ -118,30 +118,10 @@ const Home = () => {
           <div className="flex flex-col items-center mb-12">
             <h1 className="header-text text-6xl w-5/6">Darts Fight Club</h1>
           </div>
-
-          <Slider {...settings}>
-            {texts.map((item, index) => (
-              <div key={index} className="slider-wrapper">
-                <div className="max-w-xl rounded-lg flex shadow-md shadow-gray-600 m-2">
-                  <div className="w-2/5 flex items-center">
-                    <img
-                      className="object-cover w-full p-4"
-                      src={logoImg}
-                      alt="card-img"
-                    />
-                  </div>
-                  <div className="px-6 py-4 w-3/5 flex flex-col justify-center">
-                    <p className="mb-2 text-md leading-normal text-justify text-gray-900 dark:text-gray-100">
-                      {item.origin}
-                    </p>
-                    <p className="mb-2 text-md leading-normal text-justify text-gray-400 dark:text-gray-400">
-                      {item.additive}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Slider>
+          <div className="text-xl shadow-md shadow-gray-300 border border-gray-200 p-4 rounded-md dark:border-gray-800 dark:shadow-gray-700">
+            <p>{quote.origin}</p>
+            <p>{quote.additive}</p>
+          </div>
         </div>
       </div>
     </div>
