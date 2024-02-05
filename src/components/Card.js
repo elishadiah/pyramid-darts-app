@@ -1,23 +1,34 @@
-const Card = ({ ...props }) => {
+const Card = ({ username, children }) => {
   return (
-    <div className="col-span-1 flex flex-col divide-y divide-gray-200 rounded-lg bg-green-500 text-center shadow">
-      <div className="flex flex-1 flex-col p-8">
+    <>
+      <div className="group relative flex">
+        {children}
+        <div className="absolute top-10 scale-0 z-30 transition-all rounded bg-gray-800 dark:bg-gray-200 p-2 text-xs text-white dark:text-gray-900 group-hover:scale-100">
+          <p>{username}</p>
+          <button>Hi</button>
+        </div>
+      </div>
+    </>
+    // <div classNameName="flex flex-col divide-y divide-gray-200 rounded-lg bg-green-500 text-center shadow m-4 w-44 h-44">
+    /* <div classNameName="flex flex-col p-2"></div> */
+    /* <div classNameName="flex flex-col p-4">
         <img
-          class="mx-auto h-32 w-32 flex-shrink-0 rounded-full"
+          className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"
           src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
           alt="user avatar"
         ></img>
-        <h3 class="mt-6 text-sm font-medium text-gray-900">{props.username}</h3>
+        <h3 className="mt-2 text-sm font-medium text-white">{props.username}</h3>
+        <p>score</p>
       </div>
       <div>
-        <div class="-mt-px flex divide-x divide-gray-200 ">
-          <div class="flex w-0 flex-1">
+        <div className="-mt-px flex divide-x divide-gray-200 ">
+          <div className="flex w-0 flex-1">
             <a
               href="mailto:najibgafar@gmail.com"
-              class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
+              className="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
             >
               <svg
-                class="h-5 w-5 text-gray-400 hover:text-gray-50"
+                className="h-5 w-5 text-gray-400 hover:text-gray-50"
                 viewBox="0 0 20 20"
                 fill="currentColor"
                 aria-hidden="true"
@@ -28,29 +39,29 @@ const Card = ({ ...props }) => {
               Email
             </a>
           </div>
-          <div class="-ml-px flex w-0 flex-1">
+          <div className="-ml-px flex w-0 flex-1">
             <a
               href="tel:+4407393145546"
-              class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
+              className="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
             >
               <svg
-                class="h-5 w-5 text-gray-400 hover:text-gray-50"
+                className="h-5 w-5 text-gray-400 hover:text-gray-50"
                 viewBox="0 0 20 20"
                 fill="currentColor"
                 aria-hidden="true"
               >
                 <path
-                  fill-rule="evenodd"
+                  fillRule="evenodd"
                   d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 012.43 8.326 13.019 13.019 0 012 5V3.5z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 />
               </svg>
               Call
             </a>
           </div>
         </div>
-      </div>
-    </div>
+      </div> */
+    // </div>
   );
 };
 
