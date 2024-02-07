@@ -8,8 +8,8 @@ import logoImg from "../assets/img/fc_logo.png";
 const navigation = [
   { name: "Home", to: "/", current: 1 },
   { name: "Rankings", to: "/ranking", current: 2 },
-  // { name: "Spieler", to: "/players", current: 3 },
   { name: "Infos", to: "/infos", current: 3 },
+  { name: "Schedule", to: "/schedule", current: 4 },
 ];
 
 const userMenuItems = [

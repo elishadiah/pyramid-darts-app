@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import "./App.css";
 import Infos from "./pages/Infos";
 import Settings from "./pages/Settings";
+import Schedule from "./pages/Schedule";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/infos" element={<Infos />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/schedule" element={<Schedule />} />
       </Routes>
     </div>
   );
