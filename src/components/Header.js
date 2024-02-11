@@ -1,9 +1,10 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
+import { Link, redirect } from "react-router-dom";
 import Switcher from "./Switcher";
 import logoImg from "../assets/img/fc_logo.png";
+import authService from "../services/auth.service";
 
 const navigation = [
   { name: "Home", to: "/", current: 1 },
@@ -15,7 +16,6 @@ const navigation = [
 const userMenuItems = [
   { name: "Your Profile", to: "/profile" },
   { name: "Settings", to: "/settings" },
-  { name: "Sign out", to: "/login" },
 ];
 
 function classNames(...classes) {
@@ -23,8 +23,15 @@ function classNames(...classes) {
 }
 
 export default function Header({ current }) {
+  const handleLogout = () => {
+    authService.logout();
+    redirect('/login');
+  }
   return (
-    <Disclosure as="nav" className="bg-indio-50 dark:bg-gray-800 mb-12 border border-gray-200 dark:border-gray-700">
+    <Disclosure
+      as="nav"
+      className="bg-indio-50 dark:bg-gray-800 mb-12 border border-gray-200 dark:border-gray-700"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -109,6 +116,19 @@ export default function Header({ current }) {
                             )}
                           </Menu.Item>
                         ))}
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              onClick={handleLogout}
+                              className={classNames(
+                                active ? "bg-gray-100 dark:bg-gray-900" : "",
+                                "block px-4 py-2 text-sm w-full text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                              )}
+                            >
+                              Sign out
+                            </button>
+                          )}
+                        </Menu.Item>
                       </Menu.Items>
                     </Transition>
                   </Menu>
@@ -188,6 +208,9 @@ export default function Header({ current }) {
                     {item.name}
                   </Disclosure.Button>
                 ))}
+                <Disclosure.Button onClick={handleLogout} className="block rounded-md w-full px-3 py-2 text-base font-medium text-gray-900 dark:text-gray-400 hover:bg-gray-200 hover:dark:bg-gray-700 hover:text-gray-900 hover:dark:text-white">
+                  Sign out
+                </Disclosure.Button>
               </div>
             </div>
           </Disclosure.Panel>

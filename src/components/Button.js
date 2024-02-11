@@ -8,7 +8,7 @@ export function Button({ className, ...props }) {
   );
 
   return typeof props.to === "undefined" ? (
-    <button className={className} {...props} />
+    <button className={className} {...props} onClick={props.onClick} />
   ) : (
     <Link className={className} {...props} />
   );

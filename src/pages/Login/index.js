@@ -1,10 +1,29 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 import logoImg from "../../assets/img/fc_logo.png";
 import CustomInputComponent from "../../components/Input";
-import { Button } from "../../components/Button";
+import authService from "../../services/auth.service";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [authData, setAuthData] = useState({
+    email: '',
+    password: ''
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    authService
+      .login(authData)
+      .then((res) => navigate('/'))
+      .catch((err) => console.log("Login--Err-->>>", err.data));
+  };
+
+  const onChange = (payload) => {
+    setAuthData({...authData, ...payload});
+  }
   return (
     <>
       <div className="flex min-h-full h-screen flex-1 flex-col justify-center px-6 py-24 lg:px-8">
@@ -20,11 +39,13 @@ const Login = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" action="#" method="POST">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <CustomInputComponent
               name="email"
               type="email"
               placeholder="Email eingeben"
+              // errors={errors}
+              onChange={onChange}
               label={
                 <label
                   htmlFor="email"
@@ -45,7 +66,8 @@ const Login = () => {
               name="password"
               type="password"
               placeholder="Passwort eingeben"
-              required={true}
+              // errors={errors}
+              onChange={onChange}
               icon={
                 <LockClosedIcon
                   className="block h-5 w-5 font-bold focus:text-form-color"
@@ -73,9 +95,12 @@ const Login = () => {
             />
 
             <div>
-              <Button className="flex w-full px-3 py-1.5 rounded-md" to="/">
-                Sign in
-              </Button>
+              <button
+                type="submit"
+                className="flex justify-center justify-center bg-green-600 text-base font-semibold text-white hover:bg-green-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 active:text-white/70 w-full px-3 py-1.5 rounded-md"
+              >
+                Login
+              </button>
             </div>
           </form>
 

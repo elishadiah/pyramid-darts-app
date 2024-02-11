@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logoImg from "../../assets/img/fc_logo.png";
 import {
   EnvelopeIcon,
@@ -6,9 +7,28 @@ import {
   UserIcon,
 } from "@heroicons/react/24/solid";
 import CustomInputComponent from "../../components/Input";
-import { Button } from "../../components/Button";
+import authService from "../../services/auth.service";
 
 const Register = () => {
+  const navigate = useNavigate();
+  const [authData, setAuthData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    authService
+      .register(authData)
+      .then((res) => navigate('/'))
+      .catch((err) => console.log("Register--Err-->>>", err.data));
+  };
+
+  const onChange = (payload) => {
+    setAuthData({ ...authData, ...payload });
+  };
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8 bg-indigo-100 pb-40">
@@ -25,11 +45,13 @@ const Register = () => {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
           <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <CustomInputComponent
-                name="user"
+                name="username"
                 type="text"
                 placeholder="Nutzername eingeben"
+                // errors={errors}
+                onChange={onChange}
                 label={
                   <label
                     htmlFor="user"
@@ -49,6 +71,8 @@ const Register = () => {
                 name="email"
                 type="email"
                 placeholder="Email eingeben"
+                // errors={errors}
+                onChange={onChange}
                 label={
                   <label
                     htmlFor="email"
@@ -68,6 +92,8 @@ const Register = () => {
                 name="password"
                 type="password"
                 placeholder="Passwort eigeben"
+                // errors={errors}
+                onChange={onChange}
                 label={
                   <label
                     htmlFor="password"
@@ -87,6 +113,8 @@ const Register = () => {
                 name="password-confirm"
                 type="password"
                 placeholder="Passwort eingeben"
+                // errors={errors}
+                onChange={onChange}
                 label={
                   <label
                     htmlFor="password confirm"
@@ -104,9 +132,12 @@ const Register = () => {
               />
 
               <div>
-                <Button className="flex w-full px-3 py-1.5 rounded-md" to="/">
+                <button
+                  type="submit"
+                  className="flex justify-center justify-center bg-green-600 text-base font-semibold text-white hover:bg-green-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 active:text-white/70 w-full px-3 py-1.5 rounded-md"
+                >
                   Register
-                </Button>
+                </button>
               </div>
             </form>
           </div>
