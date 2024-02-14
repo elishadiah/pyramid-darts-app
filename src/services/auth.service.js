@@ -18,6 +18,15 @@ const profile = () => {
     return http.get('/user');
 }
 
+const avatarUpload = (file) => {
+    console.log('Avatar-test-->>', file)
+    return http.post('/avatar/upload', file);
+}
+
+const userInfo = () => {
+    
+}
+
 const logout = () => {
     // return http.get('/logout', null, {
     //     transformResponse: [(result) => {
@@ -26,6 +35,7 @@ const logout = () => {
     //     }]
     // });
     localStorage.removeItem('authUser');
+    window.location.reload();
 }
 
 const getAuthUser = () => {
@@ -37,7 +47,8 @@ const methods = {
     register,
     profile,
     logout,
-    getAuthUser
+    getAuthUser,
+    avatarUpload
 }
 
 export default methods;

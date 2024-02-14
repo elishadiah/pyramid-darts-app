@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import { StarIcon, TrophyIcon } from "@heroicons/react/24/solid";
 import { Calendar, momentLocalizer } from "react-big-calendar";
@@ -7,6 +7,23 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const Profile = () => {
   const localizer = momentLocalizer(moment);
+  const [user, setUser] = useState({ username: "", email: "", avatar: "" });
+
+  useEffect(() => {
+    const tmp = JSON.parse(localStorage.getItem("authUser")).user;
+    let avatar;
+    if (
+      tmp.hasOwnProperty("avatar") === false ||
+      tmp.avatar === null ||
+      tmp.avatar === ""
+    )
+      avatar = "";
+    else avatar = tmp.avatar;
+    const { username, email } = JSON.parse(
+      localStorage.getItem("authUser")
+    ).user;
+    setUser({ username, email, avatar });
+  }, []);
 
   const events = [
     {
@@ -35,12 +52,20 @@ const Profile = () => {
       <div className="p-8">
         <div className="flex border border-gray-200 bg-white p-4 rounded-md">
           <div className="w-4/12 flex flex-col space-y-4">
-            <div>
-              <img
-                src="https://www.f-cdn.com/assets/main/en/assets/unknown.png?image-optimizer=force&format=webply&width=336 1x"
-                className="rounded-md"
-                alt="user-avatar"
-              />
+            <div className="flex justify-center items-center">
+              {user.avatar === "" ? (
+                <img
+                  src="https://www.f-cdn.com/assets/main/en/assets/unknown.png?image-optimizer=force&format=webply&width=336 1x"
+                  className="rounded-md"
+                  alt="user-avatar"
+                />
+              ) : (
+                <img
+                  src={user.avatar}
+                  className="rounded-md w-72 h-72"
+                  alt="user-avatar"
+                />
+              )}
             </div>
             <div className="text-left flex items-center">
               <p className="w-4 h-4 bg-green-400 inline-block mx-4" />
@@ -48,7 +73,7 @@ const Profile = () => {
             </div>
           </div>
           <div className="w-8/12 text-left">
-            <p className="text-4xl mb-4">User name</p>
+            <p className="text-4xl mb-4">{user.username}</p>
             <div className="flex items-center space-x-4 mb-4">
               <div className="flex items-center">
                 <StarIcon

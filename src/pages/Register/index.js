@@ -21,7 +21,7 @@ const Register = () => {
     e.preventDefault();
     authService
       .register(authData)
-      .then((res) => navigate('/'))
+      .then((res) => navigate('/login'))
       .catch((err) => console.log("Register--Err-->>>", err.data));
   };
 
