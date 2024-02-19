@@ -20,7 +20,7 @@ const Card = ({ username, score, uuid, sendQuickFight, children }) => {
 
   const sendQuick = () => {
     sendQuickFight(username, user.username);
-    window.location.href = 'https://lidarts.org/game/create?opponent_name=LidartsAccountname';
+    window.open("https://lidarts.org/game/create?opponent_name=LidartsAccountname", "_blank");
   }
 
   useEffect(() => {
