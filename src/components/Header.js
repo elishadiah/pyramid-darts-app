@@ -22,13 +22,20 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Header({ current }) {
+export default function Header({ current, socket }) {
   const [userAvatar, setUserAvatar] = useState(null);
   const [user, setUser] = useState(null);
+  const [notifications, setNotifications] = useState(null);
+
   const handleLogout = () => {
     authService.logout();
     redirect("/login");
   };
+
+  const removeNotification = () => {
+    setNotifications(null);
+  };
+
   useEffect(() => {
     const tmp = JSON.parse(localStorage.getItem("authUser")).user;
     if (
@@ -38,7 +45,16 @@ export default function Header({ current }) {
     )
       setUserAvatar(null);
     else setUserAvatar(tmp.avatar);
+    setUser(tmp);
   }, []);
+
+  useEffect(() => {
+    socket.on("challengeResponse", (data) => {
+      data.user === user?.username && setNotifications(data.message);
+      console.log("Socket-notification-->>>", notifications);
+    });
+  }, [socket, user, notifications]);
+
   return (
     <Disclosure
       as="nav"
@@ -81,14 +97,63 @@ export default function Header({ current }) {
               <div className="hidden sm:ml-6 sm:block">
                 <div className="flex items-center">
                   <Switcher />
-                  <button
-                    type="button"
-                    className="relative rounded-full p-1 ml-2 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:text-gray-900 hover:dark:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    <span className="absolute -inset-1.5" />
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+                  {/* Bell notification */}
+                  <Menu as="div" className="relative ml-3">
+                    <div>
+                      <Menu.Button className="relative flex rounded-full text-gray-600 dark:bg-gray-800 dark:text-gray-400 text-sm focus:outline-none ">
+                        <span className="absolute -inset-1.5" />
+                        <span className="sr-only">Open user menu</span>
+                        <BellIcon className="h-6 w-6" aria-hidden="true" />
+                        {notifications && (
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-700"></span>
+                          </span>
+                        )}
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        {notifications && (
+                          <Menu.Item>
+                            {({ active }) => (
+                              <div
+                                className={classNames(
+                                  active ? "bg-gray-100 dark:bg-gray-900" : "",
+                                  "block px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                )}
+                              >
+                                <p className="mb-4">{notifications}</p>
+                                <div className="flex gap-2 justify-center">
+                                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none">
+                                    <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
+                                      Accept
+                                    </p>
+                                  </Disclosure.Button>
+                                  <Disclosure.Button
+                                    className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
+                                    onClick={removeNotification}
+                                  >
+                                    <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
+                                      Decline
+                                    </p>
+                                  </Disclosure.Button>
+                                </div>
+                              </div>
+                            )}
+                          </Menu.Item>
+                        )}
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
 
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
@@ -207,7 +272,7 @@ export default function Header({ current }) {
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-medium text-gray-600 dark:text-white">
-                    {user?.firstname + ' ' + user?.lastname}
+                    {user?.firstname + " " + user?.lastname}
                   </div>
                   <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     {user?.email}

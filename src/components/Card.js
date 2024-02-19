@@ -1,11 +1,12 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { DateObject, Calendar } from "react-multi-date-picker";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
 
-const Card = ({ username, score, children }) => {
+const Card = ({ username, score, uuid, sendQuickFight, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
+  const [user, setUser] = useState({});
 
   const closeModal = () => {
     setIsOpen(false);
@@ -17,24 +18,38 @@ const Card = ({ username, score, children }) => {
     console.log("Calendar===>>>", value.month);
   };
 
+  const sendQuick = () => {
+    sendQuickFight(username, user.username);
+    window.location.href = 'https://lidarts.org/game/create?opponent_name=LidartsAccountname';
+  }
+
+  useEffect(() => {
+    setUser(JSON.parse(localStorage.getItem("authUser")).user);
+  }, []);
+
   return (
     <>
       <div className="group relative flex shadow">
         {children}
-        <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-20 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
+        <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-10 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
           <div className="flex flex-col h-20 p-4">
             <p className="font-bold text-xl">{username}</p>
             <p className="font-normal text-lg">score: {score}</p>
           </div>
           <div className="flex items-center justify-center divide-x divide-gray-900 dark:divide-gray-200 dark:divide-gray-900">
             <div className="w-6/12 p-2">
-              <button className="text-center font-semibold bg-green-500 text-white rounded-md p-2">
+              <button
+                className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
+                disabled={uuid === user._id}
+                onClick={sendQuick}
+              >
                 Quick Fight
               </button>
             </div>
             <div className="w-6/12 p-2">
               <button
-                className="text-center font-semibold bg-green-500 text-white rounded-md p-2"
+                className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
+                disabled={uuid === user._id}
                 onClick={openModal}
               >
                 Scheduled Fight

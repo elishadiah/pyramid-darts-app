@@ -1,6 +1,6 @@
 import Header from "../../components/Header";
 
-const Infos = () => {
+const Infos = ({socket}) => {
   const infoTexts = [
     {
       title: "Regel1",
@@ -45,7 +45,7 @@ const Infos = () => {
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
-        <Header current={3} />
+        <Header current={3} socket={socket} />
         <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
           <div className="mb-12">
             <div className="flex justify-center mb-4">

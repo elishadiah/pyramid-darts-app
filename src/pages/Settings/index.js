@@ -9,7 +9,7 @@ import { Button } from "../../components/Button";
 import http from "../../utility/http-client";
 import { useEffect, useState } from "react";
 
-const Settings = () => {
+const Settings = ({socket}) => {
   const [userAvatar, setUserAvatar] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState({});
@@ -51,6 +51,7 @@ const Settings = () => {
         avatar: userAvatar,
       });
       const oldUser = JSON.parse(localStorage.getItem("authUser"));
+      console.log('TTT---------------', oldUser)
       const newUser = {
         token: oldUser.token,
         user: { ...oldUser.user, ...res.data.data.updatedUser },
@@ -72,7 +73,7 @@ const Settings = () => {
 
   return (
     <div className="relative sm:pb-24 bg-green-50 text-gray-900 dark:text-white dark:bg-gray-800">
-      <Header current={0} />
+      <Header current={0} socket={socket} />
       <div>
         <div className="divide-y divide-white/5">
           <div className="grid m-auto max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">

@@ -3,7 +3,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-const Schedule = () => {
+const Schedule = ({socket}) => {
   const localizer = momentLocalizer(moment);
 
   const events = [
@@ -23,7 +23,7 @@ const Schedule = () => {
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
-        <Header current={4} />
+        <Header current={4} socket={socket} />
         <div className="py-8 lg:px-12">
           <Calendar
             localizer={localizer}

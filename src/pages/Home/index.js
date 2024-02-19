@@ -2,7 +2,7 @@ import Header from "../../components/Header";
 import logoImg from "../../assets/img/fc_logo.png";
 import { useEffect, useState } from "react";
 
-const Home = () => {
+const Home = ({ socket }) => {
   const texts = [
     {
       origin: "Alles was du besitzt, besitzt irgendwann dich.",
@@ -110,7 +110,7 @@ const Home = () => {
   return (
     <div className="relative sm:pb-24 text-gray-900 dark:text-gray-100 dark:bg-gray-800 h-screen">
       <div className="relative">
-        <Header current={1} />
+        <Header current={1} socket={socket} />
         <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
           <div className="flex flex-col items-center mb-12 mt-24">
             <img className="w-80" src={logoImg} alt="logo-img" />

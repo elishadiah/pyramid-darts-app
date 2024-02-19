@@ -5,7 +5,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-const Profile = () => {
+const Profile = ({socket}) => {
   const localizer = momentLocalizer(moment);
   const [user, setUser] = useState({ username: "", email: "", avatar: "" });
 
@@ -48,7 +48,7 @@ const Profile = () => {
 
   return (
     <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
-      <Header current={0} />
+      <Header current={0} socket={socket} />
       <div className="p-8">
         <div className="flex border border-gray-200 bg-white p-4 rounded-md">
           <div className="w-4/12 flex flex-col space-y-4">
