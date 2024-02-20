@@ -12,8 +12,8 @@ import Profile from "../pages/Profile";
 import Schedule from "../pages/Schedule";
 import Settings from "../pages/Settings";
 
-// const socket = io('http://localhost:4000');
-const socket = io('https://whale-app-osu76.ondigitalocean.app');
+const socket = io('http://localhost:4000');
+// const socket = io('https://whale-app-osu76.ondigitalocean.app');
 
 
 const AppRouter = () => {

@@ -36,6 +36,10 @@ export default function Header({ current, socket }) {
     setNotifications(null);
   };
 
+  const acceptNotification = () => {
+    
+  }
+
   useEffect(() => {
     const tmp = JSON.parse(localStorage.getItem("authUser")).user;
     if (
@@ -50,8 +54,8 @@ export default function Header({ current, socket }) {
 
   useEffect(() => {
     socket.on("challengeResponse", (data) => {
-      data.user === user?.username && setNotifications(data.message);
-      console.log("Socket-notification-->>>", notifications);
+      data.user === user?.username && setNotifications(data.challenger);
+      console.log("Socket-notification-->>>", notifications, '::::', data);
     });
   }, [socket, user, notifications]);
 

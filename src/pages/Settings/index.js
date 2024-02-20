@@ -8,12 +8,18 @@ import CustomInputComponent from "../../components/Input";
 import { Button } from "../../components/Button";
 import http from "../../utility/http-client";
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Settings = ({socket}) => {
   const [userAvatar, setUserAvatar] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState({});
   const [userid, setUserid] = useState(null);
+
+  const notify = (message) => {
+    toast(message);
+  }
 
   useEffect(() => {
     const tmp = JSON.parse(localStorage.getItem("authUser")).user;
@@ -37,6 +43,7 @@ const Settings = ({socket}) => {
       setUserAvatar(res.data.url);
     } catch (err) {
       console.log("Avatar-err-->>", err);
+      notify(err);
     } finally {
       setIsLoading(false);
     }
@@ -59,8 +66,10 @@ const Settings = ({socket}) => {
       localStorage.removeItem("authUser");
       localStorage.setItem("authUser", JSON.stringify(newUser));
       console.log("Update-res-->>>", res.data.data.updatedUser);
+      notify('Success!')
     } catch (err) {
       console.log("Update-err-->>", err);
+      notify('Error!')
     } finally {
       setIsLoading(false);
     }
@@ -332,6 +341,7 @@ const Settings = ({socket}) => {
                   Save
                 </Button>
               </div>
+              <ToastContainer />
             </form>
           </div>
         </div>

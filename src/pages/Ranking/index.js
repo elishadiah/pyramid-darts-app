@@ -186,6 +186,7 @@ const Ranking = ({ socket }) => {
                   key={index}
                   uuid={item._id}
                   username={item.username}
+                  email={item.email}
                   score={0}
                   sendQuickFight={sendQuickFight}
                 >

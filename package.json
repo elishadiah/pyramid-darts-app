@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@aldabil/react-scheduler": "^2.8.2",
+    "@emailjs/browser": "^4.1.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@headlessui/react": "^1.7.18",
@@ -31,6 +32,7 @@
     "react-router": "^6.21.3",
     "react-scripts": "5.0.1",
     "react-slick": "^0.30.1",
+    "react-toastify": "^10.0.4",
     "react-toggle-dark-mode": "^1.1.1",
     "scheduler": "^0.23.0",
     "slick-carousel": "^1.8.1",

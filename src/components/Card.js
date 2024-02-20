@@ -2,8 +2,9 @@ import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { DateObject, Calendar } from "react-multi-date-picker";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
+import emailjs from "@emailjs/browser";
 
-const Card = ({ username, score, uuid, sendQuickFight, children }) => {
+const Card = ({ username, score, uuid, email, sendQuickFight, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
@@ -20,8 +21,32 @@ const Card = ({ username, score, uuid, sendQuickFight, children }) => {
 
   const sendQuick = () => {
     sendQuickFight(username, user.username);
-    window.open("https://lidarts.org/game/create?opponent_name=LidartsAccountname", "_blank");
-  }
+    emailjs
+      .send(
+        "service_e37gjno",
+        "template_c69m2ru",
+        {
+          from_name: user.username,
+          from_email: user.email,
+          to_email: email,
+          to_name: username,
+          subject: "Dart Challenge",
+          message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge.`,
+        },
+        { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
+      )
+      .then(
+        function (response) {
+          console.log("Email sent successfully!", response);
+          // Handle success
+        },
+        function (error) {
+          console.error("Email sending failed:", error);
+          // Handle error
+        }
+      );
+    window.open(`https://lidarts.org/game/create?opponent_name=${username}`, "_blank");
+  };
 
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("authUser")).user);
