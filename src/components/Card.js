@@ -3,8 +3,10 @@ import { Dialog, Transition } from "@headlessui/react";
 import { DateObject, Calendar } from "react-multi-date-picker";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import emailjs from "@emailjs/browser";
+import { useNavigate } from "react-router-dom";
 
 const Card = ({ username, score, uuid, email, sendQuickFight, children }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
@@ -46,6 +48,7 @@ const Card = ({ username, score, uuid, email, sendQuickFight, children }) => {
         }
       );
     window.open(`https://lidarts.org/game/create?opponent_name=${username}`, "_blank");
+    navigate("/result");
   };
 
   useEffect(() => {

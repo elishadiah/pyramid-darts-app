@@ -11,6 +11,7 @@ import Infos from "../pages/Infos";
 import Profile from "../pages/Profile";
 import Schedule from "../pages/Schedule";
 import Settings from "../pages/Settings";
+import Result from "../pages/Result";
 
 // const socket = io('http://localhost:4000');
 const socket = io('https://whale-app-osu76.ondigitalocean.app');
@@ -29,6 +30,7 @@ const AppRouter = () => {
         <Route path="/schedule" element={<Schedule socket={socket} />} />
         <Route path="/settings" element={<Settings socket={socket} />} />
         <Route path="/ranking" element={<Ranking socket={socket} />} />
+        <Route path="/result" element={<Result socket={socket} />} />
       </Route>
     </Routes>
   );
