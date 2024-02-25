@@ -1,9 +1,8 @@
 import { useState } from "react";
-// import http from "../../utility/http-client";
+import http from "../../utility/http-client";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 
 const Result = () => {
   const navigate = useNavigate();
@@ -13,27 +12,23 @@ const Result = () => {
   const [totalResult, setTotalResult] = useState(null);
   const [userResult, setUserResult] = useState(null);
 
-  const cheerio = require("cheerio");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await axios.get(resultUrl);
-      const $ = cheerio.load(res.data);
-      // const res = await http.post("/result/get", {
-      //   url: resultUrl,
-      // });
-      console.log("Result-->>>", $, ':::', res.data);
-      // setAllResult(res.data.allResult);
-      // setTotalResult(res.data.totalResult);
-      // setUserResult(res.data.userResult);
+      const res = await http.post("/result/get", {
+        url: resultUrl,
+      });
+      console.log("Result-->>>", res.data);
+      setAllResult(res.data.allResult);
+      setTotalResult(res.data.totalResult);
+      setUserResult(res.data.userResult);
       toast("Erhalten Sie die Spielergebnisse erfolgreich.");
     } catch (err) {
       console.log(err);
-      // setAllResult(null);
-      // setTotalResult(null);
-      // setUserResult(null);
+      setAllResult(null);
+      setTotalResult(null);
+      setUserResult(null);
       toast("Beim Abrufen der Match-Ergebnisse ist ein Fehler aufgetreten.");
     } finally {
       setIsLoading(false);
