@@ -3,7 +3,8 @@ import authService from "../services/auth.service";
 
 const instance = axios.create({
   // baseURL: "http://localhost:4000",
-  baseURL: "https://whale-app-osu76.ondigitalocean.app",
+  // baseURL: "https://whale-app-osu76.ondigitalocean.app",
+  baseURL: "http://64.23.220.240:4000",
 });
 
 instance.interceptors.request.use(
