@@ -14,8 +14,8 @@ import Settings from "../pages/Settings";
 import Result from "../pages/Result";
 
 // const socket = io('http://localhost:4000');
-const socket = io('https://whale-app-osu76.ondigitalocean.app');
-// const socket = io('http://64.23.220.240:4000');
+// const socket = io('https://whale-app-osu76.ondigitalocean.app');
+const socket = io('https://backend.dartsfightclub.de');
 
 
 const AppRouter = () => {
