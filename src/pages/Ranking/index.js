@@ -7,21 +7,12 @@ const Ranking = ({ socket }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [players, setPlayers] = useState([]);
 
-  const sendQuickFight = (username, challenger) => {
-    socket.emit("challenge", { receiver: username, challenger });
+  const sendQuickFight = (username, challenger, challengerEmail) => {
+    socket.emit("challenge", { receiver: username, challenger, challengerEmail });
   };
 
   useEffect(() => {
     setIsLoading(true);
-    // http
-    //   .get("/auth/get")
-    //   .then((res) => {
-    //     console.log("Users--->>>>>", res.data.user);
-    //     setPlayers(res.data.user);
-    //   })
-    //   .catch((err) => console.log(err))
-    //   .finally(() => setIsLoading(false));
-
     http
       .get("/result/fetch-all")
       .then((res) => {
@@ -67,7 +58,6 @@ const Ranking = ({ socket }) => {
                         uuid={user._id}
                         username={user.username}
                         email={user.email}
-                        score={0}
                         sendQuickFight={sendQuickFight}
                       >
                         <img

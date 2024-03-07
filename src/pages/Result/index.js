@@ -79,6 +79,9 @@ const Result = ({ socket }) => {
   const storeResult = async (data) => {
     try {
       await http.post("/result/post", data);
+      toast(
+        `Die Spielergebnisse von ${data.username} wurden erfolgreich gespeichert`
+      );
     } catch (err) {
       toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
     }
@@ -160,35 +163,118 @@ const Result = ({ socket }) => {
       user2_cnt26 = 0,
       user1_cntHigh = [],
       user2_cntHigh = [];
+
     const highMarks = [170, 167, 164, 161, 160, 158];
     for (let i = 157; i > 100; i--) {
       highMarks.push(i);
     }
 
-    detailResult.map((item) => {
-      item.subResult.map((val, index) => {
-        index % 4 < 1
-          ? user1.push(Number(val))
-          : index % 4 > 2 && user2.push(Number(val));
+    // init result clone
+    let user1Init = [
+      ...initResult.filter((val) => val.username === userResult[0]),
+    ][0];
+    let user2Init = [
+      ...initResult.filter((val) => val.username === userResult[1]),
+    ][0];
+
+    detailResult &&
+      detailResult.map((item) => {
+        item.subResult.map((val, index) => {
+          index % 4 < 1
+            ? user1.push(Number(val))
+            : index % 4 > 2 && user2.push(Number(val));
+          return true;
+        });
         return true;
       });
-      return true;
-    });
 
+    let user1Update = { ...user1Init },
+      user2Update = { ...user2Init };
+
+    // 26 master calculate
     user1_cnt26 = user1.filter((val) => val === 26).length;
     user2_cnt26 = user2.filter((val) => val === 26).length;
-
+    // high finish
     user1_cntHigh = getHighFinish(user1, highMarks);
     user2_cntHigh = getHighFinish(user2, highMarks);
 
-    console.log(
-      "Test---->>>",
-      user1,
-      "::user1-->>",
-      user1_cntHigh,
-      "::user2-->>",
-      user2_cntHigh
-    );
+    // result update
+    user1Update = {
+      ...user1Update,
+      master26: user1Init.master26 + user1_cnt26,
+      highFinish:
+        user1Init.highFinish.length === 0
+          ? user1_cntHigh
+          : user1Init.highFinish.map(
+              (val, index) => val + user1_cntHigh[index]
+            ),
+      currentVictoryStreak:
+        totalResult[0] > totalResult[1]
+          ? user1Init.previousWin === true
+            ? user1Init.currentVictoryStreak + 1
+            : 1
+          : 0,
+      previousWin: totalResult[0] > totalResult[1] ? true : false,
+      totalWinNo:
+        totalResult[0] > totalResult[1]
+          ? user1Init.totalWinNo + 1
+          : user1Init.totalWinNo,
+      level:
+        user1Init.level > user2Init.level
+          ? totalResult[0] < totalResult[1]
+            ? user1Init.level - 1
+            : user1Init.level
+          : totalResult[0] > totalResult[1]
+          ? user1Init.level + 1
+          : user1Init.level,
+    };
+    user1Update = {
+      ...user1Update,
+      maxVictoryStreak:
+        user1Update.currentVictoryStreak > user1Init.maxVictoryStreak
+          ? user1Update.currentVictoryStreak
+          : user1Init.maxVictoryStreak,
+    };
+    storeResult(user1Update);
+    user2Update = {
+      ...user2Update,
+      master26: user2Init.master26 + user2_cnt26,
+      highFinish:
+        user2Init.highFinish.length === 0
+          ? user2_cntHigh
+          : user2Init.highFinish.map(
+              (val, index) => val + user2_cntHigh[index]
+            ),
+      currentVictoryStreak:
+        totalResult[0] < totalResult[1]
+          ? user2Init.previousWin === true
+            ? user2Init.currentVictoryStreak + 1
+            : 1
+          : 0,
+      previousWin: totalResult[0] < totalResult[1] ? true : false,
+      totalWinNo:
+        totalResult[0] < totalResult[1]
+          ? user2Init.totalWinNo + 1
+          : user2Init.totalWinNo,
+      level:
+        user1Init.level < user2Init.level
+          ? totalResult[0] > totalResult[1]
+            ? user2Init.level - 1
+            : user2Init.level
+          : totalResult[0] < totalResult[1]
+          ? user2Init.level + 1
+          : user2Init.level,
+    };
+    user2Update = {
+      ...user2Update,
+      maxVictoryStreak:
+        user2Update.currentVictoryStreak > user2Init.maxVictoryStreak
+          ? user2Update.currentVictoryStreak
+          : user2Init.maxVictoryStreak,
+    };
+    storeResult(user2Update);
+
+    console.log("::user1-->>", user1Update, "::user2-->>", user2Update);
   };
 
   const onChange = (e) => {

@@ -5,6 +5,8 @@ import { Link, redirect } from "react-router-dom";
 import Switcher from "./Switcher";
 import logoImg from "../assets/img/fc_logo.png";
 import authService from "../services/auth.service";
+import emailjs from "@emailjs/browser";
+import { useNavigate } from "react-router-dom";
 
 const navigation = [
   { name: "Home", to: "/", current: 1 },
@@ -23,6 +25,7 @@ function classNames(...classes) {
 }
 
 export default function Header({ current, socket }) {
+  const navigate = useNavigate();
   const [userAvatar, setUserAvatar] = useState(null);
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState(null);
@@ -34,11 +37,36 @@ export default function Header({ current, socket }) {
 
   const removeNotification = () => {
     setNotifications(null);
+    emailjs
+      .send(
+        "service_e37gjno",
+        "template_c69m2ru",
+        {
+          from_name: user.username,
+          from_email: user.email,
+          to_email: notifications.email,
+          to_name: notifications.username,
+          subject: "Dart Challenge",
+          message: `${user.username} declined your challenge.`,
+        },
+        { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
+      )
+      .then(
+        function (response) {
+          console.log("Email sent successfully!", response);
+          // Handle success
+        },
+        function (error) {
+          console.error("Email sending failed:", error);
+          // Handle error
+        }
+      );
   };
 
   const acceptNotification = () => {
-    
-  }
+    window.open(`https://lidarts.org/`, "_blank");
+    navigate("/result");
+  };
 
   useEffect(() => {
     const tmp = JSON.parse(localStorage.getItem("authUser")).user;
@@ -54,8 +82,8 @@ export default function Header({ current, socket }) {
 
   useEffect(() => {
     socket.on("challengeResponse", (data) => {
-      data.user === user?.username && setNotifications(data.challenger);
-      console.log("Socket-notification-->>>", notifications, '::::', data);
+      data.user === user?.username && setNotifications({username: data.challenger, email: data.challengerEmail});
+      console.log("Socket-notification-->>>", notifications, "::::", data);
     });
   }, [socket, user, notifications]);
 
@@ -135,9 +163,12 @@ export default function Header({ current, socket }) {
                                   "block px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                 )}
                               >
-                                <p className="mb-4">{notifications}</p>
+                                <p className="mb-4">{notifications.username} hat Ihnen eine Herausforderung geschickt</p>
                                 <div className="flex gap-2 justify-center">
-                                  <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none">
+                                  <Disclosure.Button
+                                    className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
+                                    onClick={acceptNotification}
+                                  >
                                     <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
                                       Accept
                                     </p>

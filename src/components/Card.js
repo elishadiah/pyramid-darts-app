@@ -5,7 +5,7 @@ import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import emailjs from "@emailjs/browser";
 import { useNavigate } from "react-router-dom";
 
-const Card = ({ username, score, uuid, email, sendQuickFight, children }) => {
+const Card = ({ username, email, sendQuickFight, children }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
@@ -22,7 +22,7 @@ const Card = ({ username, score, uuid, email, sendQuickFight, children }) => {
   };
 
   const sendQuick = () => {
-    sendQuickFight(username, user.username);
+    sendQuickFight(username, user.username, email);
     emailjs
       .send(
         "service_e37gjno",
@@ -60,15 +60,14 @@ const Card = ({ username, score, uuid, email, sendQuickFight, children }) => {
       <div className="group relative flex shadow">
         {children}
         <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-10 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
-          <div className="flex flex-col h-20 p-4">
+          <div className="flex flex-col h-16 p-4">
             <p className="font-bold text-xl">{username}</p>
-            <p className="font-normal text-lg">score: {score}</p>
           </div>
           <div className="flex items-center justify-center divide-x divide-gray-900 dark:divide-gray-200 dark:divide-gray-900">
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={uuid === user._id}
+                disabled={username === user.username}
                 onClick={sendQuick}
               >
                 Quick Fight
@@ -77,7 +76,7 @@ const Card = ({ username, score, uuid, email, sendQuickFight, children }) => {
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={uuid === user._id}
+                disabled={username === user.username}
                 onClick={openModal}
               >
                 Scheduled Fight
