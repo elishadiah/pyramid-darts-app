@@ -10,17 +10,19 @@ import CustomInputComponent from "../../components/Input";
 import authService from "../../services/auth.service";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import http from "../../utility/http-client";
 
 const Register = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [authData, setAuthData] = useState({
     username: "",
     email: "",
     password: "",
     firstname: "",
     lastname: "",
-    avatar: "",
+    avatar: null,
   });
 
   const notify = (message) => {
@@ -30,10 +32,10 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (authData.password !== authData.password2) {
-      notify('Passwords must match!');
-      return ;
+      notify("Passwords must match!");
+      return;
     }
-    console.log('Register--test-->>', authData)
+    console.log("Register--test-->>", authData);
     setIsLoading(true);
     authService
       .register(authData)
@@ -43,6 +45,21 @@ const Register = () => {
         notify(err.data.message);
       })
       .finally(() => setIsLoading(false));
+  };
+
+  const handleAvatarUpload = async (e) => {
+    setIsAvatarLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("avatar", e.target.files[0]);
+      const res = await http.post("/avatar/upload", formData);
+      setAuthData({ ...authData, avatar: res.data.url });
+    } catch (err) {
+      console.log("Avatar-err-->>", err);
+      notify(err);
+    } finally {
+      setIsAvatarLoading(false);
+    }
   };
 
   const onChange = (payload) => {
@@ -66,6 +83,55 @@ const Register = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
           <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
             <form className="space-y-6" onSubmit={handleSubmit}>
+              {isAvatarLoading ? (
+                <div className="col-span-full flex items-center justify-center gap-x-8">
+                  <div
+                    className="inline-block h-8 w-8 animate-spin text-green-600 dark:text-white rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                    role="status"
+                  >
+                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                      Loading...
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="col-span-full flex items-center gap-x-8">
+                  {authData.avatar === null ? (
+                    <img
+                      src="https://www.f-cdn.com/assets/main/en/assets/unknown.png?image-optimizer=force&format=webply&width=336 1x"
+                      alt=""
+                      className="h-24 w-24 flex-none rounded-lg dark:bg-gray-800 object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={authData.avatar}
+                      alt=""
+                      className="h-24 w-24 flex-none rounded-lg dark:bg-gray-800 object-cover"
+                    />
+                  )}
+                  <div>
+                    <label
+                      htmlFor="avatar-upload"
+                      className="rounded-md bg-green-600 text-white cursor-pointer px-3 py-1.5 hover:bg-green-500"
+                    >
+                      Avatar ändern
+                      <input
+                        type="file"
+                        name="avatar-upload"
+                        id="avatar-upload"
+                        className="hidden"
+                        accept=".png, .jpb, .jpeg"
+                        onChange={handleAvatarUpload}
+                      />
+                    </label>
+
+                    <p className="mt-2 text-xs leading-5 text-gray-600 dark:text-gray-400">
+                      JPG, GIF or PNG. 1MB max.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <CustomInputComponent
                 name="username"
                 type="text"
@@ -184,6 +250,15 @@ const Register = () => {
               </div>
               <ToastContainer />
             </form>
+            <div className="font-normal text-md text-gray-900 dark:text-white">
+              Already have an account?{" "}
+              <span
+                className="text-green-700 font-semibold cursor-pointer select-none hover:underline"
+                onClick={() => navigate("/login")}
+              >
+                Log in
+              </span>
+            </div>
           </div>
         </div>
       </div>

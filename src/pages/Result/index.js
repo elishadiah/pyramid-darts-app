@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import http from "../../utility/http-client";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
@@ -18,6 +18,10 @@ const Result = ({ socket }) => {
   const [detailResult, setDetailResult] = useState(null);
   const [initResult, setInitResult] = useState(null);
 
+  useEffect(() => {
+    userResult && fetchResult();
+  }, [userResult]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -32,21 +36,11 @@ const Result = ({ socket }) => {
       let matchDate = new Date(
         res.data.allResult[0].split(" ")[2].split(".").reverse().join("-")
       );
-      let winnerUser, winnerResult, lostUser, lostResult;
-      if (res.data.totalResult[0] > res.data.totalResult[1]) {
-        winnerUser = res.data.userResult[0];
-        winnerResult = res.data.totalResult[0];
-        lostUser = res.data.userResult[1];
-        lostResult = res.data.totalResult[1];
-      } else {
-        winnerUser = res.data.userResult[1];
-        winnerResult = res.data.totalResult[1];
-        lostUser = res.data.userResult[0];
-        lostResult = res.data.totalResult[0];
-      }
 
       let matchNo = [
-        ...Array(Number(winnerResult) + Number(lostResult)).keys(),
+        ...Array(
+          Number(res.data.totalResult[0]) + Number(res.data.totalResult[1])
+        ).keys(),
       ];
 
       let details =
@@ -63,46 +57,6 @@ const Result = ({ socket }) => {
         lDetails.push(details[i + 2]);
         i += 3;
       }
-
-      const data = {
-        date: new Date(matchDate),
-        winner: {
-          username: winnerUser,
-          result: winnerResult,
-          avg: wDetails[0],
-          firstAvg: wDetails[1],
-          doubles: wDetails[2],
-          highestFinish: wDetails[3],
-          shortestLeg: wDetails[4],
-          max: wDetails[5],
-          plus171: wDetails[6],
-          plus140: wDetails[7],
-          plus100: wDetails[8],
-          plus80: wDetails[9],
-          plus60: wDetails[10],
-          plus40: wDetails[11],
-          plus20: wDetails[12],
-          minus20: wDetails[13],
-        },
-        lost: {
-          username: lostUser,
-          result: lostResult,
-          avg: lDetails[0],
-          firstAvg: lDetails[1],
-          doubles: lDetails[2],
-          highestFinish: lDetails[3],
-          shortestLeg: lDetails[4],
-          max: lDetails[5],
-          plus171: lDetails[6],
-          plus140: lDetails[7],
-          plus100: lDetails[8],
-          plus80: lDetails[9],
-          plus60: lDetails[10],
-          plus40: lDetails[11],
-          plus20: lDetails[12],
-          minus20: lDetails[13],
-        },
-      };
 
       getDetailResult(matchNo);
 
@@ -127,6 +81,29 @@ const Result = ({ socket }) => {
       await http.post("/result/post", data);
     } catch (err) {
       toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
+    }
+  };
+
+  const fetchResult = async () => {
+    setIsInitLoading(true);
+    let temp = [];
+    try {
+      await Promise.all(
+        userResult.map(async (val) => {
+          const res = await http.post("/result/fetch", {
+            username: val.trim(),
+          });
+          temp.push(res.data);
+        })
+      );
+      setInitResult(temp);
+
+      console.log("--------Init--result-------", temp);
+    } catch (err) {
+      setInitResult(null);
+      console.log("-------Init--err---", err);
+    } finally {
+      setIsInitLoading(false);
     }
   };
 
@@ -174,15 +151,6 @@ const Result = ({ socket }) => {
 
     return counts;
   };
-
-  const fetchResult = async (username) => {
-    try {
-      const res = await http.post("/result/fetch", { username: username.trim() });
-      console.log("fetch-result--1-->>>", res.data);
-    } catch (err) {
-      toast(err);
-    }
-  }
 
   const onSave = async (e) => {
     e.preventDefault();
@@ -257,12 +225,25 @@ const Result = ({ socket }) => {
             >
               Laden
             </button>
-            <button
-              onClick={onSave}
-              className="flex-1 bg-green-600 text-white p-2 rounded-md font-semibold text-lg"
-            >
-              Speichern
-            </button>
+            {isInitLoading ? (
+              <div className="col-span-full flex flex-1 items-center justify-center gap-x-8">
+                <div
+                  className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                  role="status"
+                >
+                  <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                    Loading...
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={onSave}
+                className="flex-1 bg-green-600 text-white p-2 rounded-md font-semibold text-lg"
+              >
+                Speichern
+              </button>
+            )}
           </div>
         </form>
 
@@ -340,7 +321,7 @@ const Result = ({ socket }) => {
             <Loading />
           </div>
         ) : (
-          detailResult && <div>Detail</div>
+          detailResult && <div></div>
         )}
 
         <ToastContainer />
