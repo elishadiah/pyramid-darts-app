@@ -5,11 +5,17 @@ import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import emailjs from "@emailjs/browser";
 import { useNavigate } from "react-router-dom";
 
-const Card = ({ username, email, sendQuickFight, children }) => {
+const Card = ({ username, available, email, sendQuickFight, children }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
+
+  console.log(`${username} Available-->>`, available);
+
+  useEffect(() => {
+    setUser(JSON.parse(localStorage.getItem("authUser")).user);
+  }, []);
 
   const closeModal = () => {
     setIsOpen(false);
@@ -51,10 +57,6 @@ const Card = ({ username, email, sendQuickFight, children }) => {
     navigate("/result");
   };
 
-  useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("authUser")).user);
-  }, []);
-
   return (
     <>
       <div className="group relative flex shadow">
@@ -67,7 +69,7 @@ const Card = ({ username, email, sendQuickFight, children }) => {
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={username === user.username}
+                disabled={!available}
                 onClick={sendQuick}
               >
                 Quick Fight
@@ -76,7 +78,7 @@ const Card = ({ username, email, sendQuickFight, children }) => {
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={username === user.username}
+                disabled={!available}
                 onClick={openModal}
               >
                 Scheduled Fight

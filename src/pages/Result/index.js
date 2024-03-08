@@ -82,6 +82,7 @@ const Result = ({ socket }) => {
       toast(
         `Die Spielergebnisse von ${data.username} wurden erfolgreich gespeichert`
       );
+      navigate("/ranking");
     } catch (err) {
       toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
     }
@@ -326,6 +327,7 @@ const Result = ({ socket }) => {
               <button
                 onClick={onSave}
                 className="flex-1 bg-green-600 text-white p-2 rounded-md font-semibold text-lg"
+                disabled={isDetailLoading ? true : false}
               >
                 Speichern
               </button>
@@ -369,6 +371,14 @@ const Result = ({ socket }) => {
           )
         )}
 
+        {isDetailLoading ? (
+          <div className="my-4">
+            <Loading />
+          </div>
+        ) : (
+          detailResult && <div></div>
+        )}
+
         {isLoading ? (
           <div className="my-4">
             <Loading />
@@ -400,14 +410,6 @@ const Result = ({ socket }) => {
               )}
             </div>
           )
-        )}
-
-        {isDetailLoading ? (
-          <div className="my-4">
-            <Loading />
-          </div>
-        ) : (
-          detailResult && <div></div>
         )}
 
         <ToastContainer />

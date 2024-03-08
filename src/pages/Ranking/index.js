@@ -6,12 +6,33 @@ import http from "../../utility/http-client";
 const Ranking = ({ socket }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [players, setPlayers] = useState([]);
+  const [rowNo, setRowNo] = useState([]);
+  const [currentLevel, setCurrentLevel] = useState(0);
 
   const sendQuickFight = (username, challenger, challengerEmail) => {
-    socket.emit("challenge", { receiver: username, challenger, challengerEmail });
+    socket.emit("challenge", {
+      receiver: username,
+      challenger,
+      challengerEmail,
+    });
+  };
+
+  const isAvailable = (level) => {
+    console.log("+++++++++++++", currentLevel, ":::", level);
+    if (currentLevel > level) return false;
+    else if (currentLevel === level) {
+      if (rowNo[rowNo.length - 1] < 4) {
+        if (currentLevel !== rowNo.length)
+          if (rowNo[currentLevel] - rowNo[currentLevel + 1] > 1) return true;
+          else return false;
+        else return false;
+      } else return false;
+    } else if (currentLevel + 1 === level) return true;
+    else return false;
   };
 
   useEffect(() => {
+    console.log("Socket-id-->>", socket.id);
     setIsLoading(true);
     http
       .get("/result/fetch-all")
@@ -23,8 +44,11 @@ const Ranking = ({ socket }) => {
             levels[level] = [];
           }
           levels[level].push(element);
+          JSON.parse(localStorage.getItem("authUser")).user.username ===
+            element.username && setCurrentLevel(element.level);
         });
         setPlayers(levels.reverse());
+        setRowNo(levels.map((val) => val.length));
         console.log("Result-->>>", levels);
       })
       .catch((err) => console.log("Res---err--->>", err))
@@ -48,7 +72,7 @@ const Ranking = ({ socket }) => {
               </div>
             </div>
           ) : (
-            <div >
+            <div>
               {players.map((levelUsers, index) => (
                 <div key={index}>
                   <div className="flex flex-wrap space-x-4 py-4">
@@ -58,6 +82,7 @@ const Ranking = ({ socket }) => {
                         uuid={user._id}
                         username={user.username}
                         email={user.email}
+                        available={isAvailable(user.level)}
                         sendQuickFight={sendQuickFight}
                       >
                         <img
