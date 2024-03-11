@@ -1,9 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Route, Routes } from "react-router-dom";
-import io from "socket.io-client";
+import socketIO from "socket.io-client";
 import AuthGuard from "../utility/ProtectedRoute";
-import { jwtDecode } from "jwt-decode";
-import authService from "../services/auth.service";
 
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -15,23 +13,13 @@ import Schedule from "../pages/Schedule";
 import Settings from "../pages/Settings";
 import Result from "../pages/Result";
 
-// const socket = io("http://localhost:4000");
-// const socket = io('https://whale-app-osu76.ondigitalocean.app');
-const socket = io('https://backend.dartsfightclub.de');
+const socket = socketIO.connect("http://localhost:4000");
+// const socket = socketIO('https://backend.dartsfightclub.de');
 
 const AppRouter = () => {
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("authUser"));
-    if (user) {
-      const decodedJwt = jwtDecode(user.token);
-      if (decodedJwt.exp * 1000 < Date.now()) {
-        authService.logout();
-      }
-    }
-  }, []);
   return (
     <Routes>
-      <Route exact path="/login" element={<Login />} />
+      <Route exact path="/login" element={<Login socket={socket} />} />
       <Route path="/register" element={<Register />} />
       <Route element={<AuthGuard />}>
         <Route path="/home" element={<Home socket={socket} />} />

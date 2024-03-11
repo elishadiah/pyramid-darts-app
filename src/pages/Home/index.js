@@ -1,6 +1,8 @@
 import Header from "../../components/Header";
 import logoImg from "../../assets/img/fc_logo.png";
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import authService from "../../services/auth.service";
 
 const Home = ({ socket }) => {
   const texts = [
@@ -95,6 +97,8 @@ const Home = ({ socket }) => {
     },
   ];
 
+  const [users, setUsers] = useState([]);
+
   const getRandomInt = (min, max) => {
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
@@ -105,7 +109,21 @@ const Home = ({ socket }) => {
 
   useEffect(() => {
     setQuote(texts[getRandomInt(0, texts.length)]);
+    const user = JSON.parse(localStorage.getItem("authUser"));
+    if (user) {
+      const decodedJwt = jwtDecode(user.token);
+      if (decodedJwt.exp * 1000 < Date.now()) {
+        authService.logout();
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    socket.on("statusUpdate", (res) => {
+      setUsers(res)
+      console.log('--status-->>', res);
+    })
+  }, [socket, users])
 
   return (
     <div className="relative sm:pb-24 text-gray-900 dark:text-gray-100 dark:bg-gray-800 h-screen">
@@ -124,6 +142,7 @@ const Home = ({ socket }) => {
           </div>
         </div>
       </div>
+      {users.map(val => <p>{val.username}</p>)}
     </div>
   );
 };

@@ -2,9 +2,9 @@ import axios from "axios";
 import authService from "../services/auth.service";
 
 const instance = axios.create({
-  // baseURL: "http://localhost:4000",
+  baseURL: "http://localhost:4000",
   // baseURL: "https://whale-app-osu76.ondigitalocean.app",
-  baseURL: "https://backend.dartsfightclub.de",
+  // baseURL: "https://backend.dartsfightclub.de",
 });
 
 instance.interceptors.request.use(

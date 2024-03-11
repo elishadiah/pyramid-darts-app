@@ -3,6 +3,8 @@ import http from "../../utility/http-client";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
 import Header from "../../components/Header";
+import AchievementImages from "../../utility/images";
+import AchievementVariables from "../../utility/variables";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -156,6 +158,101 @@ const Result = ({ socket }) => {
     return counts;
   };
 
+  const handleAcievement = (data) => {
+    console.log(
+      "Achievement-->>",
+      data.master26,
+      ":::-->>",
+      AchievementVariables.STREAK.find(
+        (val) => Number(val) === Number(data.maxVictoryStreak)
+      )
+    );
+    AchievementVariables.STREAK.find(
+      (val) => Number(val) === Number(data.maxVictoryStreak)
+    ) &&
+      toast(
+        <div className="flex">
+          <span>
+            <img
+              className="w-10"
+              src={
+                AchievementImages.STREAK[
+                  AchievementVariables.STREAK.findIndex(
+                    (val) => val === Number(data.maxVictoryStreak)
+                  )
+                ]
+              }
+              alt="achievement-icon"
+            />
+          </span>
+          {`Glückwunsch! ${data.maxVictoryStreak} Siege in Folge erzielt.`}
+        </div>
+      );
+    AchievementVariables.BREAKFAST.find(
+      (val) => val === Number(data.master26)
+    ) &&
+      toast(
+        <div className="flex">
+          <span>
+            <img
+              className="w-10"
+              src={
+                AchievementImages.BREAKFAST[
+                  AchievementVariables.BREAKFAST.findIndex(
+                    (val) => val === Number(data.master26)
+                  )
+                ]
+              }
+              alt="achievement-icon"
+            />
+          </span>
+          {`Glückwunsch! ${data.master26} Frühstücke erreicht.`}
+        </div>
+      );
+    AchievementVariables.FRIENDLYCHALLENGER.find(
+      (val) => val === Number(data.sentTotalChallengeNo)
+    ) &&
+      toast(
+        <div className="flex">
+          <span>
+            <img
+              className="w-10"
+              src={
+                AchievementImages.FRIENDLY_CHALLENGER[
+                  AchievementVariables.FRIENDLYCHALLENGER.findIndex(
+                    (val) => val === Number(data.sentTotalChallengeNo)
+                  )
+                ]
+              }
+              alt="achievement-icon"
+            />
+          </span>
+          {`Glückwunsch! Es wurden ${data.maxVictoryStreak} Herausforderungen gesendet.`}
+        </div>
+      );
+    const highIndex = data.highFinish.reduce((acc, element, index) => {
+      if (Number(element) !== 0) {
+        acc.push(index);
+      }
+      return acc;
+    }, []);
+    highIndex.map((val) => {
+      toast(
+        <div className="flex">
+          <span>
+            <img
+              className="w-24"
+              src={AchievementImages.FINISHINGACE[val]}
+              alt="achievement-icon"
+            />
+          </span>
+          {`Glückwunsch! Sie haben ein Finishing-Ace von ${AchievementVariables.FINISHINGACE[val]} erreicht.`}
+        </div>
+      );
+      return true;
+    });
+  };
+
   const onSave = async (e) => {
     e.preventDefault();
     let user1 = [],
@@ -235,8 +332,9 @@ const Result = ({ socket }) => {
         user1Update.currentVictoryStreak > user1Init.maxVictoryStreak
           ? user1Update.currentVictoryStreak
           : user1Init.maxVictoryStreak,
+      sentTotalChallengeNo: user1Init.sentTotalChallengeNo,
     };
-    storeResult(user1Update);
+    // storeResult(user1Update); // save user1 - challenger result
     user2Update = {
       ...user2Update,
       master26: user2Init.master26 + user2_cnt26,
@@ -273,7 +371,13 @@ const Result = ({ socket }) => {
           ? user2Update.currentVictoryStreak
           : user2Init.maxVictoryStreak,
     };
-    storeResult(user2Update);
+
+    const mainUser = JSON.parse(localStorage.getItem("authUser")).user;
+    userResult[0] === mainUser.username
+      ? handleAcievement(user1Update)
+      : handleAcievement(user2Update);
+
+    // storeResult(user2Update); // save user2-receiver result
 
     console.log("::user1-->>", user1Update, "::user2-->>", user2Update);
   };

@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/solid";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 import logoImg from "../../assets/img/fc_logo.png";
 import CustomInputComponent from "../../components/Input";
 import authService from "../../services/auth.service";
 import "react-toastify/dist/ReactToastify.css";
 
-const Login = () => {
+const Login = ({ socket }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [authData, setAuthData] = useState({
@@ -26,6 +26,7 @@ const Login = () => {
     authService
       .login(authData)
       .then((res) => {
+        socket.emit("new-user", {username: res.data.user.username, socketId: socket.id})
         navigate("/");
       })
       .catch((err) => {

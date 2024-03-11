@@ -11,8 +11,6 @@ const Card = ({ username, available, email, sendQuickFight, children }) => {
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
 
-  console.log(`${username} Available-->>`, available);
-
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("authUser")).user);
   }, []);

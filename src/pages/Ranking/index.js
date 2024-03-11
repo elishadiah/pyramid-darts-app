@@ -18,21 +18,17 @@ const Ranking = ({ socket }) => {
   };
 
   const isAvailable = (level) => {
-    console.log("+++++++++++++", currentLevel, ":::", level);
     if (currentLevel > level) return false;
     else if (currentLevel === level) {
-      if (rowNo[rowNo.length - 1] < 4) {
-        if (currentLevel !== rowNo.length)
-          if (rowNo[currentLevel] - rowNo[currentLevel + 1] > 1) return true;
-          else return false;
+      if (currentLevel !== rowNo.length)
+        if (rowNo[currentLevel] - rowNo[currentLevel + 1] > 1) return true;
         else return false;
-      } else return false;
+      else return false;
     } else if (currentLevel + 1 === level) return true;
     else return false;
   };
 
   useEffect(() => {
-    console.log("Socket-id-->>", socket.id);
     setIsLoading(true);
     http
       .get("/result/fetch-all")
