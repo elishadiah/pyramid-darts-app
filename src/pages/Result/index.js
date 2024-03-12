@@ -83,9 +83,6 @@ const Result = ({ socket }) => {
   const storeResult = async (data) => {
     try {
       await http.post("/result/post", data);
-      toast(
-        `Die Spielergebnisse von ${data.username} wurden erfolgreich gespeichert`
-      );
       navigate("/ranking");
     } catch (err) {
       toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
@@ -352,13 +349,23 @@ const Result = ({ socket }) => {
           user1Init.level === user2Init.level
             ? totalResult[0] < totalResult[1]
               ? user1Init.level
-              : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
+              : rowNo.length - user1Init.level - 1 === 0
+              ? user1Init.level + 1
+              : rowNo[rowNo.length - user1Init.level - 1] -
+                  rowNo[rowNo.length - user1Init.level - 2] >
+                2
               ? user1Init.level + 1
               : user1Init.level
             : totalResult[0] > totalResult[1]
             ? user2Init.level
             : user1Init.level,
       };
+      console.log(
+        "--***->>>",
+        rowNo[user1Init.level],
+        "::",
+        rowNo[user1Init.level + 1]
+      );
       user1Update = {
         ...user1Update,
         maxVictoryStreak:
@@ -392,7 +399,11 @@ const Result = ({ socket }) => {
           user1Init.level === user2Init.level
             ? totalResult[0] > totalResult[1]
               ? user2Init.level
-              : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
+              : rowNo.length - user1Init.level - 1 === 0
+              ? user2Init.level + 1
+              : rowNo[rowNo.length - user2Init.level - 1] -
+                  rowNo[rowNo.length - user2Init.level - 2] >
+                2
               ? user2Init.level + 1
               : user2Init.level
             : totalResult[0] > totalResult[1]
@@ -406,6 +417,8 @@ const Result = ({ socket }) => {
             ? user2Update.currentVictoryStreak
             : user2Init.maxVictoryStreak,
       };
+
+      console.log("User1-->>", user1Update, "::user2-->>", user2Update);
 
       const mainUser = JSON.parse(localStorage.getItem("authUser")).user;
       userResult[0] === mainUser.username
