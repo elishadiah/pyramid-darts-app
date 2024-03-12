@@ -113,6 +113,9 @@ const Result = ({ socket }) => {
       console.log("--------Init--result-------", temp);
     } catch (err) {
       setInitResult(null);
+      toast(
+        "Benutzername nicht gefunden. Spielergebnisse können nicht gespeichert werden."
+      );
       console.log("-------Init--err---", err);
     } finally {
       setIsInitLoading(false);
@@ -287,133 +290,137 @@ const Result = ({ socket }) => {
     }
 
     // init result clone
-    let user1Init = [
-      ...initResult.filter((val) => val.username === userResult[0]),
-    ][0];
-    let user2Init = [
-      ...initResult.filter((val) => val.username === userResult[1]),
-    ][0];
-
-    detailResult &&
-      detailResult.map((item) => {
-        item.subResult.map((val, index) => {
-          index % 4 < 1
-            ? user1.push(Number(val))
-            : index % 4 > 2 && user2.push(Number(val));
+    let user1Init, user2Init;
+    if (initResult) {
+      user1Init = [
+        ...initResult.filter((val) => val.username === userResult[0]),
+      ][0];
+      user2Init = [
+        ...initResult.filter((val) => val.username === userResult[1]),
+      ][0];
+      detailResult &&
+        detailResult.map((item) => {
+          item.subResult.map((val, index) => {
+            index % 4 < 1
+              ? user1.push(Number(val))
+              : index % 4 > 2 && user2.push(Number(val));
+            return true;
+          });
           return true;
         });
-        return true;
+
+      let user1Update = { ...user1Init },
+        user2Update = { ...user2Init };
+
+      // 26 master calculate
+      user1_cnt26 = user1.filter((val) => val === 26).length;
+      user2_cnt26 = user2.filter((val) => val === 26).length;
+      // high finish
+      user1_cntHigh = getHighFinish(user1, highMarks);
+      user2_cntHigh = getHighFinish(user2, highMarks);
+
+      // Pyramid rows number
+      const levels = [];
+      allInitResult.forEach((element) => {
+        const level = element.level;
+        if (!levels[level]) {
+          levels[level] = [];
+        }
+        levels[level].push(element);
       });
+      const rowNo = levels.reverse().map((val) => val.length);
 
-    let user1Update = { ...user1Init },
-      user2Update = { ...user2Init };
-
-    // 26 master calculate
-    user1_cnt26 = user1.filter((val) => val === 26).length;
-    user2_cnt26 = user2.filter((val) => val === 26).length;
-    // high finish
-    user1_cntHigh = getHighFinish(user1, highMarks);
-    user2_cntHigh = getHighFinish(user2, highMarks);
-
-    // Pyramid rows number
-    const levels = [];
-    allInitResult.forEach((element) => {
-      const level = element.level;
-      if (!levels[level]) {
-        levels[level] = [];
-      }
-      levels[level].push(element);
-    });
-    const rowNo = levels.reverse().map((val) => val.length);
-
-    // result update
-    user1Update = {
-      ...user1Update,
-      master26: user1Init.master26 + user1_cnt26,
-      highFinish:
-        user1Init.highFinish.length === 0
-          ? user1_cntHigh
-          : user1Init.highFinish.map(
-              (val, index) => val + user1_cntHigh[index]
-            ),
-      currentVictoryStreak:
-        totalResult[0] > totalResult[1]
-          ? user1Init.previousWin === true
-            ? user1Init.currentVictoryStreak + 1
-            : 1
-          : 0,
-      previousWin: totalResult[0] > totalResult[1] ? true : false,
-      totalWinNo:
-        totalResult[0] > totalResult[1]
-          ? user1Init.totalWinNo + 1
-          : user1Init.totalWinNo,
-      level:
-        user1Init.level === user2Init.level
-          ? totalResult[0] < totalResult[1]
-            ? user1Init.level
-            : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
-            ? user1Init.level + 1
-            : user1Init.level
-          : totalResult[0] > totalResult[1]
-          ? user2Init.level
-          : user1Init.level,
-    };
-    user1Update = {
-      ...user1Update,
-      maxVictoryStreak:
-        user1Update.currentVictoryStreak > user1Init.maxVictoryStreak
-          ? user1Update.currentVictoryStreak
-          : user1Init.maxVictoryStreak,
-      sentTotalChallengeNo: user1Init.sentTotalChallengeNo,
-    };
-    storeResult(user1Update); // save user1 - challenger result
-    user2Update = {
-      ...user2Update,
-      master26: user2Init.master26 + user2_cnt26,
-      highFinish:
-        user2Init.highFinish.length === 0
-          ? user2_cntHigh
-          : user2Init.highFinish.map(
-              (val, index) => val + user2_cntHigh[index]
-            ),
-      currentVictoryStreak:
-        totalResult[0] < totalResult[1]
-          ? user2Init.previousWin === true
-            ? user2Init.currentVictoryStreak + 1
-            : 1
-          : 0,
-      previousWin: totalResult[0] < totalResult[1] ? true : false,
-      totalWinNo:
-        totalResult[0] < totalResult[1]
-          ? user2Init.totalWinNo + 1
-          : user2Init.totalWinNo,
-      level:
-        user1Init.level === user2Init.level
-          ? totalResult[0] > totalResult[1]
+      // result update
+      user1Update = {
+        ...user1Update,
+        master26: user1Init.master26 + user1_cnt26,
+        highFinish:
+          user1Init.highFinish.length === 0
+            ? user1_cntHigh
+            : user1Init.highFinish.map(
+                (val, index) => val + user1_cntHigh[index]
+              ),
+        currentVictoryStreak:
+          totalResult[0] > totalResult[1]
+            ? user1Init.previousWin === true
+              ? user1Init.currentVictoryStreak + 1
+              : 1
+            : 0,
+        previousWin: totalResult[0] > totalResult[1] ? true : false,
+        totalWinNo:
+          totalResult[0] > totalResult[1]
+            ? user1Init.totalWinNo + 1
+            : user1Init.totalWinNo,
+        level:
+          user1Init.level === user2Init.level
+            ? totalResult[0] < totalResult[1]
+              ? user1Init.level
+              : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
+              ? user1Init.level + 1
+              : user1Init.level
+            : totalResult[0] > totalResult[1]
             ? user2Init.level
-            : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
-            ? user2Init.level + 1
-            : user2Init.level
-          : totalResult[0] > totalResult[1]
-          ? user2Init.level
-          : user1Init.level,
-    };
-    user2Update = {
-      ...user2Update,
-      maxVictoryStreak:
-        user2Update.currentVictoryStreak > user2Init.maxVictoryStreak
-          ? user2Update.currentVictoryStreak
-          : user2Init.maxVictoryStreak,
-    };
+            : user1Init.level,
+      };
+      user1Update = {
+        ...user1Update,
+        maxVictoryStreak:
+          user1Update.currentVictoryStreak > user1Init.maxVictoryStreak
+            ? user1Update.currentVictoryStreak
+            : user1Init.maxVictoryStreak,
+        sentTotalChallengeNo: user1Init.sentTotalChallengeNo,
+      };
+      storeResult(user1Update); // save user1 - challenger result
+      user2Update = {
+        ...user2Update,
+        master26: user2Init.master26 + user2_cnt26,
+        highFinish:
+          user2Init.highFinish.length === 0
+            ? user2_cntHigh
+            : user2Init.highFinish.map(
+                (val, index) => val + user2_cntHigh[index]
+              ),
+        currentVictoryStreak:
+          totalResult[0] < totalResult[1]
+            ? user2Init.previousWin === true
+              ? user2Init.currentVictoryStreak + 1
+              : 1
+            : 0,
+        previousWin: totalResult[0] < totalResult[1] ? true : false,
+        totalWinNo:
+          totalResult[0] < totalResult[1]
+            ? user2Init.totalWinNo + 1
+            : user2Init.totalWinNo,
+        level:
+          user1Init.level === user2Init.level
+            ? totalResult[0] > totalResult[1]
+              ? user2Init.level
+              : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
+              ? user2Init.level + 1
+              : user2Init.level
+            : totalResult[0] > totalResult[1]
+            ? user2Init.level
+            : user1Init.level,
+      };
+      user2Update = {
+        ...user2Update,
+        maxVictoryStreak:
+          user2Update.currentVictoryStreak > user2Init.maxVictoryStreak
+            ? user2Update.currentVictoryStreak
+            : user2Init.maxVictoryStreak,
+      };
 
-    const mainUser = JSON.parse(localStorage.getItem("authUser")).user;
-    userResult[0] === mainUser.username
-      ? handleAcievement(user1Update)
-      : handleAcievement(user2Update);
+      const mainUser = JSON.parse(localStorage.getItem("authUser")).user;
+      userResult[0] === mainUser.username
+        ? handleAcievement(user1Update)
+        : handleAcievement(user2Update);
 
-    storeResult(user2Update); // save user2-receiver result
-
-    console.log("::user1-->>", user1Update, "::user2-->>", user2Update);
+      storeResult(user2Update); // save user2-receiver result
+    } else {
+      toast(
+        "Benutzername nicht gefunden. Spielergebnisse können nicht gespeichert werden."
+      );
+    }
   };
 
   const onChange = (e) => {
