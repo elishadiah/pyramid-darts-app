@@ -105,40 +105,51 @@ const Card = ({
 
   const sendQuick = () => {
     sendQuickFight(username, user.username, user.email);
-    emailjs
-      .send(
-        "service_e37gjno",
-        "template_c69m2ru",
-        {
-          from_name: user.username,
-          from_email: user.email,
-          to_email: email,
-          to_name: username,
-          subject: "Dart Challenge",
-          message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
-        },
-        { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
-      )
-      .then(
-        function (response) {
-          console.log("Email sent successfully!", response);
-          // Handle success
-        },
-        function (error) {
-          console.error("Email sending failed:", error);
-          // Handle error
-        }
-      );
-    window.open(
-      `https://lidarts.org/game/create?opponent_name=${username}`,
-      "_blank"
-    );
-    navigate("/result");
+    // emailjs
+    //   .send(
+    //     "service_e37gjno",
+    //     "template_c69m2ru",
+    //     {
+    //       from_name: user.username,
+    //       from_email: user.email,
+    //       to_email: email,
+    //       to_name: username,
+    //       subject: "Dart Challenge",
+    //       message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+    //     },
+    //     { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
+    //   )
+    //   .then(
+    //     function (response) {
+    //       console.log("Email sent successfully!", response);
+    //       // Handle success
+    //     },
+    //     function (error) {
+    //       console.error("Email sending failed:", error);
+    //       // Handle error
+    //     }
+    //   );
+    // window.open(
+    //   `https://lidarts.org/game/create?opponent_name=${username}`,
+    //   "_blank"
+    // );
+    // navigate("/result");
   };
 
   return (
     <>
-      <div className="group relative flex shadow">
+      <div className="group relative flex shadow p-2 m-2">
+        {/* {occupied ? (
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-600 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-gray-700"></span>
+          </span>
+        ) : (
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-700"></span>
+          </span>
+        )} */}
         {children}
         <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-10 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
           <div className="flex flex-col h-16 p-4">

@@ -12,7 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import http from "../../utility/http-client";
 
-const Register = () => {
+const Register = ({ socket }) => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
@@ -39,7 +39,13 @@ const Register = () => {
     setIsLoading(true);
     authService
       .register(authData)
-      .then((res) => navigate("/login"))
+      .then((res) => {
+        socket.emit("new-user", {
+          username: res.data.user.username,
+          socketId: socket.id,
+        });
+        navigate("/login");
+      })
       .catch((err) => {
         console.log("Register--Err-->>>", err.data);
         notify(err.data.message);

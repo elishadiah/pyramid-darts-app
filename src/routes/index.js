@@ -13,14 +13,14 @@ import Schedule from "../pages/Schedule";
 import Settings from "../pages/Settings";
 import Result from "../pages/Result";
 
-// const socket = socketIO.connect("http://localhost:4000");
-const socket = socketIO('https://backend.dartsfightclub.de');
+const socket = socketIO.connect("http://localhost:4000");
+// const socket = socketIO('https://backend.dartsfightclub.de');
 
 const AppRouter = () => {
   return (
     <Routes>
       <Route exact path="/login" element={<Login socket={socket} />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/register" element={<Register socket={socket} />} />
       <Route element={<AuthGuard />}>
         <Route path="/home" element={<Home socket={socket} />} />
         <Route path="/" element={<Home socket={socket} />} />

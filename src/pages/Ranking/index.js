@@ -10,8 +10,16 @@ const Ranking = ({ socket }) => {
   const [currentLevel, setCurrentLevel] = useState(0);
 
   useEffect(() => {
+    fetchAllResult();
+  }, []);
+
+  useEffect(() => {
     socket.on("statusUpdate", (data) => {
-      console.log("Occupied-status", data, '::', players);
+      console.log("Occupied-status", data, "::", players);
+    });
+    socket.on("new-user-response", (data) => {
+      console.log("New-user-->>", data);
+      fetchAllResult();
     });
   }, [socket]);
 
@@ -39,25 +47,33 @@ const Ranking = ({ socket }) => {
     });
   };
 
-  const isAvailable = (level, username) => {
+  const isAvailable = (level) => {
     if (currentLevel > level) return false;
     else if (currentLevel === level) {
       if (currentLevel !== rowNo.length) {
-        if (
-          rowNo[rowNo.length - currentLevel - 1] -
-            rowNo[rowNo.length - currentLevel - 2] >
-          2
-        ) {
-          return true;
+        if (rowNo.length - currentLevel - 1 === 0) {
+          if (rowNo[rowNo.length - currentLevel - 1] <= 4) {
+            return false;
+          } else {
+            return true;
+          }
         } else {
-          return false;
+          if (
+            rowNo[rowNo.length - currentLevel - 1] -
+              rowNo[rowNo.length - currentLevel - 2] >
+            2
+          ) {
+            return true;
+          } else {
+            return false;
+          }
         }
       } else return false;
     } else if (currentLevel + 1 === level) return true;
     else return false;
   };
 
-  useEffect(() => {
+  const fetchAllResult = async () => {
     setIsLoading(true);
     http
       .get("/result/fetch-all")
@@ -78,7 +94,7 @@ const Ranking = ({ socket }) => {
       })
       .catch((err) => console.log("Res---err--->>", err))
       .finally(() => setIsLoading(false));
-  }, []);
+  };
 
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
@@ -100,17 +116,17 @@ const Ranking = ({ socket }) => {
             <div>
               {players.map((levelUsers, index) => (
                 <div key={index}>
-                  <div className="flex flex-wrap space-x-4 py-4">
+                  <div className="flex flex-wrap py-4">
                     {levelUsers.map((user, subIndex) => (
                       <Card
                         key={subIndex}
                         uuid={user._id}
                         username={user.username}
                         email={user.email}
-                        available={isAvailable(user.level, user.username)}
+                        available={isAvailable(user.level)}
                         sendQuickFight={sendQuickFight}
                         sendScheduledFight={sendScheduledFight}
-                        // occupied={}
+                        // occupied={false}
                       >
                         <img
                           className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"

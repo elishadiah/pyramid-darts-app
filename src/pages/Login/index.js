@@ -26,7 +26,6 @@ const Login = ({ socket }) => {
     authService
       .login(authData)
       .then((res) => {
-        socket.emit("new-user", {username: res.data.user.username, socketId: socket.id})
         navigate("/");
       })
       .catch((err) => {
