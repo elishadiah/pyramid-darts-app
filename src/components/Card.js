@@ -105,35 +105,35 @@ const Card = ({
 
   const sendQuick = () => {
     sendQuickFight(username, user.username, user.email);
-    // emailjs
-    //   .send(
-    //     "service_e37gjno",
-    //     "template_c69m2ru",
-    //     {
-    //       from_name: user.username,
-    //       from_email: user.email,
-    //       to_email: email,
-    //       to_name: username,
-    //       subject: "Dart Challenge",
-    //       message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
-    //     },
-    //     { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
-    //   )
-    //   .then(
-    //     function (response) {
-    //       console.log("Email sent successfully!", response);
-    //       // Handle success
-    //     },
-    //     function (error) {
-    //       console.error("Email sending failed:", error);
-    //       // Handle error
-    //     }
-    //   );
-    // window.open(
-    //   `https://lidarts.org/game/create?opponent_name=${username}`,
-    //   "_blank"
-    // );
-    // navigate("/result");
+    emailjs
+      .send(
+        "service_e37gjno",
+        "template_c69m2ru",
+        {
+          from_name: user.username,
+          from_email: user.email,
+          to_email: email,
+          to_name: username,
+          subject: "Dart Challenge",
+          message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+        },
+        { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
+      )
+      .then(
+        function (response) {
+          console.log("Email sent successfully!", response);
+          // Handle success
+        },
+        function (error) {
+          console.error("Email sending failed:", error);
+          // Handle error
+        }
+      );
+    window.open(
+      `https://lidarts.org/game/create?opponent_name=${username}`,
+      "_blank"
+    );
+    navigate("/result");
   };
 
   return (
