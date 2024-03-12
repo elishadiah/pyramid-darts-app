@@ -9,6 +9,12 @@ const Ranking = ({ socket }) => {
   const [rowNo, setRowNo] = useState([]);
   const [currentLevel, setCurrentLevel] = useState(0);
 
+  useEffect(() => {
+    socket.on("statusUpdate", (data) => {
+      console.log("Occupied-status", data, '::', players);
+    });
+  }, [socket]);
+
   const sendQuickFight = (username, challenger, challengerEmail) => {
     socket.emit("challenge", {
       receiver: username,
@@ -17,13 +23,36 @@ const Ranking = ({ socket }) => {
     });
   };
 
-  const isAvailable = (level) => {
+  const sendScheduledFight = (
+    selectedDate,
+    challenger,
+    challengerEmail,
+    receiver,
+    receiverEmail
+  ) => {
+    socket.emit("schedule-challenge", {
+      date: selectedDate,
+      challenger,
+      challengerEmail,
+      receiver,
+      receiverEmail,
+    });
+  };
+
+  const isAvailable = (level, username) => {
     if (currentLevel > level) return false;
     else if (currentLevel === level) {
-      if (currentLevel !== rowNo.length)
-        if (rowNo[currentLevel] - rowNo[currentLevel + 1] > 1) return true;
-        else return false;
-      else return false;
+      if (currentLevel !== rowNo.length) {
+        if (
+          rowNo[rowNo.length - currentLevel - 1] -
+            rowNo[rowNo.length - currentLevel - 2] >
+          2
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      } else return false;
     } else if (currentLevel + 1 === level) return true;
     else return false;
   };
@@ -78,8 +107,10 @@ const Ranking = ({ socket }) => {
                         uuid={user._id}
                         username={user.username}
                         email={user.email}
-                        available={isAvailable(user.level)}
+                        available={isAvailable(user.level, user.username)}
                         sendQuickFight={sendQuickFight}
+                        sendScheduledFight={sendScheduledFight}
+                        // occupied={}
                       >
                         <img
                           className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"

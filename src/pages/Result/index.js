@@ -19,6 +19,11 @@ const Result = ({ socket }) => {
   const [userResult, setUserResult] = useState(null);
   const [detailResult, setDetailResult] = useState(null);
   const [initResult, setInitResult] = useState(null);
+  const [allInitResult, setAllInitResult] = useState(null);
+
+  useEffect(() => {
+    fetchAllResult();
+  }, []);
 
   useEffect(() => {
     userResult && fetchResult();
@@ -32,19 +37,21 @@ const Result = ({ socket }) => {
         url: resultUrl,
       });
       console.log("Result-->>>", res.data);
-      setAllResult(res.data.allResult);
-      setTotalResult(res.data.totalResult);
-      setUserResult(res.data.userResult);
+      setAllResult(res.data.allResult); // match overview detail
+      setTotalResult(res.data.totalResult); // match result
+      setUserResult(res.data.userResult); // users of match
       let matchDate = new Date(
         res.data.allResult[0].split(" ")[2].split(".").reverse().join("-")
       );
 
+      // total match number
       let matchNo = [
         ...Array(
           Number(res.data.totalResult[0]) + Number(res.data.totalResult[1])
         ).keys(),
       ];
 
+      // webcam is whether true or false
       let details =
         res.data.allResult.length === 44
           ? [...[...res.data.allResult].splice(2)]
@@ -61,8 +68,6 @@ const Result = ({ socket }) => {
       }
 
       getDetailResult(matchNo);
-
-      // storeResult(data);
 
       // console.log("Result-handle--->>>", matchDate);
     } catch (err) {
@@ -90,6 +95,7 @@ const Result = ({ socket }) => {
     }
   };
 
+  // fetch previous result state of users
   const fetchResult = async () => {
     setIsInitLoading(true);
     let temp = [];
@@ -108,6 +114,19 @@ const Result = ({ socket }) => {
     } catch (err) {
       setInitResult(null);
       console.log("-------Init--err---", err);
+    } finally {
+      setIsInitLoading(false);
+    }
+  };
+
+  // fetch previous all result state
+  const fetchAllResult = async () => {
+    setIsInitLoading(true);
+    try {
+      const res = await http.get("/result/fetch-all");
+      setAllInitResult(res.data);
+    } catch (err) {
+      setAllInitResult(null);
     } finally {
       setIsInitLoading(false);
     }
@@ -296,6 +315,17 @@ const Result = ({ socket }) => {
     user1_cntHigh = getHighFinish(user1, highMarks);
     user2_cntHigh = getHighFinish(user2, highMarks);
 
+    // Pyramid rows number
+    const levels = [];
+    allInitResult.forEach((element) => {
+      const level = element.level;
+      if (!levels[level]) {
+        levels[level] = [];
+      }
+      levels[level].push(element);
+    });
+    const rowNo = levels.reverse().map((val) => val.length);
+
     // result update
     user1Update = {
       ...user1Update,
@@ -318,12 +348,14 @@ const Result = ({ socket }) => {
           ? user1Init.totalWinNo + 1
           : user1Init.totalWinNo,
       level:
-        user1Init.level > user2Init.level
+        user1Init.level === user2Init.level
           ? totalResult[0] < totalResult[1]
-            ? user1Init.level - 1
+            ? user1Init.level
+            : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
+            ? user1Init.level + 1
             : user1Init.level
           : totalResult[0] > totalResult[1]
-          ? user1Init.level + 1
+          ? user2Init.level
           : user1Init.level,
     };
     user1Update = {
@@ -334,7 +366,7 @@ const Result = ({ socket }) => {
           : user1Init.maxVictoryStreak,
       sentTotalChallengeNo: user1Init.sentTotalChallengeNo,
     };
-    // storeResult(user1Update); // save user1 - challenger result
+    storeResult(user1Update); // save user1 - challenger result
     user2Update = {
       ...user2Update,
       master26: user2Init.master26 + user2_cnt26,
@@ -356,13 +388,15 @@ const Result = ({ socket }) => {
           ? user2Init.totalWinNo + 1
           : user2Init.totalWinNo,
       level:
-        user1Init.level < user2Init.level
+        user1Init.level === user2Init.level
           ? totalResult[0] > totalResult[1]
-            ? user2Init.level - 1
+            ? user2Init.level
+            : rowNo[user1Init.level] - rowNo[user1Init.level + 1] > 2
+            ? user2Init.level + 1
             : user2Init.level
-          : totalResult[0] < totalResult[1]
-          ? user2Init.level + 1
-          : user2Init.level,
+          : totalResult[0] > totalResult[1]
+          ? user2Init.level
+          : user1Init.level,
     };
     user2Update = {
       ...user2Update,
@@ -377,7 +411,7 @@ const Result = ({ socket }) => {
       ? handleAcievement(user1Update)
       : handleAcievement(user2Update);
 
-    // storeResult(user2Update); // save user2-receiver result
+    storeResult(user2Update); // save user2-receiver result
 
     console.log("::user1-->>", user1Update, "::user2-->>", user2Update);
   };

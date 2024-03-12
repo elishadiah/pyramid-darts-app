@@ -4,8 +4,18 @@ import { DateObject, Calendar } from "react-multi-date-picker";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import emailjs from "@emailjs/browser";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Card = ({ username, available, email, sendQuickFight, children }) => {
+const Card = ({
+  username,
+  available,
+  email,
+  sendQuickFight,
+  sendScheduledFight,
+  children,
+}) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
@@ -18,15 +28,83 @@ const Card = ({ username, available, email, sendQuickFight, children }) => {
   const closeModal = () => {
     setIsOpen(false);
   };
+
   const openModal = () => {
     setIsOpen(true);
   };
+
+  const isDateValid = (selectedDate) => {
+    if (selectedDate) {
+      const currentDate = moment().startOf("day");
+      const selectedMoment = moment(selectedDate, "YYYY-MM-DD").startOf("day");
+      const nextThreeDays = moment().add(3, "days").startOf("day");
+
+      return selectedMoment.isBetween(currentDate, nextThreeDays, null, "[]");
+    }
+    return false;
+  };
+
   const onClick = () => {
-    console.log("Calendar===>>>", value.month);
+    const selectedDate = new Date(
+      value.year,
+      value.month.index,
+      value.day,
+      value.hour,
+      value.minute
+    );
+    if (!isDateValid(selectedDate))
+      toast(
+        "Reservierte Herausforderungen werden innerhalb von 72 Stunden verfügbar sein."
+      );
+    else {
+      sendScheduledFight(
+        selectedDate,
+        user.username,
+        user.email,
+        username,
+        email
+      );
+      emailjs
+        .send(
+          "service_e37gjno",
+          "template_c69m2ru",
+          {
+            from_name: user.username,
+            from_email: user.email,
+            to_email: email,
+            to_name: username,
+            subject: "Dart Challenge",
+            message: `${
+              user.username
+            } sent you a scheduled challenge. Challenge date: ${new Date(
+              value.year,
+              value.month.index,
+              value.day,
+              value.hour,
+              value.minute
+            )}.`,
+          },
+          {
+            publicKey: "rASlZgWjQ3kN4qzUG",
+            privateKey: "CQFRfh6s1JpgbDaD3nWlH",
+          }
+        )
+        .then(
+          function (response) {
+            console.log("Email sent successfully!", response);
+            // Handle success
+          },
+          function (error) {
+            console.error("Email sending failed:", error);
+            // Handle error
+          }
+        );
+      closeModal();
+    }
   };
 
   const sendQuick = () => {
-    sendQuickFight(username, user.username, email);
+    sendQuickFight(username, user.username, user.email);
     emailjs
       .send(
         "service_e37gjno",
@@ -37,7 +115,7 @@ const Card = ({ username, available, email, sendQuickFight, children }) => {
           to_email: email,
           to_name: username,
           subject: "Dart Challenge",
-          message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge.`,
+          message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
         },
         { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
       )
@@ -51,7 +129,10 @@ const Card = ({ username, available, email, sendQuickFight, children }) => {
           // Handle error
         }
       );
-    window.open(`https://lidarts.org/game/create?opponent_name=${username}`, "_blank");
+    window.open(
+      `https://lidarts.org/game/create?opponent_name=${username}`,
+      "_blank"
+    );
     navigate("/result");
   };
 
@@ -67,7 +148,7 @@ const Card = ({ username, available, email, sendQuickFight, children }) => {
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={!available}
+                disabled={username === user.username || !available}
                 onClick={sendQuick}
               >
                 Quick Fight
@@ -76,7 +157,7 @@ const Card = ({ username, available, email, sendQuickFight, children }) => {
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={!available}
+                disabled={username === user.username || !available}
                 onClick={openModal}
               >
                 Scheduled Fight
@@ -152,25 +233,9 @@ const Card = ({ username, available, email, sendQuickFight, children }) => {
           </div>
         </Dialog>
       </Transition>
+      <ToastContainer autoClose={3000} />
     </>
   );
 };
 
 export default Card;
-
-// function CustomButton({ ...props }) {
-//   const handleClick = (e) => {
-//     props.openCalendar();
-//     props.onFocus();
-//     props.onChange(e);
-//     console.log("Calendar-->>>", props);
-//   };
-//   return (
-//     <button
-//       className="text-center font-semibold bg-green-500 text-white rounded-md p-2"
-//       onClick={(e) => handleClick(e)}
-//     >
-//       Scheduled Fight
-//     </button>
-//   );
-// }

@@ -142,7 +142,6 @@ const Home = ({ socket }) => {
           </div>
         </div>
       </div>
-      {users.map(val => <p>{val.username}</p>)}
     </div>
   );
 };

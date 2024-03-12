@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import Header from "../../components/Header";
-import { StarIcon, TrophyIcon } from "@heroicons/react/24/solid";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import http from "../../utility/http-client";
 import moment from "moment";
@@ -8,13 +7,21 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import Loading from "../../components/Loading";
 import AchievementImages from "../../utility/images";
 import AchievementVariables from "../../utility/variables";
+import emailjs from "@emailjs/browser";
+import { Dialog, Transition } from "@headlessui/react";
+import { useNavigate } from "react-router-dom";
 
 const Profile = ({ socket }) => {
+  const navigate = useNavigate();
   const localizer = momentLocalizer(moment);
   const [user, setUser] = useState({ username: "", email: "", avatar: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [achievement, setAchievement] = useState(null);
+  const [schedules, setSchedules] = useState(null);
+  const [events, setEvents] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentSchedule, setCurrentSchedule] = useState(null);
 
   useEffect(() => {
     const tmp = JSON.parse(localStorage.getItem("authUser")).user;
@@ -31,7 +38,117 @@ const Profile = ({ socket }) => {
     ).user;
     setUser({ username, email, avatar });
     fetchResult(username);
+    fetchSchedules();
   }, []);
+
+  useEffect(() => {
+    console.log("Schedules-state-->>", schedules);
+    const { username } = JSON.parse(localStorage.getItem("authUser")).user;
+    let notiTimer, startTimer;
+    if (schedules) {
+      setEvents(
+        schedules.map((val) => ({
+          id: val._id,
+          title: `Challenge - ${val.challenger} : ${val.receiver}`,
+          start: new Date(val.date),
+          end: addMinutes(val.date, 60),
+        }))
+      );
+      schedules.map((val) => {
+        const notiTime = new Date(
+          new Date(val.date).getTime() - 4 * 60 * 60 * 1000
+        );
+
+        notiTimer = setTimeout(() => {
+          sendNotificationEmail(
+            val.challenger,
+            val.challengerEmail,
+            val.receiver,
+            val.receiverEmail,
+            "Bis zum Spiel sind es noch weniger als 4 Stunden. Wenn Sie jetzt absagen, verlieren Sie im Grunde das Spiel. Wenn Sie abbrechen möchten, stornieren Sie bitte die geplante Herausforderung auf der Seite „Profil“."
+          );
+        }, notiTime.getTime() - Date.now());
+
+        return true;
+      });
+      schedules
+        .filter((val) => val.challenger.includes(username))
+        .map((val) => {
+          const startTime = new Date(
+            new Date(val.date).getTime() - 3 * 60 * 1000
+          );
+          startTimer = setTimeout(() => {
+            sendNotificationEmail(
+              val.receiver,
+              val.receiverEmail,
+              val.challenger,
+              val.challengerEmail,
+              "Es ist Zeit, mit Ihrer bevorstehenden Herausforderung zu beginnen. Bitte erstellen Sie auf Ihrer „Profil“-Seite eine Challenge."
+            );
+          }, startTime.getTime() - Date.now());
+          return true;
+        });
+    }
+    return () => {
+      clearTimeout(notiTimer);
+      clearTimeout(startTimer);
+    };
+  }, [schedules]);
+
+  const getCurrentTimeZone = () => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return timeZone;
+  };
+
+  const sendNotificationEmail = (
+    sender,
+    senderEmail,
+    receiver,
+    receiverEmail,
+    message
+  ) => {
+    emailjs
+      .send(
+        "service_e37gjno",
+        "template_c69m2ru",
+        {
+          from_name: sender,
+          from_email: senderEmail,
+          to_email: receiverEmail,
+          to_name: receiver,
+          subject: "Kommende Herausforderungen",
+          message: message,
+        },
+        { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
+      )
+      .then(
+        function (response) {
+          console.log("Email sent successfully!", response);
+          // Handle success
+        },
+        function (error) {
+          console.error("Email sending failed:", error);
+          // Handle error
+        }
+      );
+  };
+
+  const fetchSchedules = async () => {
+    setIsLoading(true);
+    try {
+      const { username } = JSON.parse(localStorage.getItem("authUser")).user;
+      const res = await http.get("/schedule/fetch-all");
+      const tmp = res.data.filter(
+        (val) =>
+          val.challenger.includes(username) || val.receiver.includes(username)
+      );
+      setSchedules(tmp);
+    } catch (err) {
+      console.log("fetch-schedule--err-->>", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchResult = async (data) => {
     setIsLoading(true);
@@ -134,25 +251,150 @@ const Profile = ({ socket }) => {
     }
   };
 
-  const events = [
-    {
-      id: 3,
-      title: "Challenge 3",
-      start: new Date(new Date(new Date().setHours(11)).setMinutes(0)),
-      end: new Date(new Date(new Date().setHours(12)).setMinutes(0)),
-    },
-    {
-      id: 4,
-      title: "Challenge 4",
-      start: new Date(new Date(new Date().setHours(11)).setMinutes(0)),
-      end: new Date(new Date(new Date().setHours(12)).setMinutes(0)),
-    },
-  ];
+  const handleCalendar = (e) => {
+    schedules && setCurrentSchedule(schedules.find((val) => val._id === e.id));
+    setIsOpen(true);
+  };
 
   const addMinutes = (date, minutes) => {
     const dateCopy = new Date(date);
-    dateCopy.setMinutes(date.getMinutes() + minutes);
+    dateCopy.setMinutes(dateCopy.getMinutes() + minutes);
     return dateCopy;
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const onClick = () => {
+    currentSchedule &&
+      emailjs
+        .send(
+          "service_e37gjno",
+          "template_c69m2ru",
+          {
+            from_name: currentSchedule.challenger,
+            from_email: currentSchedule.challengerEmail,
+            to_email: currentSchedule.receiverEmail,
+            to_name: currentSchedule.receiver,
+            subject: "Schedule Challenge",
+            message: `${currentSchedule.challenger} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+          },
+          {
+            publicKey: "rASlZgWjQ3kN4qzUG",
+            privateKey: "CQFRfh6s1JpgbDaD3nWlH",
+          }
+        )
+        .then(
+          function (response) {
+            console.log("Email sent successfully!", response);
+            // Handle success
+          },
+          function (error) {
+            console.error("Email sending failed:", error);
+            // Handle error
+          }
+        );
+    http.post("/schedule/remove", currentSchedule);
+    window.open(
+      `https://lidarts.org/game/create?opponent_name=${currentSchedule.receiver}`,
+      "_blank"
+    );
+    navigate("/result");
+  };
+
+  const updateResult = async (data) => {
+    try {
+      await http.post("/result/post", data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const onDecline = async () => {
+    http.post("/schedule/remove", currentSchedule);
+    setIsLoading(true);
+    try {
+      const res = await http.post("/result/fetch", {
+        username: user.username.trim(),
+      });
+      const resOther = await http.post("/result/fetch", {
+        username: currentSchedule.challenger.trim(),
+      });
+      const resAll = await http.get("/result/fetch-all");
+      // Pyramid rows number
+      const levels = [];
+      resAll.data.forEach((element) => {
+        const level = element.level;
+        if (!levels[level]) {
+          levels[level] = [];
+        }
+        levels[level].push(element);
+      });
+      const rowNo = levels.map((val) => val.length);
+      const updateLevel1 =
+        res.data.level > resOther.data.level
+          ? resOther.data.level
+          : res.data.level;
+      const updateLevel2 =
+        res.data.level > resOther.data.level
+          ? res.data.level
+          : rowNo[resOther.data.level] - rowNo[resOther.data.level + 1] > 2
+          ? resOther.data.level + 1
+          : resOther.data.level;
+      const updateResult1 = {
+        ...res.data,
+        previousWin: false,
+        currentVictoryStreak: 0,
+        level: updateLevel1,
+      };
+      const updateResult2 = {
+        ...resOther.data,
+        previousWin: true,
+        currentVictoryStreak: resOther.data.currentVictoryStreak + 1,
+        maxVictoryStreak:
+          resOther.data.currentVictoryStreak + 1 >
+          resOther.data.maxVictoryStreak
+            ? resOther.data.currentVictoryStreak + 1
+            : resOther.data.maxVictoryStreak,
+        sentTotalChallengeNo: resOther.data.sentTotalChallengeNo + 1,
+        level: updateLevel2,
+      };
+      updateResult(updateResult1);
+      updateResult(updateResult2);
+      fetchSchedules();
+      emailjs
+        .send(
+          "service_e37gjno",
+          "template_c69m2ru",
+          {
+            from_name: currentSchedule.receiver,
+            from_email: currentSchedule.receiverEmail,
+            to_email: currentSchedule.challengerEmail,
+            to_name: currentSchedule.challenger,
+            subject: "Schedule Challenge",
+            message: `${currentSchedule.receiver} hat Ihre Anfechtung abgelehnt`,
+          },
+          {
+            publicKey: "rASlZgWjQ3kN4qzUG",
+            privateKey: "CQFRfh6s1JpgbDaD3nWlH",
+          }
+        )
+        .then(
+          function (response) {
+            console.log("Email sent successfully!", response);
+            // Handle success
+          },
+          function (error) {
+            console.error("Email sending failed:", error);
+            // Handle error
+          }
+        );
+    } catch (err) {
+    } finally {
+      setIsLoading(false);
+    }
+    closeModal();
   };
 
   return (
@@ -183,7 +425,9 @@ const Profile = ({ socket }) => {
           </div>
           <div className="w-8/12 text-left">
             <p className="text-4xl mb-4">{user.username}</p>
-            <p className="text-2xl mb-2 pb-1 border-b-2 border-gray-200">Leistung</p>
+            <p className="text-2xl mb-2 pb-1 border-b-2 border-gray-200">
+              Leistung
+            </p>
             {isLoading ? (
               <Loading />
             ) : (
@@ -274,15 +518,103 @@ const Profile = ({ socket }) => {
             )}
           </div>
         </div>
-        <div className="p-8 bg-white mt-8 rounded-md">
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ height: 500 }}
-          />
-        </div>
+
+        {isLoading ? (
+          <Loading />
+        ) : (
+          events && (
+            <div className="p-8 bg-white mt-8 rounded-md">
+              <Calendar
+                localizer={localizer}
+                events={events}
+                startAccessor="start"
+                endAccessor="end"
+                onSelectEvent={handleCalendar}
+                style={{ height: 500 }}
+              />
+            </div>
+          )
+        )}
+
+        {currentSchedule && (
+          <Transition appear show={isOpen} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={closeModal}>
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <div className="fixed inset-0 bg-black/25" />
+              </Transition.Child>
+
+              <div className="fixed inset-0 overflow-y-auto">
+                <div className="flex min-h-full items-center justify-center p-4 text-center">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0 scale-95"
+                    enterTo="opacity-100 scale-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100 scale-100"
+                    leaveTo="opacity-0 scale-95"
+                  >
+                    <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-lg font-medium leading-6 text-gray-900"
+                      >
+                        Scheduled Fight
+                      </Dialog.Title>
+                      <p>
+                        Challenge - {currentSchedule.challenger} :{" "}
+                        {currentSchedule.receiver}{" "}
+                      </p>
+                      <p>
+                        Time:
+                        {new Date(currentSchedule.date).toLocaleString(
+                          "en-US",
+                          {
+                            timeZone: getCurrentTimeZone(),
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "numeric",
+                            second: "numeric",
+                          }
+                        )}
+                      </p>
+                      <div className="mt-4 flex justify-end gap-2">
+                        <button
+                          type="button"
+                          className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:bg-green-400"
+                          onClick={onClick}
+                          disabled={user.username === currentSchedule.receiver}
+                        >
+                          Create
+                        </button>
+                        <button
+                          type="button"
+                          className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:bg-green-400"
+                          onClick={onDecline}
+                          disabled={
+                            user.username === currentSchedule.challenger
+                          }
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </Dialog.Panel>
+                  </Transition.Child>
+                </div>
+              </div>
+            </Dialog>
+          </Transition>
+        )}
       </div>
     </div>
   );

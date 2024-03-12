@@ -7,12 +7,13 @@ import logoImg from "../assets/img/fc_logo.png";
 import authService from "../services/auth.service";
 import emailjs from "@emailjs/browser";
 import { useNavigate } from "react-router-dom";
+import http from "../utility/http-client";
 
 const navigation = [
   { name: "Home", to: "/", current: 1 },
   { name: "Rankings", to: "/ranking", current: 2 },
   { name: "Infos", to: "/infos", current: 3 },
-  { name: "Schedule", to: "/schedule", current: 4 },
+  { name: "Profile", to: "/profile", current: 4 },
 ];
 
 const userMenuItems = [
@@ -29,14 +30,15 @@ export default function Header({ current, socket }) {
   const [userAvatar, setUserAvatar] = useState(null);
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState(null);
+  const [scheduleNotification, setScheduleNotification] = useState(null);
 
   const handleLogout = () => {
     authService.logout();
     redirect("/login");
   };
 
-  const removeNotification = () => {
-    setNotifications(null);
+  const declineChallenge = (type) => {
+    console.log('Decline-->>', notifications)
     emailjs
       .send(
         "service_e37gjno",
@@ -44,8 +46,12 @@ export default function Header({ current, socket }) {
         {
           from_name: user.username,
           from_email: user.email,
-          to_email: notifications.email,
-          to_name: notifications.username,
+          to_email:
+            type === "quick" ? notifications.email : scheduleNotification.email,
+          to_name:
+            type === "quick"
+              ? notifications.username
+              : scheduleNotification.username,
           subject: "Dart Challenge",
           message: `${user.username} declined your challenge.`,
         },
@@ -63,9 +69,34 @@ export default function Header({ current, socket }) {
       );
   };
 
+  const removeNotification = () => {
+    setNotifications(null);
+    declineChallenge("quick");
+  };
+
+  const removeScheduleNotification = () => {
+    setScheduleNotification(null);
+    declineChallenge("schedule");
+  };
+
+  const acceptScheduleNotification = async () => {
+    try {
+      http.post("/schedule/save", scheduleNotification);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setScheduleNotification(null);
+    }
+  };
+
   const acceptNotification = () => {
     window.open(`https://lidarts.org/`, "_blank");
     navigate("/result");
+  };
+
+  const getCurrentTimeZone = () => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return timeZone;
   };
 
   useEffect(() => {
@@ -82,10 +113,27 @@ export default function Header({ current, socket }) {
 
   useEffect(() => {
     socket.on("challengeResponse", (data) => {
-      data.user === user?.username && setNotifications({username: data.challenger, email: data.challengerEmail});
+      data.user === user?.username &&
+        setNotifications({
+          username: data.challenger,
+          email: data.challengerEmail,
+        });
       console.log("Socket-notification-->>>", notifications, "::::", data);
     });
   }, [socket, user, notifications]);
+
+  useEffect(() => {
+    socket.on("schedule-challenge-response", (data) => {
+      data.user === user?.username &&
+        setScheduleNotification({
+          date: data.date,
+          username: data.challenger,
+          email: data.challengerEmail,
+          receiver: data.user,
+          receiverEmail: data.email,
+        });
+    });
+  }, [socket, user, scheduleNotification]);
 
   return (
     <Disclosure
@@ -136,7 +184,7 @@ export default function Header({ current, socket }) {
                         <span className="absolute -inset-1.5" />
                         <span className="sr-only">Open user menu</span>
                         <BellIcon className="h-6 w-6" aria-hidden="true" />
-                        {notifications && (
+                        {(notifications || scheduleNotification) && (
                           <span className="relative flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-700"></span>
@@ -163,7 +211,10 @@ export default function Header({ current, socket }) {
                                   "block px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                 )}
                               >
-                                <p className="mb-4">{notifications.username} hat Ihnen eine Herausforderung geschickt</p>
+                                <p className="mb-4">
+                                  {notifications.username} hat Ihnen eine
+                                  Herausforderung geschickt
+                                </p>
                                 <div className="flex gap-2 justify-center">
                                   <Disclosure.Button
                                     className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
@@ -176,6 +227,60 @@ export default function Header({ current, socket }) {
                                   <Disclosure.Button
                                     className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
                                     onClick={removeNotification}
+                                  >
+                                    <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
+                                      Decline
+                                    </p>
+                                  </Disclosure.Button>
+                                </div>
+                              </div>
+                            )}
+                          </Menu.Item>
+                        )}
+                        {scheduleNotification && (
+                          <Menu.Item>
+                            {({ active }) => (
+                              <div
+                                className={classNames(
+                                  active ? "bg-gray-100 dark:bg-gray-900" : "",
+                                  "block px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                )}
+                              >
+                                <p className="mb-4">
+                                  {scheduleNotification.username} hat Ihnen eine
+                                  geplante Herausforderung gesendet.
+                                </p>
+                                <p>
+                                  Wenn Sie zustimmen, können Sie das Spiel in
+                                  den nächsten 8 Stunden nicht abbrechen, ohne
+                                  zu verlieren.
+                                </p>
+                                <p>
+                                  Challenge-Datum:{" "}
+                                  {new Date(
+                                    scheduleNotification.date
+                                  ).toLocaleString("en-US", {
+                                    timeZone: getCurrentTimeZone(),
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    second: "numeric",
+                                  })}
+                                </p>
+                                <div className="flex gap-2 justify-center">
+                                  <Disclosure.Button
+                                    className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
+                                    onClick={acceptScheduleNotification}
+                                  >
+                                    <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
+                                      Accept
+                                    </p>
+                                  </Disclosure.Button>
+                                  <Disclosure.Button
+                                    className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
+                                    onClick={removeScheduleNotification}
                                   >
                                     <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
                                       Decline
