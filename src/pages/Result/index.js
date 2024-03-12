@@ -40,9 +40,6 @@ const Result = ({ socket }) => {
       setAllResult(res.data.allResult); // match overview detail
       setTotalResult(res.data.totalResult); // match result
       setUserResult(res.data.userResult); // users of match
-      let matchDate = new Date(
-        res.data.allResult[0].split(" ")[2].split(".").reverse().join("-")
-      );
 
       // total match number
       let matchNo = [
