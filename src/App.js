@@ -2,6 +2,7 @@ import React from "react";
 
 import "./App.css";
 import AppRouter from "./routes";
+import "react-toastify/dist/ReactToastify.css";
 
 
 function App() {

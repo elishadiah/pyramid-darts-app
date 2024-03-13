@@ -3,10 +3,10 @@ import http from "../../utility/http-client";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
 import Header from "../../components/Header";
+import { ToastContainer, toast } from "react-toastify";
+import HandleResult from "../../utility/result";
 import AchievementImages from "../../utility/images";
 import AchievementVariables from "../../utility/variables";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Result = ({ socket }) => {
   const navigate = useNavigate();
@@ -14,20 +14,13 @@ const Result = ({ socket }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isInitLoading, setIsInitLoading] = useState(false);
-  const [allResult, setAllResult] = useState(null);
   const [totalResult, setTotalResult] = useState(null);
-  const [userResult, setUserResult] = useState(null);
   const [detailResult, setDetailResult] = useState(null);
-  const [initResult, setInitResult] = useState(null);
   const [allInitResult, setAllInitResult] = useState(null);
 
   useEffect(() => {
     fetchAllResult();
   }, []);
-
-  useEffect(() => {
-    userResult && fetchResult();
-  }, [userResult]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,83 +29,25 @@ const Result = ({ socket }) => {
       const res = await http.post("/result/get", {
         url: resultUrl,
       });
-      console.log("Result-->>>", res.data);
-      setAllResult(res.data.allResult); // match overview detail
-      setTotalResult(res.data.totalResult); // match result
-      setUserResult(res.data.userResult); // users of match
+      const mainResult = HandleResult.handleMainResult(res.data);
+      setTotalResult(mainResult);
 
       // total match number
       let matchNo = [
-        ...Array(
-          Number(res.data.totalResult[0]) + Number(res.data.totalResult[1])
-        ).keys(),
+        ...Array(mainResult.mark.challenger + mainResult.mark.receiver).keys(),
       ];
-
-      // webcam is whether true or false
-      let details =
-        res.data.allResult.length === 44
-          ? [...[...res.data.allResult].splice(2)]
-          : [...[...res.data.allResult].splice(3)];
-
-      let i = 0,
-        wDetails = [],
-        lDetails = [];
-
-      while (i < details.length) {
-        wDetails.push(details[i]);
-        lDetails.push(details[i + 2]);
-        i += 3;
-      }
 
       getDetailResult(matchNo);
 
       // console.log("Result-handle--->>>", matchDate);
     } catch (err) {
       console.log(err);
-      setAllResult(null);
       setTotalResult(null);
-      setUserResult(null);
       toast(
         "Beim Abrufen der Match-Ergebnisse ist ein Fehler aufgetreten. Bitte versuche es erneut"
       );
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const storeResult = async (data) => {
-    try {
-      await http.post("/result/post", data);
-      navigate("/ranking");
-    } catch (err) {
-      toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
-    }
-  };
-
-  // fetch previous result state of users
-  const fetchResult = async () => {
-    setIsInitLoading(true);
-    let temp = [];
-    try {
-      await Promise.all(
-        userResult.map(async (val) => {
-          const res = await http.post("/result/fetch", {
-            username: val.trim(),
-          });
-          temp.push(res.data);
-        })
-      );
-      setInitResult(temp);
-
-      console.log("--------Init--result-------", temp);
-    } catch (err) {
-      setInitResult(null);
-      toast(
-        "Benutzername nicht gefunden. Spielergebnisse können nicht gespeichert werden."
-      );
-      console.log("-------Init--err---", err);
-    } finally {
-      setIsInitLoading(false);
     }
   };
 
@@ -153,36 +88,7 @@ const Result = ({ socket }) => {
     }
   };
 
-  const getHighFinish = (firstArray, secondArray) => {
-    const counts = [];
-
-    // Create a map to store the counts of elements in the first array
-    const map = new Map();
-    for (const num of firstArray) {
-      if (map.has(num)) {
-        map.set(num, map.get(num) + 1);
-      } else {
-        map.set(num, 1);
-      }
-    }
-
-    // Count the occurrences of elements from the second array
-    for (const num of secondArray) {
-      counts.push(map.get(num) || 0);
-    }
-
-    return counts;
-  };
-
   const handleAcievement = (data) => {
-    console.log(
-      "Achievement-->>",
-      data.master26,
-      ":::-->>",
-      AchievementVariables.STREAK.find(
-        (val) => Number(val) === Number(data.maxVictoryStreak)
-      )
-    );
     AchievementVariables.STREAK.find(
       (val) => Number(val) === Number(data.maxVictoryStreak)
     ) &&
@@ -271,161 +177,31 @@ const Result = ({ socket }) => {
 
   const onSave = async (e) => {
     e.preventDefault();
-    let user1 = [],
-      user2 = [],
-      user1_cnt26 = 0,
-      user2_cnt26 = 0,
-      user1_cntHigh = [],
-      user2_cntHigh = [];
-
-    const highMarks = [170, 167, 164, 161, 160, 158];
-    for (let i = 157; i > 100; i--) {
-      highMarks.push(i);
-    }
-
-    // init result clone
-    let user1Init, user2Init;
-    if (initResult) {
-      user1Init = [
-        ...initResult.filter((val) => val.username === userResult[0]),
-      ][0];
-      user2Init = [
-        ...initResult.filter((val) => val.username === userResult[1]),
-      ][0];
-      detailResult &&
-        detailResult.map((item) => {
-          item.subResult.map((val, index) => {
-            index % 4 < 1
-              ? user1.push(Number(val))
-              : index % 4 > 2 && user2.push(Number(val));
-            return true;
-          });
-          return true;
-        });
-
-      let user1Update = { ...user1Init },
-        user2Update = { ...user2Init };
-
-      // 26 master calculate
-      user1_cnt26 = user1.filter((val) => val === 26).length;
-      user2_cnt26 = user2.filter((val) => val === 26).length;
-      // high finish
-      user1_cntHigh = getHighFinish(user1, highMarks);
-      user2_cntHigh = getHighFinish(user2, highMarks);
-
-      // Pyramid rows number
-      const levels = [];
-      allInitResult.forEach((element) => {
-        const level = element.level;
-        if (!levels[level]) {
-          levels[level] = [];
-        }
-        levels[level].push(element);
-      });
-      const rowNo = levels.reverse().map((val) => val.length);
-
-      // result update
-      user1Update = {
-        ...user1Update,
-        master26: user1Init.master26 + user1_cnt26,
-        highFinish:
-          user1Init.highFinish.length === 0
-            ? user1_cntHigh
-            : user1Init.highFinish.map(
-                (val, index) => val + user1_cntHigh[index]
-              ),
-        currentVictoryStreak:
-          totalResult[0] > totalResult[1]
-            ? user1Init.previousWin === true
-              ? user1Init.currentVictoryStreak + 1
-              : 1
-            : 0,
-        previousWin: totalResult[0] > totalResult[1] ? true : false,
-        totalWinNo:
-          totalResult[0] > totalResult[1]
-            ? user1Init.totalWinNo + 1
-            : user1Init.totalWinNo,
-        level:
-          user1Init.level === user2Init.level
-            ? totalResult[0] < totalResult[1]
-              ? user1Init.level
-              : rowNo.length - user1Init.level - 1 === 0
-              ? user1Init.level + 1
-              : rowNo[rowNo.length - user1Init.level - 1] -
-                  rowNo[rowNo.length - user1Init.level - 2] >
-                2
-              ? user1Init.level + 1
-              : user1Init.level
-            : totalResult[0] > totalResult[1]
-            ? user2Init.level
-            : user1Init.level,
-      };
-      console.log(
-        "--***->>>",
-        rowNo[user1Init.level],
-        "::",
-        rowNo[user1Init.level + 1]
+    const updateResult = HandleResult.updateResult(
+      allInitResult,
+      totalResult,
+      detailResult
+    );
+    if (updateResult) {
+      const currentUser = JSON.parse(localStorage.getItem("authUser")).user
+        .username;
+        console.log('***', updateResult.find((val) => val.username === currentUser))
+      handleAcievement(
+        updateResult.find((val) => val.username === currentUser)
       );
-      user1Update = {
-        ...user1Update,
-        maxVictoryStreak:
-          user1Update.currentVictoryStreak > user1Init.maxVictoryStreak
-            ? user1Update.currentVictoryStreak
-            : user1Init.maxVictoryStreak,
-        sentTotalChallengeNo: user1Init.sentTotalChallengeNo,
-      };
-      storeResult(user1Update); // save user1 - challenger result
-      user2Update = {
-        ...user2Update,
-        master26: user2Init.master26 + user2_cnt26,
-        highFinish:
-          user2Init.highFinish.length === 0
-            ? user2_cntHigh
-            : user2Init.highFinish.map(
-                (val, index) => val + user2_cntHigh[index]
-              ),
-        currentVictoryStreak:
-          totalResult[0] < totalResult[1]
-            ? user2Init.previousWin === true
-              ? user2Init.currentVictoryStreak + 1
-              : 1
-            : 0,
-        previousWin: totalResult[0] < totalResult[1] ? true : false,
-        totalWinNo:
-          totalResult[0] < totalResult[1]
-            ? user2Init.totalWinNo + 1
-            : user2Init.totalWinNo,
-        level:
-          user1Init.level === user2Init.level
-            ? totalResult[0] > totalResult[1]
-              ? user2Init.level
-              : rowNo.length - user1Init.level - 1 === 0
-              ? user2Init.level + 1
-              : rowNo[rowNo.length - user2Init.level - 1] -
-                  rowNo[rowNo.length - user2Init.level - 2] >
-                2
-              ? user2Init.level + 1
-              : user2Init.level
-            : totalResult[0] > totalResult[1]
-            ? user2Init.level
-            : user1Init.level,
-      };
-      user2Update = {
-        ...user2Update,
-        maxVictoryStreak:
-          user2Update.currentVictoryStreak > user2Init.maxVictoryStreak
-            ? user2Update.currentVictoryStreak
-            : user2Init.maxVictoryStreak,
-      };
-
-      console.log("User1-->>", user1Update, "::user2-->>", user2Update);
-
-      const mainUser = JSON.parse(localStorage.getItem("authUser")).user;
-      userResult[0] === mainUser.username
-        ? handleAcievement(user1Update)
-        : handleAcievement(user2Update);
-
-      storeResult(user2Update); // save user2-receiver result
+      setIsInitLoading(true);
+      try {
+        await Promise.all(
+          updateResult.map(async (val) => {
+            await http.post("/result/post", val);
+          })
+        );
+        navigate("/ranking");
+      } catch (err) {
+        toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
+      } finally {
+        setIsInitLoading(false);
+      }
     } else {
       toast(
         "Benutzername nicht gefunden. Spielergebnisse können nicht gespeichert werden."
@@ -437,6 +213,7 @@ const Result = ({ socket }) => {
     e.preventDefault();
     setResultUrl(e.target.value);
   };
+
   return (
     <div>
       <Header current={0} socket={socket} />
@@ -482,49 +259,13 @@ const Result = ({ socket }) => {
               <button
                 onClick={onSave}
                 className="flex-1 bg-green-600 text-white p-2 rounded-md font-semibold text-lg"
-                disabled={isDetailLoading ? true : false}
+                disabled={!totalResult || (isDetailLoading ? true : false)}
               >
                 Speichern
               </button>
             )}
           </div>
         </form>
-
-        {isLoading ? (
-          <div className="my-4">
-            <Loading />
-          </div>
-        ) : (
-          userResult && (
-            <div className="border p-4 rounded-md shadow shadow-md mt-4">
-              <div className="flex space-x-4">
-                {userResult.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex-1 block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
-                  >
-                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                      {item}
-                    </h5>
-                  </div>
-                ))}
-              </div>
-              {totalResult && (
-                <div className="flex flex-column mx-auto w-1/2 mt-4 bg-green-500 rounded-md px-4 py-1.5">
-                  <div className="flex-1 text-white font-semibold text-2xl text-center">
-                    {totalResult[0]}
-                  </div>
-                  <div className="flex-1 text-white font-semibold text-xl text-center">
-                    Legs
-                  </div>
-                  <div className="flex-1 text-white font-semibold text-2xl text-center">
-                    {totalResult[1]}
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        )}
 
         {isDetailLoading ? (
           <div className="my-4">
@@ -539,30 +280,61 @@ const Result = ({ socket }) => {
             <Loading />
           </div>
         ) : (
-          allResult && (
+          totalResult && (
             <div className="border p-4 rounded-md shadow shadow-md mt-4">
-              <p className="font-normal text-lg mb-4">{allResult[0]}</p>
-              <p className="font-normal text-lg mb-4">{allResult[1]}</p>
-              {allResult.length === 44 ? (
-                <div className="flex flex-wrap">
-                  {[...allResult].slice(2).map((item, index) => (
-                    <p key={index} className="w-1/3 mb-2 font-normal text-md">
+              <div className="flex space-x-4">
+                {totalResult.users.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex-1 block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
+                  >
+                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                       {item}
+                    </h5>
+                  </div>
+                ))}
+              </div>
+              {totalResult.mark && (
+                <div className="flex flex-column mx-auto w-1/2 mt-4 bg-green-500 rounded-md px-4 py-1.5">
+                  <div className="flex-1 text-white font-semibold text-2xl text-center">
+                    {totalResult.mark.challenger}
+                  </div>
+                  <div className="flex-1 text-white font-semibold text-xl text-center">
+                    Legs
+                  </div>
+                  <div className="flex-1 text-white font-semibold text-2xl text-center">
+                    {totalResult.mark.receiver}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        )}
+
+        {isLoading ? (
+          <div className="my-4">
+            <Loading />
+          </div>
+        ) : (
+          totalResult && (
+            <div className="border p-4 rounded-md shadow shadow-md mt-4">
+              {totalResult.matchOption.map((val, index) => (
+                <p key={index} className="font-normal text-lg mb-4">
+                  {val}
+                </p>
+              ))}
+              {totalResult.detail.map((item, index) => (
+                <div key={index} className="flex flex-wrap">
+                  {item.map((subItem, subIndex) => (
+                    <p
+                      key={subIndex}
+                      className="w-1/3 mb-2 font-normal text-md"
+                    >
+                      {subItem}
                     </p>
                   ))}
                 </div>
-              ) : (
-                <>
-                  <p className="font-normal text-lg mb-4">{allResult[2]}</p>
-                  <div className="flex flex-wrap">
-                    {[...allResult].slice(3).map((item, index) => (
-                      <p key={index} className="w-1/3 mb-2 font-normal text-md">
-                        {item}
-                      </p>
-                    ))}
-                  </div>
-                </>
-              )}
+              ))}
             </div>
           )
         )}
