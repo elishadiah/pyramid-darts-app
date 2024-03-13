@@ -139,6 +139,10 @@ const updateResult = (initData, result, detailResult) => {
             2
           ? user1Init.level + 1
           : user1Init.level
+        : user1Init.level > user2Init.level
+        ? result.mark.challenger > result.mark.receiver
+          ? user1Init.level
+          : user2Init.level
         : result.mark.challenger > result.mark.receiver
         ? user2Init.level
         : user1Init.level,
@@ -181,9 +185,13 @@ const updateResult = (initData, result, detailResult) => {
             2
           ? user2Init.level + 1
           : user2Init.level
+        : user1Init.level > user2Init.level
+        ? result.mark.challenger > result.mark.receiver
+          ? user2Init.level
+          : user1Init.level
         : result.mark.challenger > result.mark.receiver
-        ? user2Init.level
-        : user1Init.level,
+        ? user1Init.level
+        : user2Init.level,
   };
   user2Update = {
     ...user2Update,
