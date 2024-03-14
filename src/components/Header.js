@@ -38,7 +38,7 @@ export default function Header({ current, socket }) {
   };
 
   const declineChallenge = (type) => {
-    console.log('Decline-->>', notifications)
+    console.log("Decline-->>", notifications);
     emailjs
       .send(
         "service_e37gjno",
@@ -376,11 +376,11 @@ export default function Header({ current, socket }) {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2">
-              {navigation.map((item) => (
+              {/* {navigation.map((item) => (
                 <Disclosure.Button
                   key={item.name}
                   as="a"
-                  to={item.to}
+                  href={item.to}
                   className={classNames(
                     item.current === current
                       ? "text-gray-900 bg-gray-200 dark:bg-gray-900 dark:text-white"
@@ -391,6 +391,21 @@ export default function Header({ current, socket }) {
                 >
                   {item.name}
                 </Disclosure.Button>
+              ))} */}
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.to}
+                  className={classNames(
+                    item.current === current
+                      ? "bg-gray-100 dark:bg-gray-900 dark:text-white"
+                      : "text-gray-900 dark:text-gray-300 hover:bg-gray-100 hover:dark:bg-gray-700 hover:text-gray-900 hover:dark:text-white",
+                    "rounded-md px-3 py-2 text-sm font-medium"
+                  )}
+                  aria-current={item.current === current ? "page" : undefined}
+                >
+                  {item.name}
+                </Link>
               ))}
             </div>
             <div className="border-t border-gray-700 pb-3 pt-4">

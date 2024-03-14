@@ -413,7 +413,7 @@ const Profile = ({ socket }) => {
               ) : (
                 <img
                   src={user.avatar}
-                  className="rounded-md w-72 h-72"
+                  className="rounded-md w-24 h-24 lg:w-72 lg:h-72 sm:w-44 sm:h-44"
                   alt="user-avatar"
                 />
               )}
@@ -423,7 +423,7 @@ const Profile = ({ socket }) => {
               I'm Online
             </div>
           </div>
-          <div className="w-8/12 text-left">
+          <div className="w-8/12 text-left p-4">
             <p className="text-4xl mb-4">{user.username}</p>
             <p className="text-2xl mb-2 pb-1 border-b-2 border-gray-200">
               Leistung

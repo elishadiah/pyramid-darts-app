@@ -113,10 +113,13 @@ const Ranking = ({ socket }) => {
               </div>
             </div>
           ) : (
-            <div>
+            <div className="flex flex-col divide-y divide-green-300 dark:divide-gray-400">
               {players.map((levelUsers, index) => (
-                <div key={index}>
-                  <div className="flex flex-wrap py-4">
+                <div key={index} className="relative">
+                  <div className="absolute inline-flex items-center justify-center w-6 h-6 font-bold text-white bg-green-600 border-white rounded-full p-2 -top-4 -end-4">
+                    {index + 1}
+                  </div>
+                  <div className="flex flex-wrap justify-center py-4">
                     {levelUsers.map((user, subIndex) => (
                       <Card
                         key={subIndex}
@@ -128,11 +131,17 @@ const Ranking = ({ socket }) => {
                         sendScheduledFight={sendScheduledFight}
                         // occupied={false}
                       >
-                        <img
-                          className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"
-                          src={user.avatar}
-                          alt="user avatar"
-                        ></img>
+                        {user.avatar ? (
+                          <img
+                            className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"
+                            src={user.avatar}
+                            alt="user avatar"
+                          ></img>
+                        ) : (
+                          <div className="mx-auto w-16 h-16 flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold ">
+                            {user.username.toLocaleUpperCase().charAt(0)}
+                          </div>
+                        )}
                       </Card>
                     ))}
                   </div>
