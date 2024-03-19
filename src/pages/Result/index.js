@@ -18,28 +18,22 @@ const Result = ({ socket }) => {
   const [detailResult, setDetailResult] = useState(null);
   const [allInitResult, setAllInitResult] = useState(null);
 
-  useEffect(() => {
-    fetchAllResult();
-  }, []);
+  // useEffect(() => {
+  //   fetchAllResult();
+  // }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await http.post("/result/get", {
-        url: resultUrl,
+      const url = resultUrl.split("/");
+      url.splice(3, 0, "api");
+      const res = await http.get("/result/get", {
+        params: { url: url.join("/") },
+        headers: { "Access-Control-Allow-Origin": "*" },
       });
-      const mainResult = HandleResult.handleMainResult(res.data);
-      setTotalResult(mainResult);
-
-      // total match number
-      let matchNo = [
-        ...Array(mainResult.mark.challenger + mainResult.mark.receiver).keys(),
-      ];
-
-      getDetailResult(matchNo);
-
-      // console.log("Result-handle--->>>", matchDate);
+      // setTotalResult(res.data);
+      HandleResult.updateResult(res.data);
     } catch (err) {
       console.log(err);
       setTotalResult(null);
@@ -185,7 +179,10 @@ const Result = ({ socket }) => {
     if (updateResult) {
       const currentUser = JSON.parse(localStorage.getItem("authUser")).user
         .username;
-        console.log('***', updateResult.find((val) => val.username === currentUser))
+      console.log(
+        "***",
+        updateResult.find((val) => val.username === currentUser)
+      );
       handleAcievement(
         updateResult.find((val) => val.username === currentUser)
       );

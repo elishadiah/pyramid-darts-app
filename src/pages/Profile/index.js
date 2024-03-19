@@ -7,9 +7,11 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import Loading from "../../components/Loading";
 import AchievementImages from "../../utility/images";
 import AchievementVariables from "../../utility/variables";
-import emailjs from "@emailjs/browser";
 import { Dialog, Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
+import EmailNotify from "../../utility/emailjs";
+import HandleAchievement from "../../utility/achievements";
+import AchievementItemComponent from "../../components/AchievementItem";
 
 const Profile = ({ socket }) => {
   const navigate = useNavigate();
@@ -60,12 +62,13 @@ const Profile = ({ socket }) => {
         );
 
         notiTimer = setTimeout(() => {
-          sendNotificationEmail(
+          EmailNotify.sendNotificationEmail(
             val.challenger,
             val.challengerEmail,
             val.receiver,
             val.receiverEmail,
-            "Bis zum Spiel sind es noch weniger als 4 Stunden. Wenn Sie jetzt absagen, verlieren Sie im Grunde das Spiel. Wenn Sie abbrechen möchten, stornieren Sie bitte die geplante Herausforderung auf der Seite „Profil“."
+            "Bis zum Spiel sind es noch weniger als 4 Stunden. Wenn Sie jetzt absagen, verlieren Sie im Grunde das Spiel. Wenn Sie abbrechen möchten, stornieren Sie bitte die geplante Herausforderung auf der Seite „Profil“.",
+            "Kommende Herausforderungen"
           );
         }, notiTime.getTime() - Date.now());
 
@@ -78,12 +81,13 @@ const Profile = ({ socket }) => {
             new Date(val.date).getTime() - 3 * 60 * 1000
           );
           startTimer = setTimeout(() => {
-            sendNotificationEmail(
-              val.receiver,
-              val.receiverEmail,
+            EmailNotify.sendNotificationEmail(
               val.challenger,
               val.challengerEmail,
-              "Es ist Zeit, mit Ihrer bevorstehenden Herausforderung zu beginnen. Bitte erstellen Sie auf Ihrer „Profil“-Seite eine Challenge."
+              val.receiver,
+              val.receiverEmail,
+              "Es ist Zeit, mit Ihrer bevorstehenden Herausforderung zu beginnen. Bitte erstellen Sie auf Ihrer „Profil“-Seite eine Challenge.",
+              "Kommende Herausforderungen"
             );
           }, startTime.getTime() - Date.now());
           return true;
@@ -98,39 +102,6 @@ const Profile = ({ socket }) => {
   const getCurrentTimeZone = () => {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return timeZone;
-  };
-
-  const sendNotificationEmail = (
-    sender,
-    senderEmail,
-    receiver,
-    receiverEmail,
-    message
-  ) => {
-    emailjs
-      .send(
-        "service_e37gjno",
-        "template_c69m2ru",
-        {
-          from_name: sender,
-          from_email: senderEmail,
-          to_email: receiverEmail,
-          to_name: receiver,
-          subject: "Kommende Herausforderungen",
-          message: message,
-        },
-        { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
-      )
-      .then(
-        function (response) {
-          console.log("Email sent successfully!", response);
-          // Handle success
-        },
-        function (error) {
-          console.error("Email sending failed:", error);
-          // Handle error
-        }
-      );
   };
 
   const fetchSchedules = async () => {
@@ -268,33 +239,14 @@ const Profile = ({ socket }) => {
 
   const onClick = () => {
     currentSchedule &&
-      emailjs
-        .send(
-          "service_e37gjno",
-          "template_c69m2ru",
-          {
-            from_name: currentSchedule.challenger,
-            from_email: currentSchedule.challengerEmail,
-            to_email: currentSchedule.receiverEmail,
-            to_name: currentSchedule.receiver,
-            subject: "Schedule Challenge",
-            message: `${currentSchedule.challenger} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
-          },
-          {
-            publicKey: "rASlZgWjQ3kN4qzUG",
-            privateKey: "CQFRfh6s1JpgbDaD3nWlH",
-          }
-        )
-        .then(
-          function (response) {
-            console.log("Email sent successfully!", response);
-            // Handle success
-          },
-          function (error) {
-            console.error("Email sending failed:", error);
-            // Handle error
-          }
-        );
+      EmailNotify.sendNotificationEmail(
+        currentSchedule.challenger,
+        currentSchedule.challengerEmail,
+        currentSchedule.receiver,
+        currentSchedule.receiverEmail,
+        `${currentSchedule.challenger} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+        "Schedule Challenge"
+      );
     http.post("/schedule/remove", currentSchedule);
     window.open(
       `https://lidarts.org/game/create?opponent_name=${currentSchedule.receiver}`,
@@ -363,33 +315,14 @@ const Profile = ({ socket }) => {
       updateResult(updateResult1);
       updateResult(updateResult2);
       fetchSchedules();
-      emailjs
-        .send(
-          "service_e37gjno",
-          "template_c69m2ru",
-          {
-            from_name: currentSchedule.receiver,
-            from_email: currentSchedule.receiverEmail,
-            to_email: currentSchedule.challengerEmail,
-            to_name: currentSchedule.challenger,
-            subject: "Schedule Challenge",
-            message: `${currentSchedule.receiver} hat Ihre Anfechtung abgelehnt`,
-          },
-          {
-            publicKey: "rASlZgWjQ3kN4qzUG",
-            privateKey: "CQFRfh6s1JpgbDaD3nWlH",
-          }
-        )
-        .then(
-          function (response) {
-            console.log("Email sent successfully!", response);
-            // Handle success
-          },
-          function (error) {
-            console.error("Email sending failed:", error);
-            // Handle error
-          }
-        );
+      EmailNotify.sendNotificationEmail(
+        currentSchedule.receiver,
+        currentSchedule.receiverEmail,
+        currentSchedule.challenger,
+        currentSchedule.challengerEmail,
+        `${currentSchedule.receiver} hat Ihre Anfechtung abgelehnt`,
+        "Schedule Challenge"
+      );
     } catch (err) {
     } finally {
       setIsLoading(false);
@@ -402,7 +335,7 @@ const Profile = ({ socket }) => {
       <Header current={0} socket={socket} />
       <div className="p-8">
         <div className="flex border border-gray-200 bg-white p-4 rounded-md">
-          <div className="w-4/12 flex flex-col space-y-4">
+          <div className="w-4/12 flex flex-col space-y-4 rounded-xl py-8 sm:py-4">
             <div className="flex justify-center items-center">
               {user.avatar === "" ? (
                 <img
@@ -418,55 +351,39 @@ const Profile = ({ socket }) => {
                 />
               )}
             </div>
-            <div className="text-left flex items-center">
-              <p className="w-4 h-4 bg-green-400 inline-block mx-4" />
-              I'm Online
+            <div className="text-center font-bold lg:text-4xl sm:text-2xl md:text-3xl">
+              {user.username}
             </div>
           </div>
           <div className="w-8/12 text-left p-4">
-            <p className="text-4xl mb-4">{user.username}</p>
-            <p className="text-2xl mb-2 pb-1 border-b-2 border-gray-200">
-              Leistung
-            </p>
             {isLoading ? (
               <Loading />
             ) : (
               result && (
-                <div className="flex flex-wrap items-center p-4 mb-4">
-                  {result.sentTotalChallengeNo < 1 ? (
-                    <div className="flex items-center">
-                      <img
-                        src={AchievementImages.FRIENDLY_CHALLENGER[0]}
-                        className="opacity-50 w-14 h-14"
-                        alt="achievement-icon"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <img
-                        src={achievement.friendly}
-                        className="w-14 h-14"
-                        alt="achievement-icon"
-                      />
-                    </div>
-                  )}
-                  {result.maxVictoryStreak < 1 ? (
-                    <div className="flex items-center">
-                      <img
-                        src={AchievementImages.STREAK[0]}
-                        className="opacity-50 w-14 h-12"
-                        alt="achievement-icon"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <img
-                        src={achievement.streak}
-                        className="w-14 h-12"
-                        alt="achievement-icon"
-                      />
-                    </div>
-                  )}
+                <div className="p-4">
+                  <AchievementItemComponent
+                    result={result.sentTotalChallengeNo}
+                    achievement={achievement.friendly}
+                    iconSize="w-24 h-24"
+                    achievementIcons={AchievementImages.FRIENDLY_CHALLENGER}
+                    handleActive={HandleAchievement.friendlyActive}
+                  />
+                  <AchievementItemComponent
+                    result={result.maxVictoryStreak}
+                    achievement={achievement.streak}
+                    iconSize="w-24 h-20"
+                    achievementIcons={AchievementImages.STREAK}
+                    handleActive={HandleAchievement.streakActive}
+                  />
+                  <AchievementItemComponent
+                    result={result.master26}
+                    achievement={achievement.breakfast}
+                    iconSize="w-24 h-20"
+                    achievementIcons={AchievementImages.BREAKFAST}
+                    handleActive={HandleAchievement.breakfastActive}
+                  />
+
+           
                   {result.master26 < 10 ? (
                     <div className="flex items-center">
                       <img

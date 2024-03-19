@@ -8,10 +8,13 @@ import moment from "moment";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
+
 const Card = ({
-  username,
-  available,
-  email,
+  player,
+  isHighlighted,
   sendQuickFight,
   sendScheduledFight,
   children,
@@ -61,8 +64,8 @@ const Card = ({
         selectedDate,
         user.username,
         user.email,
-        username,
-        email
+        player.username,
+        player.email
       );
       emailjs
         .send(
@@ -71,8 +74,8 @@ const Card = ({
           {
             from_name: user.username,
             from_email: user.email,
-            to_email: email,
-            to_name: username,
+            to_email: player.email,
+            to_name: player.username,
             subject: "Dart Challenge",
             message: `${
               user.username
@@ -104,7 +107,7 @@ const Card = ({
   };
 
   const sendQuick = () => {
-    sendQuickFight(username, user.username, user.email);
+    sendQuickFight(player.username, user.username, user.email);
     emailjs
       .send(
         "service_e37gjno",
@@ -112,8 +115,8 @@ const Card = ({
         {
           from_name: user.username,
           from_email: user.email,
-          to_email: email,
-          to_name: username,
+          to_email: player.email,
+          to_name: player.username,
           subject: "Dart Challenge",
           message: `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
         },
@@ -130,7 +133,7 @@ const Card = ({
         }
       );
     window.open(
-      `https://lidarts.org/game/create?opponent_name=${username}`,
+      `https://lidarts.org/game/create?opponent_name=${player.username}`,
       "_blank"
     );
     navigate("/result");
@@ -138,7 +141,13 @@ const Card = ({
 
   return (
     <>
-      <div className="group relative flex shadow p-2 m-2">
+      <div
+        id={player._id}
+        className={classNames(
+          "group relative flex shadow p-2 m-2",
+          isHighlighted ? "border border-2 border-green-500 bg-green-100" : ""
+        )}
+      >
         {/* {occupied ? (
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-600 opacity-75"></span>
@@ -153,13 +162,13 @@ const Card = ({
         {children}
         <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-10 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
           <div className="flex flex-col h-16 p-4">
-            <p className="font-bold text-xl">{username}</p>
+            <p className="font-bold text-xl">{player.username}</p>
           </div>
           <div className="flex items-center justify-center divide-x divide-gray-900 dark:divide-gray-200 dark:divide-gray-900">
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={username === user.username || !available}
+                disabled={player.username === user.username}
                 onClick={sendQuick}
               >
                 Quick Fight
@@ -168,7 +177,7 @@ const Card = ({
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={username === user.username || !available}
+                disabled={player.username === user.username}
                 onClick={openModal}
               >
                 Scheduled Fight

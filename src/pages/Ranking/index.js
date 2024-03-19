@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import Card from "../../components/Card";
+import Card from "../../components/Rankings/Card";
 import Header from "../../components/Header";
 import http from "../../utility/http-client";
+import SearchBar from "../../components/Rankings/SearchBar";
+import Pyramid from "../../components/Rankings/Pyramid";
 
 const Ranking = ({ socket }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [players, setPlayers] = useState([]);
   const [rowNo, setRowNo] = useState([]);
   const [currentLevel, setCurrentLevel] = useState(0);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   useEffect(() => {
     fetchAllResult();
@@ -78,29 +81,33 @@ const Ranking = ({ socket }) => {
     http
       .get("/result/fetch-all")
       .then((res) => {
-        const levels = [];
-        res.data.forEach((element) => {
-          const level = element.level;
-          if (!levels[level]) {
-            levels[level] = [];
-          }
-          levels[level].push(element);
-          JSON.parse(localStorage.getItem("authUser")).user.username ===
-            element.username && setCurrentLevel(element.level);
-        });
-        setPlayers(levels.reverse());
-        setRowNo(levels.map((val) => val.length));
-        console.log("Result-->>>", levels);
+        // const levels = [];
+        // res.data.forEach((element) => {
+        //   const level = element.level;
+        //   if (!levels[level]) {
+        //     levels[level] = [];
+        //   }
+        //   levels[level].push(element);
+        //   JSON.parse(localStorage.getItem("authUser")).user.username ===
+        //     element.username && setCurrentLevel(element.level);
+        // });
+        setPlayers(res.data);
+        // setRowNo(levels.map((val) => val.length));
+        console.log("Result-->>>", res.data);
       })
       .catch((err) => console.log("Res---err--->>", err))
       .finally(() => setIsLoading(false));
+  };
+
+  const onPlayerClick = (payload) => {
+    setSelectedPlayer(payload);
   };
 
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
         <Header current={2} socket={socket} />
-        <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
+        <div className="flex px-6 lg:px-12 justify-center">
           {isLoading ? (
             <div className="col-span-full flex items-center justify-center gap-x-8 mt-44">
               <div
@@ -113,40 +120,55 @@ const Ranking = ({ socket }) => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col divide-y divide-green-300 dark:divide-gray-400">
-              {players.map((levelUsers, index) => (
-                <div key={index} className="relative">
-                  <div className="absolute inline-flex items-center justify-center w-6 h-6 font-bold text-white bg-green-600 border-white rounded-full p-2 -top-4 -end-4">
-                    {index + 1}
+            <div className="flex space-x-4 flex-col sm:flex-row">
+              {/* mobile */}
+              <div className="flex w-full px-2 sm:hidden">
+                <SearchBar players={players} onPlayerClick={onPlayerClick} />
+              </div>
+              <div className="flex flex-col w-full md:w-8/12 sm:w-6/12 divide-y divide-green-300 dark:divide-gray-400">
+                {/* {players.map((levelUsers, index) => (
+                  <div key={index} className="relative">
+                    <div className="absolute inline-flex items-center justify-center w-6 h-6 font-bold text-white bg-green-600 border-white rounded-full p-2 top-1 end-1">
+                      {index + 1}
+                    </div>
+                    <div className="flex flex-wrap justify-center p-4">
+                      {levelUsers.map((user, subIndex) => (
+                        <Card
+                          key={subIndex}
+                          uuid={user._id}
+                          username={user.username}
+                          email={user.email}
+                          available={isAvailable(user.level)}
+                          sendQuickFight={sendQuickFight}
+                          sendScheduledFight={sendScheduledFight}
+                          // occupied={false}
+                        >
+                          {user.avatar ? (
+                            <img
+                              className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"
+                              src={user.avatar}
+                              alt="user avatar"
+                            ></img>
+                          ) : (
+                            <div className="mx-auto w-16 h-16 flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold ">
+                              {user.username.toLocaleUpperCase().charAt(0)}
+                            </div>
+                          )}
+                        </Card>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap justify-center py-4">
-                    {levelUsers.map((user, subIndex) => (
-                      <Card
-                        key={subIndex}
-                        uuid={user._id}
-                        username={user.username}
-                        email={user.email}
-                        available={isAvailable(user.level)}
-                        sendQuickFight={sendQuickFight}
-                        sendScheduledFight={sendScheduledFight}
-                        // occupied={false}
-                      >
-                        {user.avatar ? (
-                          <img
-                            className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"
-                            src={user.avatar}
-                            alt="user avatar"
-                          ></img>
-                        ) : (
-                          <div className="mx-auto w-16 h-16 flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold ">
-                            {user.username.toLocaleUpperCase().charAt(0)}
-                          </div>
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                ))} */}
+                <Pyramid
+                  players={players}
+                  selectedPlayer={selectedPlayer}
+                  sendQuickFight={sendQuickFight}
+                  sendScheduledFight={sendScheduledFight}
+                />
+              </div>
+              <div className="hidden px-2 sm:flex sm:px-6 w-6/12 md:w-4/12">
+                <SearchBar players={players} onPlayerClick={onPlayerClick} />
+              </div>
             </div>
           )}
         </div>
