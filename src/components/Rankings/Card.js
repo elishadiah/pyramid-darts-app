@@ -14,6 +14,7 @@ function classNames(...classes) {
 
 const Card = ({
   player,
+  available,
   isHighlighted,
   sendQuickFight,
   sendScheduledFight,
@@ -168,7 +169,7 @@ const Card = ({
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={player.username === user.username}
+                disabled={player.username === user.username || !available}
                 onClick={sendQuick}
               >
                 Quick Fight
@@ -177,7 +178,7 @@ const Card = ({
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={player.username === user.username}
+                disabled={player.username === user.username || !available}
                 onClick={openModal}
               >
                 Scheduled Fight

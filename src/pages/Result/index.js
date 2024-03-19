@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 import http from "../../utility/http-client";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
@@ -12,15 +13,10 @@ const Result = ({ socket }) => {
   const navigate = useNavigate();
   const [resultUrl, setResultUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDetailLoading, setIsDetailLoading] = useState(false);
-  const [isInitLoading, setIsInitLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalResult, setTotalResult] = useState(null);
-  const [detailResult, setDetailResult] = useState(null);
-  const [allInitResult, setAllInitResult] = useState(null);
-
-  // useEffect(() => {
-  //   fetchAllResult();
-  // }, []);
+  const [updatedResult, setUpdatedResult] = useState(null);
+  const [updatedAchievements, setUpdatedAchievements] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,8 +28,8 @@ const Result = ({ socket }) => {
         params: { url: url.join("/") },
         headers: { "Access-Control-Allow-Origin": "*" },
       });
-      // setTotalResult(res.data);
-      HandleResult.updateResult(res.data);
+      setTotalResult(res.data);
+      setUpdatedResult(HandleResult.updateResult(res.data));
     } catch (err) {
       console.log(err);
       setTotalResult(null);
@@ -45,159 +41,43 @@ const Result = ({ socket }) => {
     }
   };
 
-  // fetch previous all result state
-  const fetchAllResult = async () => {
-    setIsInitLoading(true);
-    try {
-      const res = await http.get("/result/fetch-all");
-      setAllInitResult(res.data);
-    } catch (err) {
-      setAllInitResult(null);
-    } finally {
-      setIsInitLoading(false);
-    }
-  };
-
-  const getDetailResult = async (matchNo) => {
-    setIsDetailLoading(true);
-    let temp = [];
-    try {
-      await Promise.all(
-        matchNo.map(async (val) => {
-          const res = await http.post("/result/detail", {
-            url: `${resultUrl}/statistics/1/${val + 1}`,
-          });
-          temp.push(res.data);
-        })
-      );
-      setDetailResult(temp);
-
-      console.log("---Detai-->>>>", temp);
-      toast("Erhalten Sie die Spielergebnisse erfolgreich.");
-    } catch (err) {
-      setDetailResult(null);
-      console.log("Detail-err--->>>>", err);
-    } finally {
-      setIsDetailLoading(false);
-    }
-  };
-
-  const handleAcievement = (data) => {
-    AchievementVariables.STREAK.find(
-      (val) => Number(val) === Number(data.maxVictoryStreak)
-    ) &&
-      toast(
-        <div className="flex">
-          <span>
-            <img
-              className="w-10"
-              src={
-                AchievementImages.STREAK[
-                  AchievementVariables.STREAK.findIndex(
-                    (val) => val === Number(data.maxVictoryStreak)
-                  )
-                ]
-              }
-              alt="achievement-icon"
-            />
-          </span>
-          {`Glückwunsch! ${data.maxVictoryStreak} Siege in Folge erzielt.`}
-        </div>
-      );
-    AchievementVariables.BREAKFAST.find(
-      (val) => val === Number(data.master26)
-    ) &&
-      toast(
-        <div className="flex">
-          <span>
-            <img
-              className="w-10"
-              src={
-                AchievementImages.BREAKFAST[
-                  AchievementVariables.BREAKFAST.findIndex(
-                    (val) => val === Number(data.master26)
-                  )
-                ]
-              }
-              alt="achievement-icon"
-            />
-          </span>
-          {`Glückwunsch! ${data.master26} Frühstücke erreicht.`}
-        </div>
-      );
-    AchievementVariables.FRIENDLYCHALLENGER.find(
-      (val) => val === Number(data.sentTotalChallengeNo)
-    ) &&
-      toast(
-        <div className="flex">
-          <span>
-            <img
-              className="w-10"
-              src={
-                AchievementImages.FRIENDLY_CHALLENGER[
-                  AchievementVariables.FRIENDLYCHALLENGER.findIndex(
-                    (val) => val === Number(data.sentTotalChallengeNo)
-                  )
-                ]
-              }
-              alt="achievement-icon"
-            />
-          </span>
-          {`Glückwunsch! Es wurden ${data.maxVictoryStreak} Herausforderungen gesendet.`}
-        </div>
-      );
-    const highIndex = data.highFinish.reduce((acc, element, index) => {
-      if (Number(element) !== 0) {
-        acc.push(index);
-      }
-      return acc;
-    }, []);
-    highIndex.map((val) => {
-      toast(
-        <div className="flex">
-          <span>
-            <img
-              className="w-24"
-              src={AchievementImages.FINISHINGACE[val]}
-              alt="achievement-icon"
-            />
-          </span>
-          {`Glückwunsch! Sie haben ein Finishing-Ace von ${AchievementVariables.FINISHINGACE[val]} erreicht.`}
-        </div>
-      );
-      return true;
-    });
+  const closeModal = () => {
+    setIsModalOpen(false);
+    navigate("/ranking");
   };
 
   const onSave = async (e) => {
     e.preventDefault();
-    const updateResult = HandleResult.updateResult(
-      allInitResult,
-      totalResult,
-      detailResult
-    );
-    if (updateResult) {
+
+    if (updatedResult) {
       const currentUser = JSON.parse(localStorage.getItem("authUser")).user
         .username;
+
+      const earnedAchievement = HandleResult.handleAcievement(
+        updatedResult.find((val) => val.username === currentUser),
+        totalResult.allResult.find((val) => val.username === currentUser)
+      );
+
+      setUpdatedAchievements(earnedAchievement);
+
+      earnedAchievement.length && setIsModalOpen(true);
       console.log(
         "***",
-        updateResult.find((val) => val.username === currentUser)
+        updatedResult.find((val) => val.username === currentUser),
+        ":::::",
+        earnedAchievement
       );
-      handleAcievement(
-        updateResult.find((val) => val.username === currentUser)
-      );
-      setIsInitLoading(true);
+      setIsLoading(true);
       try {
         await Promise.all(
-          updateResult.map(async (val) => {
+          updatedResult.map(async (val) => {
             await http.post("/result/post", val);
           })
         );
-        navigate("/ranking");
       } catch (err) {
         toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
       } finally {
-        setIsInitLoading(false);
+        setIsLoading(false);
       }
     } else {
       toast(
@@ -214,7 +94,7 @@ const Result = ({ socket }) => {
   return (
     <div>
       <Header current={0} socket={socket} />
-      <div className="mx-auto max-w-2xl p-8 lg:max-w-4xl lg:px-12">
+      <div className="mx-auto max-w-2xl p-8 mt-20 lg:max-w-4xl lg:px-12">
         <form
           className="border p-4 rounded-md shadow shadow-md"
           onSubmit={handleSubmit}
@@ -241,7 +121,7 @@ const Result = ({ socket }) => {
             >
               Laden
             </button>
-            {isInitLoading ? (
+            {isLoading ? (
               <div className="col-span-full flex flex-1 items-center justify-center gap-x-8">
                 <div
                   className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
@@ -256,7 +136,7 @@ const Result = ({ socket }) => {
               <button
                 onClick={onSave}
                 className="flex-1 bg-green-600 text-white p-2 rounded-md font-semibold text-lg"
-                disabled={!totalResult || (isDetailLoading ? true : false)}
+                disabled={!totalResult}
               >
                 Speichern
               </button>
@@ -264,77 +144,133 @@ const Result = ({ socket }) => {
           </div>
         </form>
 
-        {isDetailLoading ? (
-          <div className="my-4">
-            <Loading />
-          </div>
-        ) : (
-          detailResult && <div></div>
-        )}
-
         {isLoading ? (
-          <div className="my-4">
-            <Loading />
+          <div className="mt-12">
+            <div className="my-6">
+              <Loading />
+            </div>
+            <div className="my-6">
+              <Loading />
+            </div>
+            <div className="my-6">
+              <Loading />
+            </div>
           </div>
         ) : (
           totalResult && (
-            <div className="border p-4 rounded-md shadow shadow-md mt-4">
+            <div className="border p-4 rounded-md shadow shadow-md mt-12">
               <div className="flex space-x-4">
-                {totalResult.users.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex-1 block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
-                  >
-                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                      {item}
-                    </h5>
-                  </div>
-                ))}
-              </div>
-              {totalResult.mark && (
-                <div className="flex flex-column mx-auto w-1/2 mt-4 bg-green-500 rounded-md px-4 py-1.5">
-                  <div className="flex-1 text-white font-semibold text-2xl text-center">
-                    {totalResult.mark.challenger}
-                  </div>
-                  <div className="flex-1 text-white font-semibold text-xl text-center">
-                    Legs
-                  </div>
-                  <div className="flex-1 text-white font-semibold text-2xl text-center">
-                    {totalResult.mark.receiver}
-                  </div>
+                <div className="flex-1 block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                  <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    {totalResult.user1.name}
+                  </h5>
                 </div>
-              )}
+                <div className="flex-1 block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                  <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                    {totalResult.user2.name}
+                  </h5>
+                </div>
+              </div>
+              <div className="flex flex-column mx-auto w-1/2 mt-4 bg-green-500 rounded-md px-4 py-1.5">
+                <div className="flex-1 text-white font-semibold text-2xl text-center">
+                  {totalResult.user1.won}
+                </div>
+                <div className="flex-1 text-white font-semibold text-xl text-center">
+                  Legs
+                </div>
+                <div className="flex-1 text-white font-semibold text-2xl text-center">
+                  {totalResult.user2.won}
+                </div>
+              </div>
+              <p className="font-normal text-lg p-2 my-8 border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                <span className="font-semibold">Match start: </span>
+                {new Date(totalResult.begin).toLocaleString()}
+              </p>
             </div>
           )
         )}
 
-        {isLoading ? (
-          <div className="my-4">
-            <Loading />
-          </div>
-        ) : (
-          totalResult && (
-            <div className="border p-4 rounded-md shadow shadow-md mt-4">
-              {totalResult.matchOption.map((val, index) => (
-                <p key={index} className="font-normal text-lg mb-4">
-                  {val}
-                </p>
-              ))}
-              {totalResult.detail.map((item, index) => (
-                <div key={index} className="flex flex-wrap">
-                  {item.map((subItem, subIndex) => (
-                    <p
-                      key={subIndex}
-                      className="w-1/3 mb-2 font-normal text-md"
+        <Transition appear show={isModalOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-10" onClose={closeModal}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black/25" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-3xl text-center font-medium leading-6 text-gray-900"
                     >
-                      {subItem}
-                    </p>
-                  ))}
-                </div>
-              ))}
+                      Achievements
+                    </Dialog.Title>
+                    <div className="mt-4">
+                      <p className="text-lg text-center text-gray-500">
+                        Wow, you have earned {updatedAchievements.length}{" "}
+                        achievements
+                      </p>
+                    </div>
+
+                    <div className="p-4">
+                      {updatedAchievements.map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-8 justify-center"
+                        >
+                          <img
+                            className="w-16 h-16"
+                            src={
+                              AchievementImages[item.name][
+                                AchievementVariables[item.name].findIndex(
+                                  (val) => val === Number(item.value)
+                                )
+                              ]
+                            }
+                            alt="achievement-icon"
+                          />
+                          <p className="font-semibold text-xl">
+                            <span className="font-bold text-xl">
+                              {item.name}
+                            </span>{" "}
+                            {item.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 flex justify-center gap-2">
+                      <button
+                        type="button"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        onClick={closeModal}
+                      >
+                        Hooray
+                      </button>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
             </div>
-          )
-        )}
+          </Dialog>
+        </Transition>
 
         <ToastContainer />
       </div>

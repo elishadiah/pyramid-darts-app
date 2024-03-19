@@ -153,24 +153,24 @@ const Profile = ({ socket }) => {
         return true;
       });
 
-      AchievementVariables.FRIENDLYCHALLENGER.map((val, index) => {
-        if (index < AchievementVariables.FRIENDLYCHALLENGER.length - 1) {
+      AchievementVariables.FRIENDLY_CHALLENGER.map((val, index) => {
+        if (index < AchievementVariables.FRIENDLY_CHALLENGER.length - 1) {
           if (
             val <= res.data.sentTotalChallengeNo &&
             res.data.sentTotalChallengeNo <
-              AchievementVariables.FRIENDLYCHALLENGER[index + 1]
+              AchievementVariables.FRIENDLY_CHALLENGER[index + 1]
           ) {
             challengerImg = AchievementImages.FRIENDLY_CHALLENGER[index];
           }
         } else if (
           res.data.sentTotalChallengeNo >=
-          AchievementVariables.FRIENDLYCHALLENGER[
-            AchievementVariables.FRIENDLYCHALLENGER.length - 1
+          AchievementVariables.FRIENDLY_CHALLENGER[
+            AchievementVariables.FRIENDLY_CHALLENGER.length - 1
           ]
         ) {
           challengerImg =
             AchievementImages.FRIENDLY_CHALLENGER[
-              AchievementVariables.FRIENDLYCHALLENGER.length - 1
+              AchievementVariables.FRIENDLY_CHALLENGER.length - 1
             ];
         }
         return true;

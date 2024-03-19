@@ -1,197 +1,130 @@
-const handleMainResult = (data) => {
-  if (data) {
-    let user1 = {
-      name: data.p1_name,
-      legs: data.p1_legs,
-    };
-    let user2 = {
-      name: data.p2_name,
-      legs: data.p2_legs
-    }
-    console.log("Result-handle--->>>", JSON.parse(data.match_json)[1], data);
-  } else {
-    return null;
-  }
-};
-
-const getHighFinish = (firstArray, secondArray) => {
-  const counts = [];
-
-  // Create a map to store the counts of elements in the first array
-  const map = new Map();
-  for (const num of firstArray) {
-    if (map.has(num)) {
-      map.set(num, map.get(num) + 1);
-    } else {
-      map.set(num, 1);
-    }
-  }
-
-  // Count the occurrences of elements from the second array
-  for (const num of secondArray) {
-    counts.push(map.get(num) || 0);
-  }
-
-  return counts;
-};
-
-const getHighMarks = () => {
-  const highMarks = [170, 167, 164, 161, 160, 158];
-  for (let i = 157; i > 100; i--) {
-    highMarks.push(i);
-  }
-  return highMarks;
-};
+import AchievementVariables from "./variables";
 
 const updateResult = (data) => {
-  console.log('Update-result--->>>', data);
-  // let user1 = [],
-  //   user2 = [],
-  //   user1_cnt26 = 0,
-  //   user2_cnt26 = 0,
-  //   user1_cntHigh = [],
-  //   user2_cntHigh = [];
+  console.log("Result--->>>", data);
+  const availablePositionNo = Math.pow(2, 7 - data.user1.init.level);
+  const currentAbovePlayersNo = data.allResult.filter(
+    (val) => val.level === data.user1.init.level + 1
+  ).length;
+  const rowSpotNo = availablePositionNo - currentAbovePlayersNo;
 
-  // const initUsersResult = initData.filter((val) =>
-  //   result.users.includes(val.username)
-  // );
-  // if (initUsersResult.length !== 2) return false;
+  // result update
+  let user1Update = {
+    ...data.user1.init,
+    master26: data.user1.init.master26 + data.user1.breakfast,
+    currentVictoryStreak:
+      data.user1.won > data.user2.won
+        ? data.user1.init.previousWin === true
+          ? data.user1.init.currentVictoryStreak + 1
+          : 1
+        : 0,
+    previousWin: data.user1.won > data.user2.won ? true : false,
+    totalWinNo:
+      data.user1.won > data.user2.won
+        ? data.user1.init.totalWinNo + 1
+        : data.user1.init.totalWinNo,
+    level:
+      data.user1.init.level > data.user2.init.level
+        ? data.user1.won > data.user2.won
+          ? data.user1.init.level
+          : data.user2.init.level
+        : data.user1.init.level < data.user2.init.level
+        ? data.user1.won > data.user2.won
+          ? data.user2.init.level
+          : data.user1.init.level
+        : data.user1.won > data.user2.won
+        ? rowSpotNo < 1
+          ? data.user1.init.level
+          : data.user1.init.level + 1
+        : data.user1.init.level,
+  };
+  user1Update = {
+    ...user1Update,
+    maxVictoryStreak:
+      user1Update.currentVictoryStreak > data.user1.init.maxVictoryStreak
+        ? user1Update.currentVictoryStreak
+        : data.user1.init.maxVictoryStreak,
+    sentTotalChallengeNo: data.user1.init.sentTotalChallengeNo + 1,
+  };
 
-  // // Pyramid rows number
-  // const levels = [];
-  // initData.forEach((element) => {
-  //   const level = element.level;
-  //   if (!levels[level]) {
-  //     levels[level] = [];
-  //   }
-  //   levels[level].push(element);
-  // });
-  // const rowNo = levels.reverse().map((val) => val.length);
+  let user2Update = {
+    ...data.user2.init,
+    master26: data.user2.init.master26 + data.user2.breakfast,
+    currentVictoryStreak:
+      data.user1.won < data.user2.won
+        ? data.user2.init.previousWin === true
+          ? data.user2.init.currentVictoryStreak + 1
+          : 1
+        : 0,
+    previousWin: data.user1.won > data.user2.won ? false : true,
+    totalWinNo:
+      data.user1.won > data.user2.won
+        ? data.user2.init.totalWinNo
+        : data.user2.init.totalWinNo + 1,
+    level:
+      data.user1.init.level < data.user2.init.level
+        ? data.user1.won > data.user2.won
+          ? data.user1.init.level
+          : data.user2.init.level
+        : data.user1.init.level > data.user2.init.level
+        ? data.user1.won > data.user2.won
+          ? data.user2.init.level
+          : data.user1.init.level
+        : data.user1.won < data.user2.won
+        ? rowSpotNo < 1
+          ? data.user2.init.level
+          : data.user2.init.level + 1
+        : data.user2.init.level,
+  };
+  user2Update = {
+    ...user2Update,
+    maxVictoryStreak:
+      user2Update.currentVictoryStreak > data.user2.init.maxVictoryStreak
+        ? user2Update.currentVictoryStreak
+        : data.user2.init.maxVictoryStreak,
+  };
 
-  // detailResult &&
-  //   detailResult.map((item) => {
-  //     item.subResult.map((val, index) => {
-  //       index % 4 < 1
-  //         ? user1.push(Number(val))
-  //         : index % 4 > 2 && user2.push(Number(val));
-  //       return true;
-  //     });
-  //     return true;
-  //   });
+  console.log("Update-result--->>>", user1Update, user2Update);
 
-  // // 26 master calculate
-  // user1_cnt26 = user1.filter((val) => val === 26).length;
-  // user2_cnt26 = user2.filter((val) => val === 26).length;
-  // // high finish
-  // user1_cntHigh = getHighFinish(user1, getHighMarks());
-  // user2_cntHigh = getHighFinish(user2, getHighMarks());
+  return [user1Update, user2Update];
+};
 
-  // const user1Init = initUsersResult.find(
-  //   (val) => val.username === result.users[0]
-  // );
-  // const user2Init = initUsersResult.find(
-  //   (val) => val.username === result.users[1]
-  // );
+const handleAcievement = (data, origin) => {
+  const earnedAchievement = [];
+  AchievementVariables.STREAK.find(
+    (val) => Number(val) === Number(data.maxVictoryStreak)
+  ) && earnedAchievement.push({ name: "STREAK", value: data.maxVictoryStreak });
+  AchievementVariables.BREAKFAST.find((val) => val === Number(data.master26)) &&
+    earnedAchievement.push({ name: "BREAKFAST", value: data.master26 });
 
-  // // result update
-  // let user1Update = {
-  //   ...user1Init,
-  //   master26: user1Init.master26 + user1_cnt26,
-  //   highFinish:
-  //     user1Init.highFinish.length === 0
-  //       ? user1_cntHigh
-  //       : user1Init.highFinish.map((val, index) => val + user1_cntHigh[index]),
-  //   currentVictoryStreak:
-  //     result.mark.challenger > result.mark.receiver
-  //       ? user1Init.previousWin === true
-  //         ? user1Init.currentVictoryStreak + 1
-  //         : 1
-  //       : 0,
-  //   previousWin: result.mark.challenger > result.mark.receiver ? true : false,
-  //   totalWinNo:
-  //     result.mark.challenger > result.mark.receiver
-  //       ? user1Init.totalWinNo + 1
-  //       : user1Init.totalWinNo,
-  //   level:
-  //     user1Init.level === user2Init.level
-  //       ? result.mark.challenger < result.mark.receiver
-  //         ? user1Init.level
-  //         : rowNo.length - user1Init.level - 1 === 0
-  //         ? user1Init.level + 1
-  //         : rowNo[rowNo.length - user1Init.level - 1] -
-  //             rowNo[rowNo.length - user1Init.level - 2] >
-  //           2
-  //         ? user1Init.level + 1
-  //         : user1Init.level
-  //       : user1Init.level > user2Init.level
-  //       ? result.mark.challenger > result.mark.receiver
-  //         ? user1Init.level
-  //         : user2Init.level
-  //       : result.mark.challenger > result.mark.receiver
-  //       ? user2Init.level
-  //       : user1Init.level,
-  // };
-  // user1Update = {
-  //   ...user1Update,
-  //   maxVictoryStreak:
-  //     user1Update.currentVictoryStreak > user1Init.maxVictoryStreak
-  //       ? user1Update.currentVictoryStreak
-  //       : user1Init.maxVictoryStreak,
-  //   sentTotalChallengeNo: user1Init.sentTotalChallengeNo,
-  // };
+  AchievementVariables.FRIENDLY_CHALLENGER.find(
+    (val) => val === Number(data.sentTotalChallengeNo)
+  ) &&
+    earnedAchievement.push({
+      name: "FRIENDLY_CHALLENGER",
+      value: data.sentTotalChallengeNo,
+    });
 
-  // let user2Update = {
-  //   ...user2Init,
-  //   master26: user2Init.master26 + user2_cnt26,
-  //   highFinish:
-  //     user2Init.highFinish.length === 0
-  //       ? user2_cntHigh
-  //       : user2Init.highFinish.map((val, index) => val + user2_cntHigh[index]),
-  //   currentVictoryStreak:
-  //     result.mark.challenger < result.mark.receiver
-  //       ? user2Init.previousWin === true
-  //         ? user2Init.currentVictoryStreak + 1
-  //         : 1
-  //       : 0,
-  //   previousWin: result.mark.challenger < result.mark.receiver ? true : false,
-  //   totalWinNo:
-  //     result.mark.challenger < result.mark.receiver
-  //       ? user2Init.totalWinNo + 1
-  //       : user2Init.totalWinNo,
-  //   level:
-  //     user1Init.level === user2Init.level
-  //       ? result.mark.challenger > result.mark.receiver
-  //         ? user2Init.level
-  //         : rowNo.length - user1Init.level - 1 === 0
-  //         ? user2Init.level + 1
-  //         : rowNo[rowNo.length - user2Init.level - 1] -
-  //             rowNo[rowNo.length - user2Init.level - 2] >
-  //           2
-  //         ? user2Init.level + 1
-  //         : user2Init.level
-  //       : user1Init.level > user2Init.level
-  //       ? result.mark.challenger > result.mark.receiver
-  //         ? user2Init.level
-  //         : user1Init.level
-  //       : result.mark.challenger > result.mark.receiver
-  //       ? user1Init.level
-  //       : user2Init.level,
-  // };
-  // user2Update = {
-  //   ...user2Update,
-  //   maxVictoryStreak:
-  //     user2Update.currentVictoryStreak > user2Init.maxVictoryStreak
-  //       ? user2Update.currentVictoryStreak
-  //       : user2Init.maxVictoryStreak,
-  // };
-  // return [user1Update, user2Update];
+  let updateHighIndex = [];
+
+  for (let i = 0; i < data.highFinish.length; i++) {
+    if (data.highFinish[i] !== origin.highFinish[i]) {
+      updateHighIndex.push(i);
+    }
+  }
+  updateHighIndex.map((val) => {
+    earnedAchievement.push({
+      name: "FINISHINGACE",
+      value: AchievementVariables.FINISHINGACE[val],
+    });
+    return true;
+  });
+  return earnedAchievement;
 };
 
 const handleResult = {
-  handleMainResult,
-  getHighFinish,
-  getHighMarks,
   updateResult,
+  handleAcievement,
 };
 
 export default handleResult;

@@ -1,12 +1,37 @@
+import { useEffect } from "react";
 import Card from "./Card";
 
-const Pyramid = ({ players, selectedPlayer, sendQuickFight, sendScheduledFight }) => {
-  const renderPlayer = (player) => {
+const Pyramid = ({
+  players,
+  selectedPlayer,
+  sendQuickFight,
+  sendScheduledFight,
+}) => {
+  const isAvailable = (player) => {
+    const currentUser = JSON.parse(localStorage.getItem("authUser")).user;
+    const currentPlayer = players.find((val) =>
+      val.username.includes(currentUser.username)
+    );
+    if (player.level < currentPlayer.level) return false;
+    else if (player.level > currentPlayer.level) return true;
+    else {
+      const availablePositionNo = Math.pow(2, 7 - currentPlayer.level);
+      const currentAbovePlayersNo = players.filter(
+        (val) => val.level === currentPlayer.level + 1
+      ).length;
+      const rowSpotNo = availablePositionNo - currentAbovePlayersNo;
+      if (rowSpotNo > 0) return true;
+      else return false;
+    }
+  };
+
+  const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;
     return (
       <Card
         key={player._id}
         player={player}
+        available={available}
         isHighlighted={isHighlighted}
         sendQuickFight={sendQuickFight}
         sendScheduledFight={sendScheduledFight}
@@ -32,13 +57,13 @@ const Pyramid = ({ players, selectedPlayer, sendQuickFight, sendScheduledFight }
 
     const renderedPlayers = players
       .filter((player) => player.level === rowNumber - 1)
-      .map((player) => renderPlayer(player));
+      .map((player) => renderPlayer(player, isAvailable(player)));
 
     const rowSpots = rowLength - renderedPlayers.length;
     for (let i = 0; i < rowSpots; i++) {
       renderedPlayers.push(
         <div
-          key={`spot-${i}`}
+          key={`spot-${rowNumber}-${i}`}
           className="w-16 h-16 bg-gray-300 rounded-full m-2"
         />
       );
