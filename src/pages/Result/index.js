@@ -233,19 +233,21 @@ const Result = ({ socket }) => {
                       {updatedAchievements.map((item, index) => (
                         <div
                           key={index}
-                          className="flex items-center space-x-8 justify-center"
+                          className="flex items-center space-x-8"
                         >
-                          <img
-                            className="w-16 h-16"
-                            src={
-                              AchievementImages[item.name][
-                                AchievementVariables[item.name].findIndex(
-                                  (val) => val === Number(item.value)
-                                )
-                              ]
-                            }
-                            alt="achievement-icon"
-                          />
+                          <div >
+                            <img
+                              className="w-16 h-16"
+                              src={
+                                AchievementImages[item.name][
+                                  AchievementVariables[item.name].findIndex(
+                                    (val) => val === Number(item.value)
+                                  )
+                                ]
+                              }
+                              alt="achievement-icon"
+                            />
+                          </div>
                           <p className="font-semibold text-xl">
                             <span className="font-bold text-xl">
                               {item.name}
