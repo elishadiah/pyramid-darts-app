@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import Card from "./Card";
 
 const Pyramid = ({
   players,
   selectedPlayer,
+  imgSize,
   sendQuickFight,
   sendScheduledFight,
 }) => {
@@ -39,12 +39,16 @@ const Pyramid = ({
       >
         {player.avatar ? (
           <img
-            className="mx-auto h-16 w-16 flex-shrink-0 rounded-full"
+            className={`mx-auto flex-shrink-0 rounded-full`}
             src={player.avatar}
+            style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
             alt="user avatar"
           ></img>
         ) : (
-          <div className="mx-auto w-16 h-16 flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold ">
+          <div
+            className={`mx-auto flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold`}
+            style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
+          >
             {player.username.toLocaleUpperCase().charAt(0)}
           </div>
         )}
@@ -64,7 +68,8 @@ const Pyramid = ({
       renderedPlayers.push(
         <div
           key={`spot-${rowNumber}-${i}`}
-          className="w-16 h-16 bg-gray-300 rounded-full m-2"
+          className={`bg-gray-300 rounded-full m-2`}
+          style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
         />
       );
     }

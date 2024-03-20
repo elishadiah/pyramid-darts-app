@@ -15,7 +15,7 @@ const SearchBar = ({ players, onPlayerClick }) => {
   return (
     <div className="w-full">
       <SearchComponent onSearchFunc={onSearchFunc} />
-      <div className="py-4">
+      <div className="py-4 overflow-y-auto max-h-30-vh sm:max-h-75-vh my-4">
         <ul>
           {filteredPlayers.map((player) => (
             <li

@@ -12,6 +12,12 @@ module.exports = {
         'divider-color': 'rgb(73, 73, 73)',
         'form-color': '#2196f3'
       },
+      maxHeight: {
+        '80-vh': "80vh",
+        '75-vh': "75vh",
+        '70-vh': "70vh",
+        '30-vh': "30vh",
+      },
     },
   },
   plugins: [],

@@ -145,7 +145,7 @@ const Card = ({
       <div
         id={player._id}
         className={classNames(
-          "group relative flex shadow p-2 m-2",
+          "group relative flex shadow h-full p-2 m-2",
           isHighlighted ? "border border-2 border-green-500 bg-green-100" : ""
         )}
       >

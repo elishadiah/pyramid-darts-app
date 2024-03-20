@@ -9,6 +9,7 @@ const Ranking = ({ socket }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [players, setPlayers] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [imgSize, setImgSize] = useState(16);
 
   useEffect(() => {
     fetchAllResult();
@@ -64,6 +65,10 @@ const Ranking = ({ socket }) => {
     setSelectedPlayer(payload);
   };
 
+  const onSliderChange = (e) => {
+    setImgSize(e.target.value);
+  };
+
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
@@ -86,13 +91,29 @@ const Ranking = ({ socket }) => {
               <div className="flex w-full px-2 sm:hidden">
                 <SearchBar players={players} onPlayerClick={onPlayerClick} />
               </div>
-              <div className="flex flex-col w-full md:w-8/12 sm:w-6/12 divide-y divide-green-300 dark:divide-gray-400">
-                <Pyramid
-                  players={players}
-                  selectedPlayer={selectedPlayer}
-                  sendQuickFight={sendQuickFight}
-                  sendScheduledFight={sendScheduledFight}
-                />
+              <div className="flex flex-col w-full py-4 md:w-8/12 sm:w-6/12 ">
+                <div className="flex items-center space-x-4">
+                  <p>Zoom&nbsp;In</p>
+                  <input
+                    id="medium-range"
+                    type="range"
+                    min={6}
+                    max={16}
+                    step={2}
+                    className="w-full h-2 bg-gray-200 text-green-600 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                    onChange={onSliderChange}
+                  />
+                  <p>Zoom&nbsp;Out</p>
+                </div>
+                <div className="overflow-y-auto py-4 max-h-70-vh divide-y divide-green-300 dark:divide-gray-400">
+                  <Pyramid
+                    players={players}
+                    selectedPlayer={selectedPlayer}
+                    imgSize={imgSize}
+                    sendQuickFight={sendQuickFight}
+                    sendScheduledFight={sendScheduledFight}
+                  />
+                </div>
               </div>
               <div className="hidden px-2 sm:flex sm:px-6 w-6/12 md:w-4/12">
                 <SearchBar players={players} onPlayerClick={onPlayerClick} />
