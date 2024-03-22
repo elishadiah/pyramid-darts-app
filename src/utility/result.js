@@ -122,8 +122,8 @@ const updateResult = (data) => {
     maxVictoryStreak:
       user1Update.currentVictoryStreak > data.user1.init.maxVictoryStreak
         ? user1Update.currentVictoryStreak
-        : data.user1.init.maxVictoryStreak,
-    sentTotalChallengeNo: data.user1.init.sentTotalChallengeNo + 1,
+        : data.user1.init.maxVictoryStreak + 1,
+    sentTotalChallengeNo: Number(user1Update.sentTotalChallengeNo) + 1,
   };
 
   user2Update = {
@@ -131,7 +131,7 @@ const updateResult = (data) => {
     master26: user2Update.master26 + cntBreakfast2,
     maxVictoryStreak:
       user2Update.currentVictoryStreak > data.user2.init.maxVictoryStreak
-        ? user2Update.currentVictoryStreak
+        ? user2Update.currentVictoryStreak + 2
         : data.user2.init.maxVictoryStreak,
   };
 

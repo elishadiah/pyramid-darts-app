@@ -129,71 +129,6 @@ const Profile = ({ socket }) => {
       });
       setResult(res.data);
 
-      let breakfastImg, challengerImg, streakImg;
-
-      AchievementVariables.BREAKFAST.map((val, index) => {
-        if (index < AchievementVariables.BREAKFAST.length - 1) {
-          if (
-            val <= res.data.master26 &&
-            res.data.master26 < AchievementVariables.BREAKFAST[index + 1]
-          ) {
-            breakfastImg = AchievementImages.BREAKFAST[index];
-          }
-        } else if (
-          res.data.master26 >=
-          AchievementVariables.BREAKFAST[
-            AchievementVariables.BREAKFAST.length - 1
-          ]
-        ) {
-          breakfastImg =
-            AchievementImages.BREAKFAST[
-              AchievementVariables.BREAKFAST.length - 1
-            ];
-        }
-        return true;
-      });
-
-      AchievementVariables.FRIENDLY_CHALLENGER.map((val, index) => {
-        if (index < AchievementVariables.FRIENDLY_CHALLENGER.length - 1) {
-          if (
-            val <= res.data.sentTotalChallengeNo &&
-            res.data.sentTotalChallengeNo <
-              AchievementVariables.FRIENDLY_CHALLENGER[index + 1]
-          ) {
-            challengerImg = AchievementImages.FRIENDLY_CHALLENGER[index];
-          }
-        } else if (
-          res.data.sentTotalChallengeNo >=
-          AchievementVariables.FRIENDLY_CHALLENGER[
-            AchievementVariables.FRIENDLY_CHALLENGER.length - 1
-          ]
-        ) {
-          challengerImg =
-            AchievementImages.FRIENDLY_CHALLENGER[
-              AchievementVariables.FRIENDLY_CHALLENGER.length - 1
-            ];
-        }
-        return true;
-      });
-
-      AchievementVariables.STREAK.map((val, index) => {
-        if (index < AchievementVariables.STREAK.length - 1) {
-          if (
-            val <= res.data.maxVictoryStreak &&
-            res.data.maxVictoryStreak < AchievementVariables.STREAK[index + 1]
-          ) {
-            streakImg = AchievementImages.STREAK[index];
-          }
-        } else if (
-          res.data.maxVictoryStreak >=
-          AchievementVariables.STREAK[AchievementVariables.STREAK.length - 1]
-        ) {
-          streakImg =
-            AchievementImages.STREAK[AchievementVariables.STREAK.length - 1];
-        }
-        return true;
-      });
-
       const highIndex = res.data.highFinish.reduce((acc, element, index) => {
         if (Number(element) !== 0) {
           acc.push(index);
@@ -202,18 +137,10 @@ const Profile = ({ socket }) => {
       }, []);
 
       setAchievement({
-        breakfast: breakfastImg,
-        streak: streakImg,
-        friendly: challengerImg,
         finishing: highIndex,
       });
 
-      console.log(
-        "--------Init-profile--result-------",
-        res.data,
-        "::::-->>",
-        breakfastImg
-      );
+      console.log("--------Init-profile--result-------", res.data);
     } catch (err) {
       console.log("-------Init-profile--err---", err);
       setResult(null);
@@ -334,19 +261,19 @@ const Profile = ({ socket }) => {
     <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
       <Header current={0} socket={socket} />
       <div className="p-8">
-        <div className="flex border border-gray-200 bg-white p-4 rounded-md">
-          <div className="w-4/12 flex flex-col space-y-4 rounded-xl py-8 sm:py-4">
+        <div className="flex sm:flex-row flex-col border border-gray-200 bg-white p-4 mb-4 rounded-md">
+          <div className="w-full sm:w-4/12 flex flex-col space-y-4 rounded-xl py-8 sm:py-4">
             <div className="flex justify-center items-center">
               {user.avatar === "" ? (
                 <img
                   src="https://www.f-cdn.com/assets/main/en/assets/unknown.png?image-optimizer=force&format=webply&width=336 1x"
-                  className="rounded-md"
+                  className="rounded-md w-44 h-44 lg:w-72 lg:h-72 sm:w-44 sm:h-44"
                   alt="user-avatar"
                 />
               ) : (
                 <img
                   src={user.avatar}
-                  className="rounded-md w-24 h-24 lg:w-72 lg:h-72 sm:w-44 sm:h-44"
+                  className="rounded-md w-44 h-44 lg:w-72 lg:h-72 sm:w-44 sm:h-44"
                   alt="user-avatar"
                 />
               )}
@@ -355,81 +282,55 @@ const Profile = ({ socket }) => {
               {user.username}
             </div>
           </div>
-          <div className="w-8/12 text-left p-4">
+          <div className="w-full sm:w-8/12 text-left p-4">
             {isLoading ? (
               <Loading />
             ) : (
               result && (
-                <div className="p-4">
+                <div className="px-4">
                   <AchievementItemComponent
                     result={result.sentTotalChallengeNo}
-                    achievement={achievement.friendly}
-                    iconSize="w-24 h-24"
+                    max={100}
+                    iconSize="xl:w-24 xl:h-24 lg:w-20 lg:h-20 sm:w-16 sm:h-16 w-20 h-20"
                     achievementIcons={AchievementImages.FRIENDLY_CHALLENGER}
                     handleActive={HandleAchievement.friendlyActive}
                   />
                   <AchievementItemComponent
                     result={result.maxVictoryStreak}
-                    achievement={achievement.streak}
+                    max={10}
                     iconSize="w-24 h-20"
                     achievementIcons={AchievementImages.STREAK}
                     handleActive={HandleAchievement.streakActive}
                   />
                   <AchievementItemComponent
                     result={result.master26}
-                    achievement={achievement.breakfast}
-                    iconSize="w-24 h-20"
+                    max={1000}
+                    iconSize="lg:w-24 lg:h-20"
                     achievementIcons={AchievementImages.BREAKFAST}
                     handleActive={HandleAchievement.breakfastActive}
                   />
 
-           
-                  {result.master26 < 10 ? (
-                    <div className="flex items-center">
-                      <img
-                        src={AchievementImages.BREAKFAST[0]}
-                        className="opacity-50 w-14 h-14"
-                        alt="achievement-icon"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <img
-                        src={achievement.breakfast}
-                        className="w-14 h-14"
-                        alt="achievement-icon"
-                      />
-                    </div>
-                  )}
-                  {result.highFinish.length === 0
-                    ? AchievementImages.FINISHINGACE.map((val, index) => (
-                        <div className="flex items-center" key={index}>
+                  <div className="flex flex-wrap justify-center mt-8 max-h-40 sm:max-h-full sm:overflow-y-none overflow-y-auto">
+                    {AchievementImages.FINISHINGACE.map((val, index) =>
+                      achievement.finishing.includes(index) ? (
+                        <div className="sm:flex sm:items-center sm:w-20 w-[33.3%]" key={index}>
                           <img
                             src={val}
-                            className="opacity-50 w-14 h-14"
+                            className="sm:w-20 sm:h-20 w-full"
                             alt="achievement-icon"
                           />
                         </div>
-                      ))
-                    : AchievementImages.FINISHINGACE.map((val, index) =>
-                        achievement.finishing.includes(index) ? (
-                          <div className="flex items-center" key={index}>
-                            <img
-                              src={val}
-                              className="w-14 h-14"
-                              alt="achievement-icon"
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex items-center" key={index}>
-                            <img
-                              src={val}
-                              className="opacity-50 w-14 h-14"
-                              alt="achievement-icon"
-                            />
-                          </div>
-                        )
-                      )}
+                      ) : (
+                        <div className="sm:flex sm:items-center sm:w-20 w-[33.3%]" key={index}>
+                          <img
+                            src={val}
+                            className="opacity-50 sm:w-20 sm:h-20 w-full"
+                            alt="achievement-icon"
+                          />
+                        </div>
+                      )
+                    )}
+                  </div>
                 </div>
               )
             )}
