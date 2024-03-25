@@ -28,7 +28,7 @@ const AppRouter = () => {
         <Route path="/profile" element={<Profile socket={socket} />} />
         <Route path="/schedule" element={<Schedule socket={socket} />} />
         <Route path="/settings" element={<Settings socket={socket} />} />
-        <Route path="/ranking" element={<Ranking socket={socket} />} />
+        <Route path="/pyramid" element={<Ranking socket={socket} />} />
         <Route path="/result" element={<Result socket={socket} />} />
       </Route>
     </Routes>

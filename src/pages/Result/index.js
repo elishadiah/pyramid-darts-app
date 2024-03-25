@@ -43,7 +43,7 @@ const Result = ({ socket }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    navigate("/ranking");
+    navigate("/pyramid");
   };
 
   const onSave = async (e) => {
@@ -60,25 +60,31 @@ const Result = ({ socket }) => {
 
       setUpdatedAchievements(earnedAchievement);
 
-      earnedAchievement.length && setIsModalOpen(true);
-      console.log(
-        "***",
-        updatedResult.find((val) => val.username === currentUser),
-        ":::::",
-        earnedAchievement
+      // earnedAchievement.length && setIsModalOpen(true);
+      const user1Init = totalResult.allResult.find(
+        (val) => val.username === totalResult.user1.name
       );
-      setIsLoading(true);
-      try {
-        await Promise.all(
-          updatedResult.map(async (val) => {
-            await http.post("/result/post", val);
-          })
-        );
-      } catch (err) {
-        toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
-      } finally {
-        setIsLoading(false);
+
+      if (
+        new Date(user1Init.date).toISOString() ===
+        new Date(totalResult.begin).toISOString()
+      ) {
+        toast("Dieses Spiel wurde bereits gespeichert.");
+      } else {
+        setIsLoading(true);
+        try {
+          await Promise.all(
+            updatedResult.map(async (val) => {
+              await http.post("/result/post", val);
+            })
+          );
+        } catch (err) {
+          toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
+        } finally {
+          setIsLoading(false);
+        }
       }
+
     } else {
       toast(
         "Benutzername nicht gefunden. Spielergebnisse können nicht gespeichert werden."
@@ -235,7 +241,7 @@ const Result = ({ socket }) => {
                           key={index}
                           className="flex items-center space-x-8"
                         >
-                          <div >
+                          <div>
                             <img
                               className="w-16 h-16"
                               src={

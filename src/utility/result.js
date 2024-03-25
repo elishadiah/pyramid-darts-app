@@ -124,6 +124,7 @@ const updateResult = (data) => {
         ? user1Update.currentVictoryStreak
         : data.user1.init.maxVictoryStreak + 1,
     sentTotalChallengeNo: Number(user1Update.sentTotalChallengeNo) + 1,
+    date: new Date(data.begin),
   };
 
   user2Update = {
@@ -133,6 +134,7 @@ const updateResult = (data) => {
       user2Update.currentVictoryStreak > data.user2.init.maxVictoryStreak
         ? user2Update.currentVictoryStreak + 2
         : data.user2.init.maxVictoryStreak,
+    date: new Date(data.begin),
   };
 
   console.log("Update-result--->>>", user1Update, user2Update);

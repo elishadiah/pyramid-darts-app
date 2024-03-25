@@ -20,7 +20,7 @@ const SearchBar = ({ players, onPlayerClick }) => {
           {filteredPlayers.map((player) => (
             <li
               key={player._id}
-              className="text-left pl-2"
+              className="text-left pl-2 bg-white"
               onClick={() => onPlayerClick(player)}
             >
               <a className="font-semibold text-lg" href={`#${player._id}`}>

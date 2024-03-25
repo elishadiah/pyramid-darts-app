@@ -5,15 +5,16 @@ import { Link, redirect } from "react-router-dom";
 import Switcher from "./Switcher";
 import logoImg from "../assets/img/fc_logo.png";
 import authService from "../services/auth.service";
-import emailjs from "@emailjs/browser";
 import { useNavigate } from "react-router-dom";
 import http from "../utility/http-client";
+import EmailNotify from "../utility/emailjs";
 
 const navigation = [
   { name: "Home", to: "/", current: 1 },
-  { name: "Rankings", to: "/ranking", current: 2 },
+  { name: "Pyramid", to: "/pyramid", current: 2 },
   { name: "Infos", to: "/infos", current: 3 },
   { name: "Profile", to: "/profile", current: 4 },
+  { name: "Calendar", to: "/schedule", current: 5 },
 ];
 
 const userMenuItems = [
@@ -38,35 +39,14 @@ export default function Header({ current, socket }) {
   };
 
   const declineChallenge = (type) => {
-    console.log("Decline-->>", notifications);
-    emailjs
-      .send(
-        "service_e37gjno",
-        "template_c69m2ru",
-        {
-          from_name: user.username,
-          from_email: user.email,
-          to_email:
-            type === "quick" ? notifications.email : scheduleNotification.email,
-          to_name:
-            type === "quick"
-              ? notifications.username
-              : scheduleNotification.username,
-          subject: "Dart Challenge",
-          message: `${user.username} declined your challenge.`,
-        },
-        { publicKey: "rASlZgWjQ3kN4qzUG", privateKey: "CQFRfh6s1JpgbDaD3nWlH" }
-      )
-      .then(
-        function (response) {
-          console.log("Email sent successfully!", response);
-          // Handle success
-        },
-        function (error) {
-          console.error("Email sending failed:", error);
-          // Handle error
-        }
-      );
+    EmailNotify.sendNotificationEmail(
+      user.username,
+      user.email,
+      type === "quick" ? notifications.username : scheduleNotification.username,
+      type === "quick" ? notifications.email : scheduleNotification.email,
+      `${user.username} declined your challenge.`,
+      "Dart Challenge"
+    );
   };
 
   const removeNotification = () => {
