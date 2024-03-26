@@ -50,7 +50,7 @@ const Schedule = ({ socket }) => {
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
-        <Header current={4} socket={socket} />
+        <Header current={5} socket={socket} />
         {isLoading ? (
           <div className="flex flex-col space-y-4">
             <Loading />

@@ -15,6 +15,7 @@ const navigation = [
   { name: "Infos", to: "/infos", current: 3 },
   { name: "Profile", to: "/profile", current: 4 },
   { name: "Calendar", to: "/schedule", current: 5 },
+  { name: "Events", to: "/events", current: 6 },
 ];
 
 const userMenuItems = [
@@ -39,6 +40,7 @@ export default function Header({ current, socket }) {
   };
 
   const declineChallenge = (type) => {
+    http.post("/event/post", {content: `${user.username} rejected a challenge`});
     EmailNotify.sendNotificationEmail(
       user.username,
       user.email,

@@ -45,8 +45,6 @@ const Profile = ({ socket }) => {
 
   useEffect(() => {
     console.log("Schedules-state-->>", schedules);
-    const { username } = JSON.parse(localStorage.getItem("authUser")).user;
-    let notiTimer, startTimer;
     if (schedules) {
       setEvents(
         schedules.map((val) => ({
@@ -56,47 +54,7 @@ const Profile = ({ socket }) => {
           end: addMinutes(val.date, 60),
         }))
       );
-      schedules.map((val) => {
-        const notiTime = new Date(
-          new Date(val.date).getTime() - 4 * 60 * 60 * 1000
-        );
-
-        notiTimer = setTimeout(() => {
-          EmailNotify.sendNotificationEmail(
-            val.challenger,
-            val.challengerEmail,
-            val.receiver,
-            val.receiverEmail,
-            "Bis zum Spiel sind es noch weniger als 4 Stunden. Wenn Sie jetzt absagen, verlieren Sie im Grunde das Spiel. Wenn Sie abbrechen möchten, stornieren Sie bitte die geplante Herausforderung auf der Seite „Profil“.",
-            "Kommende Herausforderungen"
-          );
-        }, notiTime.getTime() - Date.now());
-
-        return true;
-      });
-      schedules
-        .filter((val) => val.challenger.includes(username))
-        .map((val) => {
-          const startTime = new Date(
-            new Date(val.date).getTime() - 3 * 60 * 1000
-          );
-          startTimer = setTimeout(() => {
-            EmailNotify.sendNotificationEmail(
-              val.challenger,
-              val.challengerEmail,
-              val.receiver,
-              val.receiverEmail,
-              "Es ist Zeit, mit Ihrer bevorstehenden Herausforderung zu beginnen. Bitte erstellen Sie auf Ihrer „Profil“-Seite eine Challenge.",
-              "Kommende Herausforderungen"
-            );
-          }, startTime.getTime() - Date.now());
-          return true;
-        });
     }
-    return () => {
-      clearTimeout(notiTimer);
-      clearTimeout(startTimer);
-    };
   }, [schedules]);
 
   const getCurrentTimeZone = () => {
@@ -175,6 +133,7 @@ const Profile = ({ socket }) => {
         "Schedule Challenge"
       );
     http.post("/schedule/remove", currentSchedule);
+    http.post("/event/post", {content: `${currentSchedule.challenger} create a scheduled challenge`});
     window.open(
       `https://lidarts.org/game/create?opponent_name=${currentSchedule.receiver}`,
       "_blank"
@@ -192,6 +151,7 @@ const Profile = ({ socket }) => {
 
   const onDecline = async () => {
     http.post("/schedule/remove", currentSchedule);
+    http.post("/event/post", {content: `${currentSchedule.receiver} rejected a scheduled challenge`});
     setIsLoading(true);
     try {
       const res = await http.post("/result/fetch", {
@@ -313,7 +273,10 @@ const Profile = ({ socket }) => {
                   <div className="flex flex-wrap justify-center mt-8 max-h-40 sm:max-h-full sm:overflow-y-none overflow-y-auto">
                     {AchievementImages.FINISHINGACE.map((val, index) =>
                       achievement.finishing.includes(index) ? (
-                        <div className="sm:flex sm:items-center sm:w-20 w-[33.3%]" key={index}>
+                        <div
+                          className="sm:flex sm:items-center sm:w-20 w-[33.3%]"
+                          key={index}
+                        >
                           <img
                             src={val}
                             className="sm:w-20 sm:h-20 w-full"
@@ -321,7 +284,10 @@ const Profile = ({ socket }) => {
                           />
                         </div>
                       ) : (
-                        <div className="sm:flex sm:items-center sm:w-20 w-[33.3%]" key={index}>
+                        <div
+                          className="sm:flex sm:items-center sm:w-20 w-[33.3%]"
+                          key={index}
+                        >
                           <img
                             src={val}
                             className="opacity-50 sm:w-20 sm:h-20 w-full"

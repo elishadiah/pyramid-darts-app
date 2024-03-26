@@ -25,6 +25,7 @@ const Ranking = ({ socket }) => {
   }, [socket]);
 
   const sendQuickFight = (username, challenger, challengerEmail) => {
+    http.post("/event/post", {content: `${challenger} send a quick challenge to ${username}`});
     socket.emit("challenge", {
       receiver: username,
       challenger,
@@ -39,6 +40,8 @@ const Ranking = ({ socket }) => {
     receiver,
     receiverEmail
   ) => {
+    console.log('Select--date-->>', selectedDate);
+    http.post("/event/post", {content: `${challenger} send a quick challenge to ${receiver}`});
     socket.emit("schedule-challenge", {
       date: selectedDate,
       challenger,
