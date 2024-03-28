@@ -60,7 +60,7 @@ const Result = ({ socket }) => {
 
       setUpdatedAchievements(earnedAchievement);
 
-      // earnedAchievement.length && setIsModalOpen(true);
+      earnedAchievement.length && setIsModalOpen(true);
       const user1Init = totalResult.allResult.find(
         (val) => val.username === totalResult.user1.name
       );

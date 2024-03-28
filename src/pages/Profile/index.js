@@ -133,7 +133,9 @@ const Profile = ({ socket }) => {
         "Schedule Challenge"
       );
     http.post("/schedule/remove", currentSchedule);
-    http.post("/event/post", {content: `${currentSchedule.challenger} create a scheduled challenge`});
+    http.post("/event/post", {
+      content: `${currentSchedule.challenger} create a scheduled challenge`,
+    });
     window.open(
       `https://lidarts.org/game/create?opponent_name=${currentSchedule.receiver}`,
       "_blank"
@@ -151,7 +153,9 @@ const Profile = ({ socket }) => {
 
   const onDecline = async () => {
     http.post("/schedule/remove", currentSchedule);
-    http.post("/event/post", {content: `${currentSchedule.receiver} rejected a scheduled challenge`});
+    http.post("/event/post", {
+      content: `${currentSchedule.receiver} rejected a scheduled challenge`,
+    });
     setIsLoading(true);
     try {
       const res = await http.post("/result/fetch", {
@@ -161,46 +165,41 @@ const Profile = ({ socket }) => {
         username: currentSchedule.challenger.trim(),
       });
       const resAll = await http.get("/result/fetch-all");
-      // Pyramid rows number
-      const levels = [];
-      resAll.data.forEach((element) => {
-        const level = element.level;
-        if (!levels[level]) {
-          levels[level] = [];
-        }
-        levels[level].push(element);
-      });
-      const rowNo = levels.map((val) => val.length);
-      const updateLevel1 =
-        res.data.level > resOther.data.level
-          ? resOther.data.level
-          : res.data.level;
-      const updateLevel2 =
-        res.data.level > resOther.data.level
-          ? res.data.level
-          : rowNo[resOther.data.level] - rowNo[resOther.data.level + 1] > 2
-          ? resOther.data.level + 1
-          : resOther.data.level;
-      const updateResult1 = {
-        ...res.data,
-        previousWin: false,
+
+      let user1Update = { ...resOther.data };
+      let user2Update = { ...res.data };
+
+      const availablePositionNo = Math.pow(2, 7 - user2Update.level);
+      const currentAbovePlayersNo = resAll.data.filter(
+        (val) => val.level === user2Update.level + 1
+      ).length;
+      const rowSpotNo = availablePositionNo - currentAbovePlayersNo;
+
+      user2Update = {
+        ...user2Update,
         currentVictoryStreak: 0,
-        level: updateLevel1,
+        previousWin: false,
+        level:
+          res.data.level > resOther.data.level
+            ? resOther.data.level
+            : res.data.level,
       };
-      const updateResult2 = {
-        ...resOther.data,
-        previousWin: true,
-        currentVictoryStreak: resOther.data.currentVictoryStreak + 1,
-        maxVictoryStreak:
-          resOther.data.currentVictoryStreak + 1 >
-          resOther.data.maxVictoryStreak
-            ? resOther.data.currentVictoryStreak + 1
-            : resOther.data.maxVictoryStreak,
-        sentTotalChallengeNo: resOther.data.sentTotalChallengeNo + 1,
-        level: updateLevel2,
+
+      user1Update = {
+        ...user1Update,
+        level:
+          res.data.level > resOther.data.level
+            ? res.data.level
+            : res.data.level < resOther.data.level
+            ? resOther.data.level
+            : rowSpotNo < 1
+            ? res.data.level
+            : res.data.level + 1,
       };
-      updateResult(updateResult1);
-      updateResult(updateResult2);
+
+      updateResult(user1Update);
+      updateResult(user2Update);
+
       fetchSchedules();
       EmailNotify.sendNotificationEmail(
         currentSchedule.receiver,

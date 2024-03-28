@@ -13,6 +13,7 @@ import Schedule from "../pages/Schedule";
 import Settings from "../pages/Settings";
 import Result from "../pages/Result";
 import GlobalEvents from "../pages/Events";
+import RankingTable from "../pages/RankingTable";
 
 // const socket = socketIO.connect("http://localhost:4000");
 const socket = socketIO('https://backend.dartsfightclub.de');
@@ -32,6 +33,7 @@ const AppRouter = () => {
         <Route path="/pyramid" element={<Ranking socket={socket} />} />
         <Route path="/result" element={<Result socket={socket} />} />
         <Route path="/events" element={<GlobalEvents socket={socket} />} />
+        <Route path="/ranking-table" element={<RankingTable socket={socket} />} />
       </Route>
     </Routes>
   );

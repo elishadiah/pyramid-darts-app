@@ -16,6 +16,7 @@ const navigation = [
   { name: "Profile", to: "/profile", current: 4 },
   { name: "Calendar", to: "/schedule", current: 5 },
   { name: "Events", to: "/events", current: 6 },
+  { name: "Ranking", to: "/ranking-table", current: 7 },
 ];
 
 const userMenuItems = [
