@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { DateObject, Calendar } from "react-multi-date-picker";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
@@ -15,6 +15,7 @@ function classNames(...classes) {
 const Card = ({
   player,
   available,
+  connectedUsers,
   isHighlighted,
   sendQuickFight,
   sendScheduledFight,
@@ -24,6 +25,12 @@ const Card = ({
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
+
+  const connected = useMemo(
+    () =>
+      connectedUsers.find((val) => val.username === player.username)?.connected,
+    [connectedUsers, player]
+  );
 
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("authUser")).user);
@@ -114,17 +121,17 @@ const Card = ({
           isHighlighted ? "border border-2 border-green-500 bg-green-100" : ""
         )}
       >
-        {/* {occupied ? (
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-600 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-gray-700"></span>
-          </span>
-        ) : (
+        {connected ? (
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-700"></span>
           </span>
-        )} */}
+        ) : (
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-600 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-gray-700"></span>
+          </span>
+        )}
         {children}
         <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-10 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
           <div className="flex flex-col h-16 p-4">

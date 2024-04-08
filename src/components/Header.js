@@ -8,32 +8,31 @@ import authService from "../services/auth.service";
 import { useNavigate } from "react-router-dom";
 import http from "../utility/http-client";
 import EmailNotify from "../utility/emailjs";
-
-const navigation = [
-  { name: "Home", to: "/", current: 1 },
-  { name: "Pyramid", to: "/pyramid", current: 2 },
-  { name: "Infos", to: "/infos", current: 3 },
-  { name: "Profile", to: "/profile", current: 4 },
-  { name: "Calendar", to: "/schedule", current: 5 },
-  { name: "Events", to: "/events", current: 6 },
-  { name: "Ranking", to: "/ranking-table", current: 7 },
-];
-
-const userMenuItems = [
-  { name: "Your Profile", to: "/profile" },
-  { name: "Settings", to: "/settings" },
-];
+import socket from "../socket";
+import constant from "../utility/constant";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Header({ current, socket }) {
+export default function Header({ current }) {
   const navigate = useNavigate();
   const [userAvatar, setUserAvatar] = useState(null);
   const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState(null);
   const [scheduleNotification, setScheduleNotification] = useState(null);
+
+  useEffect(() => {
+    const tmp = authService.getAuthUser().user;
+    if (
+      tmp.hasOwnProperty("avatar") === false ||
+      tmp.avatar === null ||
+      tmp.avatar === ""
+    )
+      setUserAvatar(null);
+    else setUserAvatar(tmp.avatar);
+    setUser(tmp);
+  }, []);
 
   const handleLogout = () => {
     authService.logout();
@@ -41,7 +40,9 @@ export default function Header({ current, socket }) {
   };
 
   const declineChallenge = (type) => {
-    http.post("/event/post", {content: `${user.username} rejected a challenge`});
+    http.post("/event/post", {
+      content: `${user.username} rejected a challenge`,
+    });
     EmailNotify.sendNotificationEmail(
       user.username,
       user.email,
@@ -82,46 +83,34 @@ export default function Header({ current, socket }) {
     return timeZone;
   };
 
-  useEffect(() => {
-    const tmp = JSON.parse(localStorage.getItem("authUser")).user;
-    if (
-      tmp.hasOwnProperty("avatar") === false ||
-      tmp.avatar === null ||
-      tmp.avatar === ""
-    )
-      setUserAvatar(null);
-    else setUserAvatar(tmp.avatar);
-    setUser(tmp);
-  }, []);
+  // useEffect(() => {
+  //   socket.on("challengeResponse", (data) => {
+  //     data.user === user?.username &&
+  //       setNotifications({
+  //         username: data.challenger,
+  //         email: data.challengerEmail,
+  //       });
+  //     console.log("Socket-notification-->>>", notifications, "::::", data);
+  //   });
+  // }, [socket, user, notifications]);
 
-  useEffect(() => {
-    socket.on("challengeResponse", (data) => {
-      data.user === user?.username &&
-        setNotifications({
-          username: data.challenger,
-          email: data.challengerEmail,
-        });
-      console.log("Socket-notification-->>>", notifications, "::::", data);
-    });
-  }, [socket, user, notifications]);
-
-  useEffect(() => {
-    socket.on("schedule-challenge-response", (data) => {
-      data.user === user?.username &&
-        setScheduleNotification({
-          date: data.date,
-          username: data.challenger,
-          email: data.challengerEmail,
-          receiver: data.user,
-          receiverEmail: data.email,
-        });
-    });
-  }, [socket, user, scheduleNotification]);
+  // useEffect(() => {
+  //   socket.on("schedule-challenge-response", (data) => {
+  //     data.user === user?.username &&
+  //       setScheduleNotification({
+  //         date: data.date,
+  //         username: data.challenger,
+  //         email: data.challengerEmail,
+  //         receiver: data.user,
+  //         receiverEmail: data.email,
+  //       });
+  //   });
+  // }, [socket, user, scheduleNotification]);
 
   return (
     <Disclosure
       as="nav"
-      className="bg-indio-50 dark:bg-gray-800 mb-12 border border-gray-200 dark:border-gray-700"
+      className="sticky top-0 z-50 bg-white dark:bg-gray-800 mb-12 border border-gray-200 dark:border-gray-700"
     >
       {({ open }) => (
         <>
@@ -137,7 +126,7 @@ export default function Header({ current, socket }) {
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
-                    {navigation.map((item) => (
+                    {constant.navigation.map((item) => (
                       <Link
                         key={item.name}
                         to={item.to}
@@ -309,7 +298,7 @@ export default function Header({ current, socket }) {
                       leaveTo="transform opacity-0 scale-95"
                     >
                       <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {userMenuItems.map((item, index) => (
+                        {constant.userMenuItems.map((item, index) => (
                           <Menu.Item key={index}>
                             {({ active }) => (
                               <Link
@@ -375,7 +364,7 @@ export default function Header({ current, socket }) {
                   {item.name}
                 </Disclosure.Button>
               ))} */}
-              {navigation.map((item) => (
+              {constant.navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.to}
@@ -429,7 +418,7 @@ export default function Header({ current, socket }) {
                 </button>
               </div>
               <div className="mt-3 space-y-1 px-2">
-                {userMenuItems.map((item, index) => (
+                {constant.userMenuItems.map((item, index) => (
                   <Disclosure.Button
                     key={index}
                     as="a"

@@ -10,8 +10,10 @@ import http from "../../utility/http-client";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
 
-const Settings = ({socket}) => {
+const Settings = () => {
   const [userAvatar, setUserAvatar] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState({});
@@ -19,10 +21,10 @@ const Settings = ({socket}) => {
 
   const notify = (message) => {
     toast(message);
-  }
+  };
 
   useEffect(() => {
-    const tmp = JSON.parse(localStorage.getItem("authUser")).user;
+    const tmp = authService.getAuthUser().user;
     if (
       tmp.hasOwnProperty("avatar") === false ||
       tmp.avatar === null ||
@@ -31,7 +33,31 @@ const Settings = ({socket}) => {
       setUserAvatar(null);
     else setUserAvatar(tmp.avatar);
 
-    setUserid(JSON.parse(localStorage.getItem("authUser")).user._id);
+    const sessionID = authService.getAuthUser().user._id;
+    const username = authService.getAuthUser().user.username;
+    if (sessionID) {
+      socket.auth = { sessionID, username };
+      socket.connect();
+    }
+
+    const handleErr = (err) => {
+      console.log("Socket--err-->>", err);
+    };
+
+    const handleUserID = ({ userID }) => {
+      socket.userID = userID;
+    };
+
+    socket.on("session_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    setUserid(sessionID);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("session_id", handleUserID);
+      socket.disconnect();
+    };
   }, []);
 
   const handleAvatarUpload = async (e) => {
@@ -58,7 +84,7 @@ const Settings = ({socket}) => {
         avatar: userAvatar,
       });
       const oldUser = JSON.parse(localStorage.getItem("authUser"));
-      console.log('TTT---------------', oldUser)
+      console.log("TTT---------------", oldUser);
       const newUser = {
         token: oldUser.token,
         user: { ...oldUser.user, ...res.data.data.updatedUser },
@@ -66,10 +92,10 @@ const Settings = ({socket}) => {
       localStorage.removeItem("authUser");
       localStorage.setItem("authUser", JSON.stringify(newUser));
       console.log("Update-res-->>>", res.data.data.updatedUser);
-      notify('Success!')
+      notify("Success!");
     } catch (err) {
       console.log("Update-err-->>", err);
-      notify('Error!')
+      notify("Error!");
     } finally {
       setIsLoading(false);
     }

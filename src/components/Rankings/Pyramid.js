@@ -3,6 +3,7 @@ import Card from "./Card";
 const Pyramid = ({
   players,
   selectedPlayer,
+  connectedUsers,
   imgSize,
   sendQuickFight,
   sendScheduledFight,
@@ -25,6 +26,8 @@ const Pyramid = ({
     }
   };
 
+  console.log('--------------------------------------', connectedUsers)
+
   const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;
     return (
@@ -35,6 +38,7 @@ const Pyramid = ({
         isHighlighted={isHighlighted}
         sendQuickFight={sendQuickFight}
         sendScheduledFight={sendScheduledFight}
+        connectedUsers={connectedUsers}
         // occupied={false}
       >
         {player.avatar ? (

@@ -3,12 +3,38 @@ import Header from "../../components/Header";
 import http from "../../utility/http-client";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
 
-const RankingTable = ({ socket }) => {
+const RankingTable = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState([]);
   useEffect(() => {
     fetchResult();
+
+    const sessionID = authService.getAuthUser().user._id;
+    const username = authService.getAuthUser().user.username;
+    if (sessionID) {
+      socket.auth = { sessionID, username };
+      socket.connect();
+    }
+
+    const handleErr = (err) => {
+      console.log("Socket--err-->>", err);
+    };
+
+    const handleUserID = ({ userID }) => {
+      socket.userID = userID;
+    };
+
+    socket.on("session_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("session_id", handleUserID);
+      socket.disconnect();
+    };
   }, []);
 
   const fetchResult = async () => {
@@ -43,32 +69,26 @@ const RankingTable = ({ socket }) => {
       },
     },
     {
-      name: "Avatar",
+      name: "Username",
       selector: (row) => row.avatar,
-      center: "true",
       cell: (row) => (
-        <div className="flex items-center justify-center">
-          {row.avatar ? (
-            <img
-              className="w-8 h-8 rounded-full border"
-              src={row.avatar}
-              alt="avatar"
-            />
-          ) : (
-            <div className="w-8 h-8 rounded-full border text-center flex items-center justify-center font-bold text-2xl">
-              {row.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-center">
+            {row.avatar ? (
+              <img
+                className="w-8 h-8 rounded-full border"
+                src={row.avatar}
+                alt="avatar"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full border text-center flex items-center justify-center font-bold text-2xl">
+                {row.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          <div className="font-md">{row.name}</div>
         </div>
       ),
-    },
-    {
-      name: "User Name",
-      selector: (row) => row.name,
-      sortable: true,
-      style: {
-        fontSize: "16px",
-      },
     },
     {
       name: "Breakfast",

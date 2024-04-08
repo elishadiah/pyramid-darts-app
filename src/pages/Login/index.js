@@ -8,7 +8,7 @@ import CustomInputComponent from "../../components/Input";
 import authService from "../../services/auth.service";
 import "react-toastify/dist/ReactToastify.css";
 
-const Login = ({ socket }) => {
+const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [authData, setAuthData] = useState({

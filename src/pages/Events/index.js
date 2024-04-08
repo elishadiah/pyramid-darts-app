@@ -3,12 +3,38 @@ import http from "../../utility/http-client";
 import Header from "../../components/Header";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
 
-const GlobalEvents = ({ socket }) => {
+const GlobalEvents = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getEvents();
+
+    const sessionID = authService.getAuthUser().user._id;
+    const username = authService.getAuthUser().user.username;
+    if (sessionID) {
+      socket.auth = { sessionID, username };
+      socket.connect();
+    }
+
+    const handleErr = (err) => {
+      console.log("Socket--err-->>", err);
+    };
+
+    const handleUserID = ({ userID }) => {
+      socket.userID = userID;
+    };
+
+    socket.on("session_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("session_id", handleUserID);
+      socket.disconnect();
+    };
   }, []);
 
   const columns = [

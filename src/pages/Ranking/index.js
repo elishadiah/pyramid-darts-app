@@ -3,29 +3,148 @@ import Header from "../../components/Header";
 import http from "../../utility/http-client";
 import SearchBar from "../../components/Rankings/SearchBar";
 import Pyramid from "../../components/Rankings/Pyramid";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
 
-const Ranking = ({ socket }) => {
+const Ranking = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [players, setPlayers] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [imgSize, setImgSize] = useState(16);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     fetchAllResult();
+
+    const sessionID = authService.getAuthUser().user._id;
+
+    if (sessionID) {
+      socket.auth = { sessionID };
+      socket.connect();
+    }
+
+    const handleErr = (err) => {
+      console.log("Socket--err-->>", err);
+    };
+
+    const handleUserID = ({ userID }) => {
+      socket.userID = userID;
+    };
+
+    socket.on("user_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("user_id", handleUserID);
+      socket.disconnect()
+    };
   }, []);
 
   useEffect(() => {
-    socket.on("statusUpdate", (data) => {
-      console.log("Occupied-status", data, "::", players);
-    });
-    socket.on("new-user-response", (data) => {
-      console.log("New-user-->>", data);
-      fetchAllResult();
-    });
-  }, [socket]);
+    const handleConnect = () => {
+      users.forEach((user) => {
+        if (user.self) {
+          user.connected = true;
+          user.status = "online";
+        }
+      });
+      console.log("--connect");
+    };
+
+    const handleDisconnect = () => {
+      users.forEach((user) => {
+        if (user.self) {
+          user.connected = false;
+          user.status = "offline";
+        }
+      });
+      console.log("--disconnect");
+    };
+
+    const handleUsers = (receivedUsers) => {
+      console.log("--users");
+      receivedUsers.forEach((user) => {
+        const existingUserIndex = users.findIndex(
+          (existingUser) => existingUser.userID === user.userID
+        );
+        if (existingUserIndex !== -1) {
+          setUsers((prevUsers) => {
+            const updatedUsers = [...prevUsers];
+            updatedUsers[existingUserIndex].connected = user.connected;
+            updatedUsers[existingUserIndex].status = user.status;
+            return updatedUsers;
+          });
+        } else {
+          user.self = user.userID === socket.userID;
+          setUsers((prevUsers) => [...prevUsers, user]);
+        }
+      });
+    };
+
+    const handleUserConnected = (user) => {
+      console.log("--user connected", users);
+      setUsers((prevUsers) => {
+        const updatedUsers = prevUsers.map((existingUser) => {
+          if (existingUser.userID === user.userID) {
+            return { ...existingUser, connected: true, status: "online" };
+          }
+          return existingUser;
+        });
+
+        const newUser = prevUsers.find(
+          (existingUser) => existingUser.userID === user.userID
+        );
+        if (!newUser) {
+          updatedUsers.push(user);
+        }
+
+        return updatedUsers;
+      });
+    };
+
+    const handleUserDisconnected = (id) => {
+      setUsers((prevUsers) => {
+        const updatedUsers = prevUsers.map((user) => {
+          if (user.userID === id) {
+            return { ...user, connected: false, status: "offline" };
+          }
+          return user;
+        });
+
+        return updatedUsers;
+      });
+    };
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("users", handleUsers);
+    socket.on("user connected", handleUserConnected);
+    socket.on("user disconnected", handleUserDisconnected);
+
+    return () => {
+      console.log("BBBB");
+
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("users", handleUsers);
+      socket.off("user connected", handleUserConnected);
+      socket.off("user disconnected", handleUserDisconnected);
+    };
+  }, [users]);
+
+  // useEffect(() => {
+
+  //   socket.on("new-user-response", (data) => {
+  //     console.log("New-user-->>", data);
+  //     fetchAllResult();
+  //   });
+  // }, [socket]);
 
   const sendQuickFight = (username, challenger, challengerEmail) => {
-    http.post("/event/post", {content: `${challenger} send a quick challenge to ${username}`});
+    http.post("/event/post", {
+      content: `${challenger} send a quick challenge to ${username}`,
+    });
     socket.emit("challenge", {
       receiver: username,
       challenger,
@@ -40,8 +159,10 @@ const Ranking = ({ socket }) => {
     receiver,
     receiverEmail
   ) => {
-    console.log('Select--date-->>', selectedDate);
-    http.post("/event/post", {content: `${challenger} send a quick challenge to ${receiver}`});
+    console.log("Select--date-->>", selectedDate);
+    http.post("/event/post", {
+      content: `${challenger} send a quick challenge to ${receiver}`,
+    });
     socket.emit("schedule-challenge", {
       date: selectedDate,
       challenger,
@@ -57,7 +178,7 @@ const Ranking = ({ socket }) => {
       .get("/result/fetch-all")
       .then((res) => {
         setPlayers(res.data);
-        console.log("Result-->>>", res.data);
+        // console.log("Result-->>>", res.data);
       })
       .catch((err) => console.log("Res---err--->>", err))
       .finally(() => setIsLoading(false));
@@ -74,7 +195,7 @@ const Ranking = ({ socket }) => {
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
-        <Header current={2} socket={socket} />
+        <Header current={2} />
         <div className="flex px-6 lg:px-12 justify-center">
           {isLoading ? (
             <div className="col-span-full flex items-center justify-center gap-x-8 mt-44">
@@ -95,7 +216,7 @@ const Ranking = ({ socket }) => {
               </div>
               <div className="flex flex-col w-full py-4 md:w-8/12 sm:w-6/12 ">
                 <div className="flex items-center space-x-4">
-                  <p className="text-gray-900 dark:text-white">Zoom&nbsp;In</p>
+                  <p className="text-gray-900 dark:text-white">Zoom&nbsp;Out</p>
                   <input
                     id="medium-range"
                     type="range"
@@ -105,12 +226,13 @@ const Ranking = ({ socket }) => {
                     className="w-full h-2 bg-gray-200 text-green-600 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                     onChange={onSliderChange}
                   />
-                  <p className="text-gray-900 dark:text-white">Zoom&nbsp;Out</p>
+                  <p className="text-gray-900 dark:text-white">Zoom&nbsp;In</p>
                 </div>
                 <div className="overflow-y-auto py-4 max-h-70-vh divide-y divide-green-300 dark:divide-gray-400">
                   <Pyramid
                     players={players}
                     selectedPlayer={selectedPlayer}
+                    connectedUsers={users}
                     imgSize={imgSize}
                     sendQuickFight={sendQuickFight}
                     sendScheduledFight={sendScheduledFight}

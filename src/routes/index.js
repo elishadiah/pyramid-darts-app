@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import socketIO from "socket.io-client";
 import AuthGuard from "../utility/ProtectedRoute";
 
 import Login from "../pages/Login";
@@ -15,25 +14,22 @@ import Result from "../pages/Result";
 import GlobalEvents from "../pages/Events";
 import RankingTable from "../pages/RankingTable";
 
-// const socket = socketIO.connect("http://localhost:4000");
-const socket = socketIO('https://backend.dartsfightclub.de');
-
 const AppRouter = () => {
   return (
     <Routes>
-      <Route exact path="/login" element={<Login socket={socket} />} />
-      <Route path="/register" element={<Register socket={socket} />} />
+      <Route exact path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route element={<AuthGuard />}>
-        <Route path="/home" element={<Home socket={socket} />} />
-        <Route path="/" element={<Home socket={socket} />} />
-        <Route path="/infos" element={<Infos socket={socket} />} />
-        <Route path="/profile" element={<Profile socket={socket} />} />
-        <Route path="/schedule" element={<Schedule socket={socket} />} />
-        <Route path="/settings" element={<Settings socket={socket} />} />
-        <Route path="/pyramid" element={<Ranking socket={socket} />} />
-        <Route path="/result" element={<Result socket={socket} />} />
-        <Route path="/events" element={<GlobalEvents socket={socket} />} />
-        <Route path="/ranking-table" element={<RankingTable socket={socket} />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/infos" element={<Infos />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/schedule" element={<Schedule />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/pyramid" element={<Ranking />} />
+        <Route path="/result" element={<Result />} />
+        <Route path="/events" element={<GlobalEvents />} />
+        <Route path="/ranking-table" element={<RankingTable />} />
       </Route>
     </Routes>
   );

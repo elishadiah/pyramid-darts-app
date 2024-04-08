@@ -6,14 +6,15 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import Loading from "../../components/Loading";
 import AchievementImages from "../../utility/images";
-import AchievementVariables from "../../utility/variables";
 import { Dialog, Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
 import EmailNotify from "../../utility/emailjs";
 import HandleAchievement from "../../utility/achievements";
 import AchievementItemComponent from "../../components/AchievementItem";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
 
-const Profile = ({ socket }) => {
+const Profile = () => {
   const navigate = useNavigate();
   const localizer = momentLocalizer(moment);
   const [user, setUser] = useState({ username: "", email: "", avatar: "" });
@@ -26,21 +27,42 @@ const Profile = ({ socket }) => {
   const [currentSchedule, setCurrentSchedule] = useState(null);
 
   useEffect(() => {
-    const tmp = JSON.parse(localStorage.getItem("authUser")).user;
+    const user = JSON.parse(localStorage.getItem("authUser")).user;
     let avatar;
     if (
-      tmp.hasOwnProperty("avatar") === false ||
-      tmp.avatar === null ||
-      tmp.avatar === ""
+      user.hasOwnProperty("avatar") === false ||
+      user.avatar === null ||
+      user.avatar === ""
     )
       avatar = "";
-    else avatar = tmp.avatar;
-    const { username, email } = JSON.parse(
-      localStorage.getItem("authUser")
-    ).user;
+    else avatar = user.avatar;
+    const { username, email } = authService.getAuthUser().user;
     setUser({ username, email, avatar });
     fetchResult(username);
     fetchSchedules();
+
+    const sessionID = authService.getAuthUser().user._id;
+    if (sessionID) {
+      socket.auth = { sessionID, username };
+      socket.connect();
+    }
+
+    const handleErr = (err) => {
+      console.log("Socket--err-->>", err);
+    };
+
+    const handleUserID = ({ userID }) => {
+      socket.userID = userID;
+    };
+
+    socket.on("session_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("session_id", handleUserID);
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -218,7 +240,7 @@ const Profile = ({ socket }) => {
 
   return (
     <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
-      <Header current={0} socket={socket} />
+      <Header current={4} socket={socket} />
       <div className="p-8">
         <div className="flex sm:flex-row flex-col border border-gray-200 bg-white p-4 mb-4 rounded-md">
           <div className="w-full sm:w-4/12 flex flex-col space-y-4 rounded-xl py-8 sm:py-4">

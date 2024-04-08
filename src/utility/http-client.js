@@ -1,9 +1,9 @@
 import axios from "axios";
 import authService from "../services/auth.service";
+import constant from "./constant";
 
 const instance = axios.create({
-  // baseURL: "http://localhost:4000",
-  baseURL: "https://backend.dartsfightclub.de",
+  baseURL: constant.URL,
 });
 
 instance.interceptors.request.use(

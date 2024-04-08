@@ -5,14 +5,40 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import http from "../../utility/http-client";
 import Loading from "../../components/Loading";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
 
-const Schedule = ({ socket }) => {
+const Schedule = () => {
   // const [schedules, setSchedules] = useState([]);
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchSchedules();
+
+    const sessionID = authService.getAuthUser().user._id;
+    const username = authService.getAuthUser().user.username;
+    if (sessionID) {
+      socket.auth = { sessionID, username };
+      socket.connect();
+    }
+
+    const handleErr = (err) => {
+      console.log("Socket--err-->>", err);
+    };
+
+    const handleUserID = ({ userID }) => {
+      socket.userID = userID;
+    };
+
+    socket.on("session_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("session_id", handleUserID);
+      socket.disconnect();
+    };
   }, []);
 
   const fetchSchedules = async () => {
@@ -27,8 +53,8 @@ const Schedule = ({ socket }) => {
       );
       const tmp = res.data.map((val) => ({
         id: val._id,
-        title: `${val.challenger} - ${val.receiver}`,
-        start: new Date(val.date),
+        title: `${val?.challenger} - ${val?.receiver}`,
+        start: new Date(val?.date),
         end: addMinutes(val.date, 60),
       }));
       setEvents(tmp);

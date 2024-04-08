@@ -23,10 +23,6 @@ const avatarUpload = (file) => {
     return http.post('/avatar/upload', file);
 }
 
-const userInfo = () => {
-    
-}
-
 const logout = () => {
     localStorage.removeItem('authUser');
     window.location.reload();

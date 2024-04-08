@@ -1,51 +1,40 @@
+import { useEffect } from "react";
 import Header from "../../components/Header";
+import constant from "../../utility/constant";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
 
-const Infos = ({socket}) => {
-  const infoTexts = [
-    {
-      title: "Regel1",
-      text: " Ihr verliert ab und zu mal ein Wort über den Darts Fight Club.",
-    },
-    {
-      title: "Regel2",
-      text: " Ihr verliert AB UND ZU mal ein Wort über den Darts Fight Club.",
-    },
-    {
-      title: "Regel3",
-      text: " Wenn jemand 3 legs gecheckt hat, ist der Kampf vorbei.",
-    },
-    {
-      title: "Regel4",
-      text: " Es spielen jeweils nur 2.",
-    },
-    {
-      title: "Regel5",
-      text: " Nur eine Herausforderung auf einmal.",
-    },
-    {
-      title: "Regel6",
-      text: " Hemden, Hosen.",
-    },
-    {
-      title: "Regel7",
-      text: " Die Kämpfe dauern genau solange, wie vorgeschrieben.",
-    },
-    {
-      title: "Regel8",
-      text: " und letzte Regel: Wer neu ist im Fight Club, muss herausfordern.",
-    },
-  ];
+const Infos = () => {
+  useEffect(() => {
+    const sessionID = authService.getAuthUser().user._id;
+    const username = authService.getAuthUser().user.username;
+    if (sessionID) {
+      socket.auth = { sessionID, username };
+      socket.connect();
+    }
 
-  const additiveTexts = [
-    "1. Ihr fordert nach oben oder zur Seite.",
-    "2. Die Kämpfe dauern 501DO, BO 5.",
-    "3. Wer herausgefordert wird, muss reagieren.",
-    "4. Jeden 28. im Monat wird der Clubchef unter den Top 4 ermittelt.",
-  ];
+    const handleErr = (err) => {
+      console.log("Socket--err-->>", err);
+    };
+
+    const handleUserID = ({ userID }) => {
+      socket.userID = userID;
+    };
+
+    socket.on("session_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("session_id", handleUserID);
+      socket.disconnect();
+    };
+  }, []);
+
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">
       <div className="relative">
-        <Header current={3} socket={socket} />
+        <Header current={3} />
         <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
           <div className="mb-12">
             <div className="flex justify-center mb-4">
@@ -54,7 +43,7 @@ const Infos = ({socket}) => {
               </h3>
             </div>
             <ul className="space-y-3">
-              {infoTexts.map((item, index) => (
+              {constant.infoTexts.map((item, index) => (
                 <li
                   key={index}
                   className="overflow-hidden text-left rounded-md bg-white px-6 py-4 shadow dark:bg-gray-900 dark:text-gray-100"
@@ -75,7 +64,7 @@ const Infos = ({socket}) => {
               </h3>
             </div>
             <ul className="space-y-3">
-              {additiveTexts.map((item, index) => (
+              {constant.additiveTexts.map((item, index) => (
                 <li
                   key={index}
                   className="overflow-hidden text-left rounded-md bg-white px-6 py-4 shadow dark:bg-gray-900 dark:text-gray-100"
