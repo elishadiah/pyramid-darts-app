@@ -3,38 +3,12 @@ import Header from "../../components/Header";
 import http from "../../utility/http-client";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
-import socket from "../../socket";
-import authService from "../../services/auth.service";
 
 const RankingTable = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState([]);
   useEffect(() => {
     fetchResult();
-
-    const sessionID = authService.getAuthUser().user._id;
-    const username = authService.getAuthUser().user.username;
-    if (sessionID) {
-      socket.auth = { sessionID, username };
-      socket.connect();
-    }
-
-    const handleErr = (err) => {
-      console.log("Socket--err-->>", err);
-    };
-
-    const handleUserID = ({ userID }) => {
-      socket.userID = userID;
-    };
-
-    socket.on("session_id", handleUserID);
-    socket.on("connect_error", handleErr);
-
-    return () => {
-      socket.off("connect_error", handleErr);
-      socket.off("session_id", handleUserID);
-      socket.disconnect();
-    };
   }, []);
 
   const fetchResult = async () => {
@@ -133,7 +107,7 @@ const RankingTable = () => {
 
   return (
     <div className="relative sm:pb-24 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
-      <Header current={7} socket={socket} />
+      <Header current={7} />
       <div className="p-8">
         <DataTable
           title={<div className="text-4xl font-bold mb-4">Ranking</div>}

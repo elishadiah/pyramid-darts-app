@@ -2,8 +2,6 @@ import Header from "../../components/Header";
 import logoImg from "../../assets/img/fc_logo.png";
 import { useEffect, useState } from "react";
 import constant from "../../utility/constant";
-import socket from "../../socket";
-import authService from "../../services/auth.service";
 
 const Home = () => {
   const getRandomInt = (min, max) => {
@@ -16,28 +14,6 @@ const Home = () => {
 
   useEffect(() => {
     setQuote(constant.quotes[getRandomInt(0, constant.quotes.length)]);
-    const sessionID = authService.getAuthUser().user._id;
-    const username = authService.getAuthUser().user.username;
-    if (sessionID) {
-      socket.auth = { sessionID, username };
-      socket.connect();
-    }
-
-    const handleErr = (err) => {
-      console.log("Socket--err-->>", err);
-    };
-
-    const handleUserID = ({ userID }) => {
-      socket.userID = userID;
-    };
-
-    socket.on("session_id", handleUserID);
-    socket.on("connect_error", handleErr);
-
-    return () => {
-      socket.off("connect_error", handleErr);
-      socket.off("session_id", handleUserID);
-    };
   }, []);
 
   return (

@@ -10,7 +10,6 @@ import http from "../../utility/http-client";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import socket from "../../socket";
 import authService from "../../services/auth.service";
 
 const Settings = () => {
@@ -32,32 +31,6 @@ const Settings = () => {
     )
       setUserAvatar(null);
     else setUserAvatar(tmp.avatar);
-
-    const sessionID = authService.getAuthUser().user._id;
-    const username = authService.getAuthUser().user.username;
-    if (sessionID) {
-      socket.auth = { sessionID, username };
-      socket.connect();
-    }
-
-    const handleErr = (err) => {
-      console.log("Socket--err-->>", err);
-    };
-
-    const handleUserID = ({ userID }) => {
-      socket.userID = userID;
-    };
-
-    socket.on("session_id", handleUserID);
-    socket.on("connect_error", handleErr);
-
-    setUserid(sessionID);
-
-    return () => {
-      socket.off("connect_error", handleErr);
-      socket.off("session_id", handleUserID);
-      socket.disconnect();
-    };
   }, []);
 
   const handleAvatarUpload = async (e) => {
@@ -108,7 +81,7 @@ const Settings = () => {
 
   return (
     <div className="relative sm:pb-24 bg-green-50 text-gray-900 dark:text-white dark:bg-gray-800">
-      <Header current={0} socket={socket} />
+      <Header current={0} />
       <div>
         <div className="divide-y divide-white/5">
           <div className="grid m-auto max-w-7xl grid-cols-1 gap-x-8 gap-y-10 px-4 py-16 sm:px-6 md:grid-cols-3 lg:px-8">

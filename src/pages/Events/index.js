@@ -3,38 +3,12 @@ import http from "../../utility/http-client";
 import Header from "../../components/Header";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
-import socket from "../../socket";
-import authService from "../../services/auth.service";
 
 const GlobalEvents = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     getEvents();
-
-    const sessionID = authService.getAuthUser().user._id;
-    const username = authService.getAuthUser().user.username;
-    if (sessionID) {
-      socket.auth = { sessionID, username };
-      socket.connect();
-    }
-
-    const handleErr = (err) => {
-      console.log("Socket--err-->>", err);
-    };
-
-    const handleUserID = ({ userID }) => {
-      socket.userID = userID;
-    };
-
-    socket.on("session_id", handleUserID);
-    socket.on("connect_error", handleErr);
-
-    return () => {
-      socket.off("connect_error", handleErr);
-      socket.off("session_id", handleUserID);
-      socket.disconnect();
-    };
   }, []);
 
   const columns = [
@@ -78,11 +52,13 @@ const GlobalEvents = () => {
     try {
       const res = await http.get("/event/get");
       setEvents(
-        res.data.map((val) => ({
-          id: val._id,
-          date: new Date(val.createdAt).toLocaleString(),
-          content: val.content,
-        }))
+        res.data
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .map((val) => ({
+            id: val._id,
+            date: new Date(val.createdAt).toLocaleString(),
+            content: val.content,
+          }))
       );
       console.log("Events-->>", res.data);
     } catch (err) {
@@ -93,7 +69,7 @@ const GlobalEvents = () => {
   };
   return (
     <div>
-      <Header current={6} socket={socket} />
+      <Header current={6} />
       <div className="py-4 px-8">
         <DataTable
           title={<div className="text-4xl font-bold mb-4">Events</div>}

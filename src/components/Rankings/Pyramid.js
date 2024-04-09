@@ -26,8 +26,6 @@ const Pyramid = ({
     }
   };
 
-  console.log('--------------------------------------', connectedUsers)
-
   const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;
     return (

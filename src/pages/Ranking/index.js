@@ -37,7 +37,7 @@ const Ranking = () => {
     return () => {
       socket.off("connect_error", handleErr);
       socket.off("user_id", handleUserID);
-      socket.disconnect()
+      socket.disconnect();
     };
   }, []);
 
@@ -133,22 +133,13 @@ const Ranking = () => {
     };
   }, [users]);
 
-  // useEffect(() => {
-
-  //   socket.on("new-user-response", (data) => {
-  //     console.log("New-user-->>", data);
-  //     fetchAllResult();
-  //   });
-  // }, [socket]);
-
   const sendQuickFight = (username, challenger, challengerEmail) => {
     http.post("/event/post", {
       content: `${challenger} send a quick challenge to ${username}`,
     });
     socket.emit("challenge", {
-      receiver: username,
-      challenger,
-      challengerEmail,
+      content: `${challenger}(Email: ${challengerEmail}) has sent you the quick challenge Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+      to: users.find((val) => val.username === username)?.userID,
     });
   };
 
@@ -178,7 +169,6 @@ const Ranking = () => {
       .get("/result/fetch-all")
       .then((res) => {
         setPlayers(res.data);
-        // console.log("Result-->>>", res.data);
       })
       .catch((err) => console.log("Res---err--->>", err))
       .finally(() => setIsLoading(false));
