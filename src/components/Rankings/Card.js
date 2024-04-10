@@ -15,6 +15,7 @@ function classNames(...classes) {
 const Card = ({
   player,
   available,
+  onlineShow,
   connectedUsers,
   isHighlighted,
   sendQuickFight,
@@ -118,7 +119,8 @@ const Card = ({
         id={player._id}
         className={classNames(
           "group relative flex shadow h-full p-2 m-2",
-          isHighlighted ? "border border-2 border-green-500 bg-green-100" : ""
+          isHighlighted ? "border border-2 border-green-500 bg-green-100" : "",
+          onlineShow && !connected && "hidden"
         )}
       >
         {connected ? (

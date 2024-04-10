@@ -5,6 +5,7 @@ import SearchBar from "../../components/Rankings/SearchBar";
 import Pyramid from "../../components/Rankings/Pyramid";
 import socket from "../../socket";
 import authService from "../../services/auth.service";
+import OnlineCheck from "../../components/OnlineCheck";
 
 const Ranking = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,6 +13,7 @@ const Ranking = () => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [imgSize, setImgSize] = useState(16);
   const [users, setUsers] = useState([]);
+  const [isOnlineShow, setIsOnlineShow] = useState(false);
 
   useEffect(() => {
     fetchAllResult();
@@ -201,7 +203,11 @@ const Ranking = () => {
           ) : (
             <div className="flex space-x-4 flex-col sm:flex-row">
               {/* mobile */}
-              <div className="flex w-full px-2 sm:hidden">
+              <div className="flex w-full px-2 flex-col sm:hidden">
+                <OnlineCheck
+                  isOnlineShow={isOnlineShow}
+                  setIsOnlineShow={setIsOnlineShow}
+                />
                 <SearchBar players={players} onPlayerClick={onPlayerClick} />
               </div>
               <div className="flex flex-col w-full py-4 md:w-8/12 sm:w-6/12 ">
@@ -220,6 +226,7 @@ const Ranking = () => {
                 </div>
                 <div className="overflow-y-auto py-4 max-h-70-vh divide-y divide-green-300 dark:divide-gray-400">
                   <Pyramid
+                    onlineShow={isOnlineShow}
                     players={players}
                     selectedPlayer={selectedPlayer}
                     connectedUsers={users}
@@ -229,7 +236,11 @@ const Ranking = () => {
                   />
                 </div>
               </div>
-              <div className="hidden px-2 sm:flex sm:px-6 w-6/12 md:w-4/12">
+              <div className="hidden px-2 sm:flex sm:flex-col sm:px-6 w-6/12 md:w-4/12">
+                <OnlineCheck
+                  isOnlineShow={isOnlineShow}
+                  setIsOnlineShow={setIsOnlineShow}
+                />
                 <SearchBar players={players} onPlayerClick={onPlayerClick} />
               </div>
             </div>

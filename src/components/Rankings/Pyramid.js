@@ -4,6 +4,7 @@ const Pyramid = ({
   players,
   selectedPlayer,
   connectedUsers,
+  onlineShow,
   imgSize,
   sendQuickFight,
   sendScheduledFight,
@@ -26,6 +27,7 @@ const Pyramid = ({
     }
   };
 
+
   const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;
     return (
@@ -37,6 +39,7 @@ const Pyramid = ({
         sendQuickFight={sendQuickFight}
         sendScheduledFight={sendScheduledFight}
         connectedUsers={connectedUsers}
+        onlineShow={onlineShow}
         // occupied={false}
       >
         {player.avatar ? (
