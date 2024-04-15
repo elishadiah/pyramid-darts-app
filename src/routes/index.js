@@ -13,12 +13,16 @@ import Settings from "../pages/Settings";
 import Result from "../pages/Result";
 import GlobalEvents from "../pages/Events";
 import RankingTable from "../pages/RankingTable";
+import ResetPassword from "../pages/ResetPassword";
+import RetypePassword from "../pages/RetypePassword";
 
 const AppRouter = () => {
   return (
     <Routes>
       <Route exact path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/retype-password/:id/:token" element={<RetypePassword />} />
       <Route element={<AuthGuard />}>
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<Home />} />

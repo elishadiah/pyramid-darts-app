@@ -8,7 +8,7 @@ const CustomInputComponent = ({ ...props }) => {
     setShowPassword(!showPassword);
   };
   const onChange = (e) => {
-    props.onChange({[e.target.name]: e.target.value})
+    props.onChange({[e.target.name]: e.target.value.trim()})
   }
   return (
     <div>
