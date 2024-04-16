@@ -20,6 +20,7 @@ const CustomInputComponent = ({ ...props }) => {
         <input
           id={props.name}
           name={props.name}
+          value={props.value}
           type={showPassword ? "text" : props.type}
           placeholder={props.placeholder}
           required={props.required}
