@@ -1,4 +1,4 @@
-import http from "../utility/http-client";
+import http from "../helper/http-client";
 
 const login = (data) => {
     return http.post('/auth/login', data, {

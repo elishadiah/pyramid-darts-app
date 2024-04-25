@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import EmailNotify from "../../utility/emailjs";
+import EmailNotify from "../../helper/emailjs";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

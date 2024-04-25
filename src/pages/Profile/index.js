@@ -1,225 +1,28 @@
 import React, { useEffect, useState, Fragment } from "react";
 import Header from "../../components/Header";
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import http from "../../utility/http-client";
+import http from "../../helper/http-client";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import Loading from "../../components/Loading";
-import AchievementImages from "../../utility/images";
+import AchievementImages from "../../helper/images";
 import { Dialog, Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import EmailNotify from "../../utility/emailjs";
-import HandleAchievement from "../../utility/achievements";
-import AchievementItemComponent from "../../components/AchievementItem";
+import EmailNotify from "../../helper/emailjs";
+import HandleAchievement from "../../helper/achievements";
+import AchievementItemComponent from "../../components/Profile/AchievementItem";
 import authService from "../../services/auth.service";
 
 const Profile = () => {
-  const navigate = useNavigate();
-  const localizer = momentLocalizer(moment);
-  const [user, setUser] = useState({ username: "", email: "", avatar: "" });
-  const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [achievement, setAchievement] = useState(null);
-  const [schedules, setSchedules] = useState(null);
-  const [events, setEvents] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentSchedule, setCurrentSchedule] = useState(null);
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("authUser")).user;
-    let avatar;
-    if (
-      user.hasOwnProperty("avatar") === false ||
-      user.avatar === null ||
-      user.avatar === ""
-    )
-      avatar = "";
-    else avatar = user.avatar;
-    const { username, email } = authService.getAuthUser().user;
-    setUser({ username, email, avatar });
-    fetchResult(username);
-    fetchSchedules();
-  }, []);
-
-  useEffect(() => {
-    console.log("Schedules-state-->>", schedules);
-    if (schedules) {
-      setEvents(
-        schedules.map((val) => ({
-          id: val._id,
-          title: `Challenge - ${val.challenger} : ${val.receiver}`,
-          start: new Date(val.date),
-          end: addMinutes(val.date, 60),
-        }))
-      );
-    }
-  }, [schedules]);
-
-  const getCurrentTimeZone = () => {
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return timeZone;
-  };
-
-  const fetchSchedules = async () => {
-    setIsLoading(true);
-    try {
-      const { username } = JSON.parse(localStorage.getItem("authUser")).user;
-      const res = await http.get("/schedule/fetch-all");
-      const tmp = res.data.filter(
-        (val) =>
-          val.challenger.includes(username) || val.receiver.includes(username)
-      );
-      setSchedules(tmp);
-    } catch (err) {
-      console.log("fetch-schedule--err-->>", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchResult = async (data) => {
-    setIsLoading(true);
-    try {
-      const res = await http.post("/result/fetch", {
-        username: data.trim(),
-      });
-      setResult(res.data);
-
-      const highIndex = res.data.highFinish.reduce((acc, element, index) => {
-        if (Number(element) !== 0) {
-          acc.push(index);
-        }
-        return acc;
-      }, []);
-
-      setAchievement({
-        finishing: highIndex,
-      });
-
-      console.log("--------Init-profile--result-------", res.data);
-    } catch (err) {
-      console.log("-------Init-profile--err---", err);
-      setResult(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCalendar = (e) => {
-    schedules && setCurrentSchedule(schedules.find((val) => val._id === e.id));
-    setIsOpen(true);
-  };
-
-  const addMinutes = (date, minutes) => {
-    const dateCopy = new Date(date);
-    dateCopy.setMinutes(dateCopy.getMinutes() + minutes);
-    return dateCopy;
-  };
-
-  const closeModal = () => {
-    setIsOpen(false);
-  };
-
-  const onClick = () => {
-    currentSchedule &&
-      EmailNotify.sendNotificationEmail(
-        currentSchedule.challenger,
-        currentSchedule.challengerEmail,
-        currentSchedule.receiver,
-        currentSchedule.receiverEmail,
-        `${currentSchedule.challenger} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
-        "Schedule Challenge"
-      );
-    http.post("/schedule/remove", currentSchedule);
-    http.post("/event/post", {
-      content: `${currentSchedule.challenger} create a scheduled challenge`,
-    });
-    window.open(
-      `https://lidarts.org/game/create?opponent_name=${currentSchedule.receiver}`,
-      "_blank"
-    );
-    navigate("/result");
-  };
-
-  const updateResult = async (data) => {
-    try {
-      await http.post("/result/post", data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const onDecline = async () => {
-    http.post("/schedule/remove", currentSchedule);
-    http.post("/event/post", {
-      content: `${currentSchedule.receiver} rejected a scheduled challenge`,
-    });
-    setIsLoading(true);
-    try {
-      const res = await http.post("/result/fetch", {
-        username: user.username.trim(),
-      });
-      const resOther = await http.post("/result/fetch", {
-        username: currentSchedule.challenger.trim(),
-      });
-      const resAll = await http.get("/result/fetch-all");
-
-      let user1Update = { ...resOther.data };
-      let user2Update = { ...res.data };
-
-      const availablePositionNo = Math.pow(2, 7 - user2Update.level);
-      const currentAbovePlayersNo = resAll.data.filter(
-        (val) => val.level === user2Update.level + 1
-      ).length;
-      const rowSpotNo = availablePositionNo - currentAbovePlayersNo;
-
-      user2Update = {
-        ...user2Update,
-        currentVictoryStreak: 0,
-        previousWin: false,
-        level:
-          res.data.level > resOther.data.level
-            ? resOther.data.level
-            : res.data.level,
-      };
-
-      user1Update = {
-        ...user1Update,
-        level:
-          res.data.level > resOther.data.level
-            ? res.data.level
-            : res.data.level < resOther.data.level
-            ? resOther.data.level
-            : rowSpotNo < 1
-            ? res.data.level
-            : res.data.level + 1,
-      };
-
-      updateResult(user1Update);
-      updateResult(user2Update);
-
-      fetchSchedules();
-      EmailNotify.sendNotificationEmail(
-        currentSchedule.receiver,
-        currentSchedule.receiverEmail,
-        currentSchedule.challenger,
-        currentSchedule.challengerEmail,
-        `${currentSchedule.receiver} hat Ihre Anfechtung abgelehnt`,
-        "Schedule Challenge"
-      );
-    } catch (err) {
-    } finally {
-      setIsLoading(false);
-    }
-    closeModal();
-  };
-
+  
   return (
     <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
       <Header current={4} />
       <div className="p-8">
-        <div className="flex sm:flex-row flex-col border border-gray-200 bg-white p-4 mb-4 rounded-md">
-          <div className="w-full sm:w-4/12 flex flex-col space-y-4 rounded-xl py-8 sm:py-4">
+        
+
+        {/* <div className="flex md:flex-row flex-col border border-gray-200 bg-white p-4 mb-4 rounded-md">
+          <div className="w-full md:w-4/12 flex flex-col space-y-4 rounded-xl py-8 sm:py-4">
             <div className="flex justify-center items-center">
               {user.avatar === "" ? (
                 <img
@@ -239,33 +42,41 @@ const Profile = () => {
               {user.username}
             </div>
           </div>
-          <div className="w-full sm:w-8/12 text-left p-4">
+          <div className="w-full md:w-8/12 text-left p-4">
             {isLoading ? (
               <Loading />
             ) : (
               result && (
                 <div className="px-4">
-                  <AchievementItemComponent
-                    result={result.sentTotalChallengeNo}
-                    max={100}
-                    iconSize="xl:w-24 xl:h-24 lg:w-20 lg:h-20 sm:w-16 sm:h-16 w-20 h-20"
-                    achievementIcons={AchievementImages.FRIENDLY_CHALLENGER}
-                    handleActive={HandleAchievement.friendlyActive}
-                  />
-                  <AchievementItemComponent
-                    result={result.maxVictoryStreak}
-                    max={10}
-                    iconSize="w-24 h-20"
-                    achievementIcons={AchievementImages.STREAK}
-                    handleActive={HandleAchievement.streakActive}
-                  />
-                  <AchievementItemComponent
-                    result={result.master26}
-                    max={1000}
-                    iconSize="lg:w-24 lg:h-20"
-                    achievementIcons={AchievementImages.BREAKFAST}
-                    handleActive={HandleAchievement.breakfastActive}
-                  />
+                  <div className="sm:flex sm:flex-wrap gap-4">
+                    <AchievementItemComponent
+                      result={result.sentTotalChallengeNo}
+                      title="Friendly Challenger"
+                      type="season"
+                      max={100}
+                      iconSize="w-16 h-12"
+                      achievementIcons={AchievementImages.FRIENDLY_CHALLENGER}
+                      handleActive={HandleAchievement.friendlyActive}
+                    />
+                    <AchievementItemComponent
+                      result={result.maxVictoryStreak}
+                      title="Victory Streak"
+                      type="both"
+                      max={10}
+                      iconSize="w-16 h-12"
+                      achievementIcons={AchievementImages.STREAK}
+                      handleActive={HandleAchievement.streakActive}
+                    />
+                    <AchievementItemComponent
+                      result={result.master26}
+                      title="Breakfast"
+                      type="season"
+                      max={1000}
+                      iconSize="w-16 h-12"
+                      achievementIcons={AchievementImages.BREAKFAST}
+                      handleActive={HandleAchievement.breakfastActive}
+                    />
+                  </div>
 
                   <div className="flex flex-wrap justify-center mt-8 max-h-40 sm:max-h-full sm:overflow-y-none overflow-y-auto">
                     {AchievementImages.FINISHINGACE.map((val, index) =>
@@ -395,7 +206,7 @@ const Profile = () => {
               </div>
             </Dialog>
           </Transition>
-        )}
+        )} */}
       </div>
     </div>
   );

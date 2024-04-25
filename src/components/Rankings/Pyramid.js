@@ -15,7 +15,8 @@ const Pyramid = ({
       val.username.includes(currentUser.username)
     );
     if (player.level < currentPlayer.level) return false;
-    else if (player.level > currentPlayer.level) return true;
+    else if (player.level === currentPlayer.level + 1) return true;
+    else if (player.level > currentPlayer.level + 1) return false;
     else {
       const availablePositionNo = Math.pow(2, 7 - currentPlayer.level);
       const currentAbovePlayersNo = players.filter(

@@ -5,7 +5,7 @@ import {
   Views,
   momentLocalizer,
 } from "react-big-calendar";
-import * as dates from "../utility/dates.js";
+import * as dates from "../helper/dates.js";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 const mLocalizer = momentLocalizer(moment);
