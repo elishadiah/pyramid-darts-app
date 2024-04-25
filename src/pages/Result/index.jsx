@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ConfettiExplosion from "react-confetti-explosion";
 import http from "../../helper/http-client";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/Loading";
@@ -44,7 +45,7 @@ const Result = ({ socket }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    navigate("/pyramid");
+    // navigate("/pyramid");
   };
 
   const onSave = async (e) => {
@@ -66,25 +67,25 @@ const Result = ({ socket }) => {
         const user1Init = totalResult.allResult.find(
           (val) => val.username === totalResult.user1.name
         );
-        if (
-          new Date(user1Init.date).toISOString() ===
-          new Date(totalResult.begin).toISOString()
-        ) {
-          toast("Dieses Spiel wurde bereits gespeichert.");
-        } else {
-          setIsLoading(true);
-          try {
-            await Promise.all(
-              updatedResult.map(async (val) => {
-                await http.post("/result/post", val);
-              })
-            );
-          } catch (err) {
-            toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
-          } finally {
-            setIsLoading(false);
-          }
-        }
+        // if (
+        //   new Date(user1Init.date).toISOString() ===
+        //   new Date(totalResult.begin).toISOString()
+        // ) {
+        //   toast("Dieses Spiel wurde bereits gespeichert.");
+        // } else {
+        //   setIsLoading(true);
+        //   try {
+        //     await Promise.all(
+        //       updatedResult.map(async (val) => {
+        //         await http.post("/result/post", val);
+        //       })
+        //     );
+        //   } catch (err) {
+        //     toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
+        //   } finally {
+        //     setIsLoading(false);
+        //   }
+        // }
       } else {
         console.log("achievement-error-->>>");
       }
@@ -229,7 +230,7 @@ const Result = ({ socket }) => {
                     />
                   </div>
                   <p className="font-semibold text-xl col-span-4 flex items-center">
-                    {convertStr(val?.name)}
+                    {convertStr(val?.name.split(".")[0])}
                     &nbsp;
                     {val?.value}
                   </p>
@@ -251,7 +252,7 @@ const Result = ({ socket }) => {
                     />
                   </div>
                   <p className="font-semibold text-xl col-span-4 flex items-center">
-                    Lifetime: {convertStr(val?.name)}
+                    Lifetime: {convertStr(val?.name.split(".")[0])}
                     &nbsp;
                     {val?.value}
                   </p>
@@ -276,7 +277,7 @@ const Result = ({ socket }) => {
                     />
                   </div>
                   <p className="font-semibold text-xl col-span-4 flex items-center">
-                    SEASON: {convertStr(val?.name)}
+                    SEASON: {convertStr(val?.name.split(".")[0])}
                     &nbsp;
                     {val?.value}
                   </p>
@@ -294,6 +295,15 @@ const Result = ({ socket }) => {
             </button>
           </div>
         </Modal>
+
+        {isModalOpen && (
+          <ConfettiExplosion
+            force={0.8}
+            duration={3000}
+            particleCount={250}
+            width={1600}
+          />
+        )}
 
         <ToastContainer />
       </div>

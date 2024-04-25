@@ -324,7 +324,7 @@ const PYRAMIDPROTECTOR = [
 ];
 
 // Legendary Livalry
-const LEGENDARYLIVALRY = [
+const LEGENDARYRIVALRY = [
   legendary_rivalry_1,
   legendary_rivalry_5,
   legendary_rivalry_10,
@@ -428,7 +428,7 @@ const images = {
   PYRAMIDCLIMBER,
   MONTHLYMAESTRO,
   PYRAMIDPROTECTOR,
-  LEGENDARYLIVALRY,
+  LEGENDARYRIVALRY,
   IRONDART,
   MASTER180,
   CONSISTENTSCORER,
