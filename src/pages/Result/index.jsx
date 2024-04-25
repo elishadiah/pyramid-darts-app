@@ -67,25 +67,25 @@ const Result = ({ socket }) => {
         const user1Init = totalResult.allResult.find(
           (val) => val.username === totalResult.user1.name
         );
-        // if (
-        //   new Date(user1Init.date).toISOString() ===
-        //   new Date(totalResult.begin).toISOString()
-        // ) {
-        //   toast("Dieses Spiel wurde bereits gespeichert.");
-        // } else {
-        //   setIsLoading(true);
-        //   try {
-        //     await Promise.all(
-        //       updatedResult.map(async (val) => {
-        //         await http.post("/result/post", val);
-        //       })
-        //     );
-        //   } catch (err) {
-        //     toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
-        //   } finally {
-        //     setIsLoading(false);
-        //   }
-        // }
+        if (
+          new Date(user1Init.date).toISOString() ===
+          new Date(totalResult.begin).toISOString()
+        ) {
+          toast("Dieses Spiel wurde bereits gespeichert.");
+        } else {
+          setIsLoading(true);
+          try {
+            await Promise.all(
+              updatedResult.map(async (val) => {
+                await http.post("/result/post", val);
+              })
+            );
+          } catch (err) {
+            toast("Beim Speichern der Daten ist ein Fehler aufgetreten");
+          } finally {
+            setIsLoading(false);
+          }
+        }
       } else {
         console.log("achievement-error-->>>");
       }
