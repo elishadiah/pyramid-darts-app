@@ -100,7 +100,7 @@ const navigation = [
 ];
 
 const userMenuItems = [
-  { name: "Your Profile", to: "/profile" },
+  { name: "Your Profile", to: "/profile-summary" },
   { name: "Settings", to: "/settings" },
 ];
 
