@@ -45,7 +45,7 @@ const Result = ({ socket }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    // navigate("/pyramid");
+    navigate("/pyramid");
   };
 
   const onSave = async (e) => {

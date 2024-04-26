@@ -96,7 +96,7 @@ const ProfileAchievementsPyramid = () => {
             <div className="mb-4">
               <AchievementLegendary
                 result={result?.legendaryRivalry}
-                achievementIcons={AchievementImages.LEGENDARYLIVALRY}
+                achievementIcons={AchievementImages.LEGENDARYRIVALRY}
                 handleActive={HandleAchievement.legendaryRivalry}
               />
             </div>
