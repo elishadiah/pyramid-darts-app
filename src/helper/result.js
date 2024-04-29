@@ -285,6 +285,13 @@ const updateResult = (data) => {
     consistentScorer: cntConsistentScorer_1,
     championChallenger: data.user2.init.level === 6 ? true : false,
     date: new Date(data.begin),
+    summary: data.user1.init.summary.concat({
+      doubles: data.matchResult?.p1_doubles,
+      master180: data.matchResult?.p1_180,
+      first9Avg: data.matchResult?.p1_first9_avg,
+      matchAvg: data.matchResult?.p1_match_avg,
+      level: user1Update.level,
+    }),
   };
 
   user2Update = {
@@ -306,6 +313,13 @@ const updateResult = (data) => {
         : data.user2.init.monthlyMaestro,
     consistentScorer: cntConsistentScorer_2,
     date: new Date(data.begin),
+    summary: data.user2.init.summary.concat({
+      doubles: data.matchResult?.p2_doubles,
+      master180: data.matchResult?.p2_180,
+      first9Avg: data.matchResult?.p2_first9_avg,
+      matchAvg: data.matchResult?.p2_match_avg,
+      level: user2Update.level,
+    }),
   };
 
   console.log("Update-result--->>>", user1Update, user2Update);

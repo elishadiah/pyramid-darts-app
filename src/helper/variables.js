@@ -5,13 +5,13 @@ for (let i = 157; i > 100; i--) {
   highMarks.push(i);
 }
 const FINISHINGACE = [...highMarks];
-const FRIENDLY_CHALLENGER = [1, 5, 10, 20, 50, 100];
+const FRIENDLYCHALLENGER = [1, 5, 10, 20, 50, 100];
 
 const variables = {
   BREAKFAST,
   STREAK,
   FINISHINGACE,
-  FRIENDLY_CHALLENGER,
+  FRIENDLYCHALLENGER,
 };
 
 export default variables;

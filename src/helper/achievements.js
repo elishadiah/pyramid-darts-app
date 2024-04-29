@@ -90,6 +90,16 @@ const grandMaster = (val) => {
     }
 };
 
+const cntGrandMaster = (val) => {
+  let cnt = 0;
+  const arr = [50, 60, 70, 90, 100, 110];
+  for (let i = 0; i < arr.length; i++) {
+    if (val >= arr[i]) cnt = i + 1;
+  }
+
+  return cnt;
+};
+
 const achievement = {
   friendlyActive,
   streakActive,
@@ -104,7 +114,8 @@ const achievement = {
   dartEnthusiast,
   readyForIt,
   legendaryRivalry,
-  grandMaster
+  grandMaster,
+  cntGrandMaster,
 };
 
 export default achievement;

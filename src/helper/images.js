@@ -199,6 +199,13 @@ import challenge_conqueror_10 from "../assets/img/challenge_conqueror/challenge_
 import challenge_conqueror_20 from "../assets/img/challenge_conqueror/challenge_conqueror_20.png";
 import challenge_conqueror_50 from "../assets/img/challenge_conqueror/challenge_conqueror_50.png";
 
+// hunter
+import hunter_5 from "../assets/img/hunter/player_5.png";
+import hunter_10 from "../assets/img/hunter/serious_player_10.png";
+import hunter_15 from "../assets/img/hunter/here_to_stay_15.png";
+import hunter_20 from "../assets/img/hunter/hunter_20.png";
+import hunter_25 from "../assets/img/hunter/hunter_25.png";
+
 // Breakfast image
 const MASTER26 = [
   master26_10,
@@ -280,7 +287,7 @@ const FINISHING_ACE = [
 ];
 
 // Friendly Challenger Image
-const FRIENDLY_CHALLENGER = [
+const FRIENDLYCHALLENGER = [
   friendly_challenger_1,
   friendly_challenger_5,
   friendly_challenger_10,
@@ -290,7 +297,14 @@ const FRIENDLY_CHALLENGER = [
 ];
 
 // Streak Image
-const MAXVICTORYSTREAK = [streak_1, streak_2, streak_4, streak_6, streak_8, streak_10];
+const MAXVICTORYSTREAK = [
+  streak_1,
+  streak_2,
+  streak_4,
+  streak_6,
+  streak_8,
+  streak_10,
+];
 
 // Pyramid Climber
 const PYRAMIDCLIMBER = [
@@ -420,9 +434,18 @@ const CHALLENGECONQUEROR = [
 
 const FINISHINGACE = [...FINISHING_ACE.reverse()];
 
+// Hunter
+const HUNTER = {
+  hunter_5,
+  hunter_10,
+  hunter_15,
+  hunter_20,
+  hunter_25,
+};
+
 const images = {
   MAXVICTORYSTREAK,
-  FRIENDLY_CHALLENGER,
+  FRIENDLYCHALLENGER,
   FINISHINGACE,
   MASTER26,
   PYRAMIDCLIMBER,
@@ -438,6 +461,7 @@ const images = {
   READYFORIT,
   CHAMPIONCHALLENGER,
   CHALLENGECONQUEROR,
+  HUNTER,
 };
 
 export default images;

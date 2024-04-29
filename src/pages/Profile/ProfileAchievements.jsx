@@ -42,7 +42,7 @@ const ProfileAchievements = () => {
       achievement: "Friendly Challenger",
       type: "season",
       max: 100,
-      achievementIcons: AchievementImages.FRIENDLY_CHALLENGER,
+      achievementIcons: AchievementImages.FRIENDLYCHALLENGER,
       handleActive: HandleAchievement.friendlyActive,
     },
     {
