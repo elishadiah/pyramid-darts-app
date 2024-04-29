@@ -154,8 +154,8 @@ const additiveTexts = [
   "4. Jeden 28. im Monat wird der Clubchef unter den Top 4 ermittelt.",
 ];
 
-const URL = "http://localhost:4000";
-// const URL = 'https://backend.dartsfightclub.de';
+// const URL = "http://localhost:4000";
+const URL = 'https://backend.dartsfightclub.de';
 
 const constant = {
   quotes,
