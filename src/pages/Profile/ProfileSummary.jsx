@@ -18,7 +18,7 @@ const ProfileSummary = () => {
     setIsLoading(true);
     try {
       const res = await http.post("/result/fetch", {
-        username: username.trim(),
+        username: username.trim()?.toLowerCase(),
       });
       setResult(res.data);
 

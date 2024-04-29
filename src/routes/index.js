@@ -18,6 +18,7 @@ import ResetPassword from "../pages/ResetPassword";
 import RetypePassword from "../pages/RetypePassword";
 import ProfileAchievementsPersonal from "../pages/Profile/ProfileAchievementsPersonal";
 import ProfileAchievementsPyramid from "../pages/Profile/ProfileAchievementsPyramid";
+import ProfileCalendar from "../pages/Profile/ProfileCalendar";
 
 const AppRouter = () => {
   return (
@@ -42,6 +43,10 @@ const AppRouter = () => {
         <Route
           path="/profile-achievements-pyramid"
           element={<ProfileAchievementsPyramid />}
+        />
+        <Route
+          path="/profile-calendar"
+          element={<ProfileCalendar />}
         />
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/settings" element={<Settings />} />

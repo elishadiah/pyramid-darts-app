@@ -40,7 +40,7 @@ export default function Header({ current }) {
     setUser(tmp);
 
     const sessionID = authService.getAuthUser().user._id;
-    const username = authService.getAuthUser().user.username;
+    const username = authService.getAuthUser().user.username?.toLowerCase();
     if (sessionID) {
       socket.auth = { sessionID, username };
       socket.connect();
@@ -189,14 +189,16 @@ export default function Header({ current }) {
 
   const declineChallenge = (type) => {
     http.post("/event/post", {
-      content: `${user.username} rejected a challenge`,
+      content: `${user?.username?.toLowerCase()} rejected a challenge`,
     });
     EmailNotify.sendNotificationEmail(
-      user.username,
+      user.username?.toLowerCase(),
       user.email,
-      type === "quick" ? notifications.username : scheduleNotification.username,
+      type === "quick"
+        ? notifications.username?.toLowerCase()
+        : scheduleNotification.username?.toLowerCase(),
       type === "quick" ? notifications.email : scheduleNotification.email,
-      `${user.username} declined your challenge.`,
+      `${user.username?.toLowerCase()} declined your challenge.`,
       "Dart Challenge"
     );
   };
@@ -335,9 +337,7 @@ export default function Header({ current }) {
                               >
                                 {selectedUser?.messages.map((item, index) => (
                                   <div key={index}>
-                                    <p className="mb-4">
-                                      {item.content}
-                                    </p>
+                                    <p className="mb-4">{item.content}</p>
                                     <div className="flex gap-2 justify-center">
                                       <Disclosure.Button
                                         className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
@@ -372,8 +372,9 @@ export default function Header({ current }) {
                                 )}
                               >
                                 <p className="mb-4">
-                                  {scheduleNotification.username} hat Ihnen eine
-                                  geplante Herausforderung gesendet.
+                                  {scheduleNotification.username?.toLowerCase()}{" "}
+                                  hat Ihnen eine geplante Herausforderung
+                                  gesendet.
                                 </p>
                                 <p>
                                   Wenn Sie zustimmen, können Sie das Spiel in

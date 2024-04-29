@@ -52,12 +52,18 @@ const Result = ({ socket }) => {
     e.preventDefault();
 
     if (updatedResult) {
-      const currentUser = authService.getAuthUser().user.username;
+      const currentUser = authService
+        .getAuthUser()
+        .user.username?.toLowerCase();
       console.log("Save--->>>", updatedResult, "::::", currentUser);
 
       const earnedAchievement = HandleResult.handleAchievement(
-        updatedResult.find((val) => val.username === currentUser),
-        totalResult.allResult.find((val) => val.username === currentUser)
+        updatedResult.find(
+          (val) => val.username?.toLowerCase() === currentUser
+        ),
+        totalResult.allResult.find(
+          (val) => val.username?.toLowerCase() === currentUser
+        )
       );
 
       if (earnedAchievement) {
@@ -65,7 +71,9 @@ const Result = ({ socket }) => {
 
         earnedAchievement.length && setIsModalOpen(true);
         const user1Init = totalResult.allResult.find(
-          (val) => val.username === totalResult.user1.name
+          (val) =>
+            val.username?.toLowerCase() ===
+            totalResult.user1.name?.toLowerCase()
         );
         if (
           new Date(user1Init.date).toISOString() ===

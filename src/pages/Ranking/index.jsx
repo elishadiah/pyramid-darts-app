@@ -137,11 +137,13 @@ const Ranking = () => {
 
   const sendQuickFight = (username, challenger, challengerEmail) => {
     http.post("/event/post", {
-      content: `${challenger} send a quick challenge to ${username}`,
+      content: `${challenger?.toLowerCase()} send a quick challenge to ${username?.toLowerCase()}`,
     });
     socket.emit("challenge", {
       content: `${challenger}(Email: ${challengerEmail}) has sent you the quick challenge Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
-      to: users.find((val) => val.username === username)?.userID,
+      to: users.find(
+        (val) => val.username?.toLowerCase() === username?.toLowerCase()
+      )?.userID,
     });
   };
 

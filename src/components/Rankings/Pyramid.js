@@ -12,7 +12,7 @@ const Pyramid = ({
   const isAvailable = (player) => {
     const currentUser = JSON.parse(localStorage.getItem("authUser")).user;
     const currentPlayer = players.find((val) =>
-      val.username.includes(currentUser.username)
+      val.username?.toLowerCase().includes(currentUser.username?.toLowerCase())
     );
     if (player.level < currentPlayer.level) return false;
     else if (player.level === currentPlayer.level + 1) return true;
@@ -27,7 +27,6 @@ const Pyramid = ({
       else return false;
     }
   };
-
 
   const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;

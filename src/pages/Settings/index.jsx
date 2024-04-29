@@ -11,6 +11,10 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import authService from "../../services/auth.service";
+import DiscordIcon from "../../components/Icons/DiscordIcon";
+import FacebookIcon from "../../components/Icons/FacebookIcon";
+import InstagramIcon from "../../components/Icons/InstagramIcon";
+import TwitterIcon from "../../components/Icons/TwitterIcon";
 
 const Settings = () => {
   const [userAvatar, setUserAvatar] = useState(null);
@@ -117,6 +121,20 @@ const Settings = () => {
               <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-white">
                 Persönliche Angaben
               </h2>
+              <div className="py-4 flex items-center justify-center gap-4 md:mt-16">
+                <div className="mb-2 inline-block rounded-full bg-green-600 p-3 text-xs font-medium uppercase leading-normal text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg">
+                  <DiscordIcon />
+                </div>
+                <div className="mb-2 inline-block rounded-full bg-green-600 p-3 text-xs font-medium uppercase leading-normal text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg">
+                  <FacebookIcon />
+                </div>
+                <div className="mb-2 inline-block rounded-full bg-green-600 p-3 text-xs font-medium uppercase leading-normal text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg">
+                  <InstagramIcon />
+                </div>
+                <div className="mb-2 inline-block rounded-full bg-green-600 p-3 text-xs font-medium uppercase leading-normal text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg">
+                  <TwitterIcon />
+                </div>
+              </div>
             </div>
 
             <div className="md:col-span-2">
@@ -256,7 +274,7 @@ const Settings = () => {
                       type="text"
                       placeholder="Nutzername eingeben"
                       required={true}
-                      value={user.username}
+                      value={user.username?.toLowerCase()}
                       onChange={onChange}
                       label={
                         <label
@@ -276,7 +294,7 @@ const Settings = () => {
                   </div>
                 </div>
 
-                <div className="mt-8 flex">
+                <div className="mt-8 flex justify-center md:justify-start">
                   <Button
                     type="submit"
                     className="rounded-md py-2 px-3 text-sm font-semibold shadow-sm"
@@ -373,7 +391,7 @@ const Settings = () => {
                 </div>
               </div>
 
-              <div className="mt-8 flex">
+              <div className="mt-8 flex justify-center md:justify-start">
                 <Button
                   type="submit"
                   className="rounded-md py-2 px-3 text-sm font-semibold shadow-sm"

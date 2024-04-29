@@ -20,7 +20,7 @@ const RankingTable = () => {
           id: val._id,
           ranking: val.level,
           avatar: val.avatar,
-          name: val.username,
+          name: val.username?.toLowerCase(),
           breakfast: val.master26,
           streak: val.maxVictoryStreak,
           friendly: val.sentTotalChallengeNo,

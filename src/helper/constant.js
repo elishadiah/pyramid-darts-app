@@ -109,6 +109,7 @@ const profileMenuItems = [
   { name: `Pyramid Achievements`, to: "/profile-achievements-pyramid" },
   { name: "Fight Club Achievements", to: "/profile-achievements-participation" },
   { name: "Personal Achievements", to: "/profile-achievements-personal" },
+  { name: "My Calendar", to: "/profile-calendar" },
 ];
 
 const infoTexts = [
@@ -153,8 +154,8 @@ const additiveTexts = [
   "4. Jeden 28. im Monat wird der Clubchef unter den Top 4 ermittelt.",
 ];
 
-// const URL = "http://localhost:4000";
-const URL = 'https://backend.dartsfightclub.de';
+const URL = "http://localhost:4000";
+// const URL = 'https://backend.dartsfightclub.de';
 
 const constant = {
   quotes,

@@ -16,7 +16,14 @@ const isEmpty = (data) => {
 };
 
 const updateResult = (data) => {
-  console.log("Result--->>>", data);
+  console.log(
+    "Result--->>>",
+    data,
+    "---->>>--->>>>",
+    data.user1.init.summary,
+    ":::---->>>--->>>",
+    data.user1.init.summary.push({})
+  );
   const availablePositionNo = Math.pow(2, 7 - data.user1.init.level);
   const currentAbovePlayersNo = data.allResult.filter(
     (val) => val.level === data.user1.init.level + 1
@@ -75,15 +82,15 @@ const updateResult = (data) => {
         ? data.user1.init.pyramidProtector + 1
         : data.user1.init.pyramidProtector,
     legendaryRivalry: data.user1.init.legendaryRivalry.find(
-      (val) => val.opponent === data.user2.init.username
+      (val) => val.opponent === data.user2.init.username?.toLowerCase()
     )
       ? data.user1.init.legendaryRivalry.map((val) =>
-          val.opponent === data.user2.init.username
+          val.opponent === data.user2.init.username?.toLowerCase()
             ? { ...val, lifetime: val.lifetime + 1, season: val.season + 1 }
             : { ...val }
         )
       : data.user1.init.legendaryRivalry.concat({
-          opponent: data.user2.init.username,
+          opponent: data.user2.init.username?.toLowerCase(),
           lifetime: 1,
           season: 1,
         }),
@@ -174,15 +181,15 @@ const updateResult = (data) => {
         ? data.user2.init.pyramidProtector + 1
         : data.user2.init.pyramidProtector,
     legendaryRivalry: data.user2.init.legendaryRivalry.find(
-      (val) => val.opponent === data.user1.init.username
+      (val) => val.opponent === data.user1.init.username?.toLowerCase()
     )
       ? data.user2.init.legendaryRivalry.map((val) =>
-          val.opponent === data.user1.init.username
+          val.opponent === data.user1.init.username?.toLowerCase()
             ? { ...val, lifetime: val.lifetime + 1, season: val.season + 1 }
             : { ...val }
         )
       : data.user2.init.legendaryRivalry.concat({
-          opponent: data.user1.init.username,
+          opponent: data.user1.init.username?.toLowerCase(),
           lifetime: 1,
           season: 1,
         }),

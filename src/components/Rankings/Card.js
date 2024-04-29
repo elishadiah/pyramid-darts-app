@@ -29,7 +29,9 @@ const Card = ({
 
   const connected = useMemo(
     () =>
-      connectedUsers.find((val) => val.username === player.username)?.connected,
+      connectedUsers.find(
+        (val) => val.username?.toLowerCase() === player.username?.toLowerCase()
+      )?.connected,
     [connectedUsers, player]
   );
 
@@ -81,9 +83,7 @@ const Card = ({
         user.email,
         player.username,
         player.email,
-        `${
-          user.username
-        } sent you a scheduled challenge. Challenge date: ${new Date(
+        `${user.username?.toLowerCase()} sent you a scheduled challenge. Challenge date: ${new Date(
           value.year,
           value.month.index,
           value.day,
@@ -103,11 +103,11 @@ const Card = ({
       user.email,
       player.username,
       player.email,
-      `${user.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+      `${user.username?.toLowerCase()} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
       "Dart Challenge"
     );
     window.open(
-      `https://lidarts.org/game/create?opponent_name=${player.username}`,
+      `https://lidarts.org/game/create?opponent_name=${player.username?.toLowerCase()}`,
       "_blank"
     );
     navigate("/result");
@@ -137,13 +137,18 @@ const Card = ({
         {children}
         <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-10 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
           <div className="flex flex-col h-16 p-4">
-            <p className="font-bold text-xl">{player.username}</p>
+            <p className="font-bold text-xl">
+              {player.username?.toLowerCase()}
+            </p>
           </div>
           <div className="flex items-center justify-center divide-x divide-gray-900 dark:divide-gray-200 dark:divide-gray-900">
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={player.username === user.username || !available}
+                disabled={
+                  player.username?.toLowerCase() ===
+                    user.username?.toLowerCase() || !available
+                }
                 onClick={sendQuick}
               >
                 Quick Fight
@@ -152,7 +157,10 @@ const Card = ({
             <div className="w-6/12 p-2">
               <button
                 className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={player.username === user.username || !available}
+                disabled={
+                  player.username?.toLowerCase() ===
+                    user.username?.toLowerCase() || !available
+                }
                 onClick={openModal}
               >
                 Scheduled Fight

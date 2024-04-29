@@ -17,7 +17,7 @@ const ProfileAchievementsPersonal = () => {
 
   useEffect(() => {
     const { username } = authService.getAuthUser().user;
-    fetchResult(username);
+    fetchResult(username?.toLowerCase());
   }, []);
 
   const fetchResult = async (data) => {

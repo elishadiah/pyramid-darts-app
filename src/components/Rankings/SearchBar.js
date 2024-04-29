@@ -24,7 +24,7 @@ const SearchBar = ({ players, onPlayerClick }) => {
               onClick={() => onPlayerClick(player)}
             >
               <a className="font-semibold text-lg" href={`#${player._id}`}>
-                {player.username}
+                {player.username?.toLowerCase()}
               </a>
             </li>
           ))}
