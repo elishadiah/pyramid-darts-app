@@ -19,11 +19,15 @@ import {
   cntAchievements,
   setTotalAchievements,
 } from "../../helper/profileSummary";
+import { Button } from "../../components/Button";
+import CustomTextAreaComponent from "../../components/TextArea";
 
 const ProfileSummary = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [cntAchievementsNo, setCntAchievementsNo] = useState(0);
+  const [isEditable, setIsEditable] = useState(false);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     const user = authService.getAuthUser().user;
@@ -41,7 +45,7 @@ const ProfileSummary = () => {
         res.data?.summary
           ?.filter((item) => !isVariableEmpty(item))
           ?.map((item, index) => ({
-            name: index,
+            name: index + 1,
             Doubles: item?.doubles,
             First9Avg: item?.first9Avg,
             MatchAvg: item?.matchAvg,
@@ -50,6 +54,8 @@ const ProfileSummary = () => {
       );
       setCntAchievementsNo(cntAchievements(res.data));
 
+      fetchProfile();
+
       console.log("--------Init-profile--result-------", res.data);
     } catch (err) {
       console.log("-------Init-profile--err---", err);
@@ -57,6 +63,35 @@ const ProfileSummary = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const user = authService.getAuthUser().user;
+      const res = await http.get(`/auth/get-profile/${user?._id}`);
+      setProfile({ introduction: res.data?.profile });
+    } catch (err) {
+      console.log("-------Init-profile--err---", err);
+      setProfile(null);
+    }
+  };
+
+  const onSave = async () => {
+    setIsEditable(false);
+    const user = authService.getAuthUser().user;
+    try {
+      const res = await http.post(`/auth/update-profile/${user?._id}`, {
+        profile: profile?.introduction,
+      });
+      fetchProfile();
+      console.log("--------profile--update-------", res.data);
+    } catch (err) {
+      console.log("-------profile--err---", err);
+    }
+  };
+
+  const onChange = (e) => {
+    setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
   return (
@@ -75,10 +110,33 @@ const ProfileSummary = () => {
           </div>
         </div>
       )}
+      <div className="w-full flex justify-end items-center mb-8">
+        {isEditable ? (
+          <Button className="py-2 px-4 rounded-md" onClick={onSave}>
+            Save
+          </Button>
+        ) : (
+          <Button
+            className="py-2 px-4 rounded-md"
+            onClick={() => setIsEditable(true)}
+          >
+            Edit Profile
+          </Button>
+        )}
+      </div>
       <div className="mb-8">
-        <h5 className="w-full min-h-60 p-4 text-xl text-left border border-t-8 border-t-green-600 rounded-md cursor-pointer ">
-          Introduction
-        </h5>
+        {isEditable ? (
+          <CustomTextAreaComponent
+            name="introduction"
+            placeholder="Please enter your introduction here..."
+            value={profile?.introduction}
+            handleTextArea={onChange}
+          />
+        ) : (
+          <h5 className="w-full min-h-60 p-4 text-xl text-left border border-t-8 border-t-green-600 rounded-md cursor-pointer ">
+            {profile?.introduction}
+          </h5>
+        )}
       </div>
       {isLoading ? (
         <Loading />

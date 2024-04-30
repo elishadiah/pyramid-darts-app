@@ -1,10 +1,10 @@
 const AchievementGrandmaster = ({ result, achievementIcons, handleActive }) => {
   return (
-    <div className="w-full font-serif rounded-lg p-6 text-white shadow-green-900 shadow-md bg-gradient-to-br from-green-500 to-gray-900">
-      <h2 className="font-semibold mb-4 text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-5xl">Highest Average</h2>
-      <div className="flex flex-wrap justify-center items-center text-lg sm:text-xl md:text-xl lg:text-2xl xl:text-3xl gap-x-4 mb-4">
+    <div className="w-full lg:w-48p font-serif rounded-lg p-6 text-white shadow-green-900 shadow-md bg-gradient-to-br from-green-500 to-gray-900">
+      <h2 className="font-semibold mb-4 text-3xl">Grand Master</h2>
+      <div className="flex flex-wrap justify-center items-center  gap-x-4 mb-4">
         <p className="font-semibold">Achievement</p>
-        <p className="opacity-70">Grand Master</p>
+        <p className="opacity-70">Highest Average</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

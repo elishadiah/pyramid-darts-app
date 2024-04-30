@@ -13,7 +13,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
         <div className="w-12 h-12">
           <CircularProgressbar
             value={(result / max) * 100}
-            text={`${parseFloat((result / max) * 100).toFixed(2)}%`}
+            text={result ? result : "0"}
             styles={{
               path: {
                 stroke: `rgb(34 197 94)`,
@@ -24,6 +24,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
               text: {
                 fill: "#fff",
                 fontFamily: "sans-serif",
+                fontSize: "2.5rem",
               },
             }}
           />
@@ -35,7 +36,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
         <div className="w-12 h-12">
           <CircularProgressbar
             value={(result / max) * 100}
-            text={`${parseFloat((result / max) * 100).toFixed(2)}%`}
+            text={result ? result : "0"}
             styles={{
               path: {
                 stroke: `rgb(34 197 94)`,
@@ -46,6 +47,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
               text: {
                 fill: "#fff",
                 fontFamily: "sans-serif",
+                fontSize: "2.5rem",
               },
             }}
           />
@@ -59,9 +61,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
             <div className="w-12 h-12">
               <CircularProgressbar
                 value={(result?.lifetime / max) * 100}
-                text={`${parseFloat((result?.lifetime / max) * 100).toFixed(
-                  2
-                )}%`}
+                text={result?.lifetime ? result?.lifetime : "0"}
                 styles={{
                   path: {
                     stroke: `rgb(34 197 94)`,
@@ -72,6 +72,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
                   text: {
                     fill: "#fff",
                     fontFamily: "sans-serif",
+                    fontSize: "2.5rem",
                   },
                 }}
               />
@@ -81,7 +82,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
             <div className="w-12 h-12">
               <CircularProgressbar
                 value={(result?.season / max) * 100}
-                text={`${parseFloat((result?.season / max) * 100).toFixed(2)}%`}
+                text={result?.season ? result?.season : "0"}
                 styles={{
                   path: {
                     stroke: `rgb(34 197 94)`,
@@ -92,6 +93,7 @@ const AchievementBody = ({ result, achievement, max, type }) => (
                   text: {
                     fill: "#fff",
                     fontFamily: "sans-serif",
+                    fontSize: "2.5rem",
                   },
                 }}
               />

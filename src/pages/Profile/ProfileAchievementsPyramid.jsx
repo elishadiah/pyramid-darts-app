@@ -38,8 +38,8 @@ const ProfileAchievementsPyramid = () => {
   const achievementItems = [
     {
       result: result?.pyramidClimber,
-      title: "Climb the Pyramid",
-      achievement: "Pyramid Climber",
+      achievement: "Climb the Pyramid",
+      title: "Pyramid Climber",
       type: "both",
       max: 20,
       achievementIcons: AchievementImages.PYRAMIDCLIMBER,
@@ -60,8 +60,8 @@ const ProfileAchievementsPyramid = () => {
 
     {
       result: result?.challengeConqueror,
-      title: "Accept a challenge and win the match",
-      achievement: "Challenge Conqueror",
+      achievement: "Accept a challenge and win the match",
+      title: "Challenge Conqueror",
       type: "both",
       max: 50,
       achievementIcons: AchievementImages.CHALLENGECONQUEROR,
@@ -69,8 +69,8 @@ const ProfileAchievementsPyramid = () => {
     },
     {
       result: result?.monthlyMaestro,
-      title: "Finish in the top Four Positions",
-      achievement: "Monthly Maestro",
+      achievement: "Finish in the top Four Positions",
+      title: "Monthly Maestro",
       type: "season",
       max: 9,
       achievementIcons: AchievementImages.MONTHLYMAESTRO,
@@ -78,8 +78,8 @@ const ProfileAchievementsPyramid = () => {
     },
     {
       result: result?.pyramidProtector,
-      title: "Defend the Position",
-      achievement: "Pyramid Protector",
+      achievement: "Defend the Position",
+      title: "Pyramid Protector",
       type: "season",
       max: 20,
       achievementIcons: AchievementImages.PYRAMIDPROTECTOR,
@@ -93,13 +93,6 @@ const ProfileAchievementsPyramid = () => {
       ) : (
         result && (
           <div className="p-4 shadow-md rounded-md">
-            <div className="mb-4">
-              <AchievementLegendary
-                result={result?.legendaryRivalry}
-                achievementIcons={AchievementImages.LEGENDARYRIVALRY}
-                handleActive={HandleAchievement.legendaryRivalry}
-              />
-            </div>
             <div className="flex flex-col lg:flex-row sm:flex-wrap gap-4">
               {achievementItems.map((item, index) => (
                 <AchievementItemComponent
@@ -114,6 +107,11 @@ const ProfileAchievementsPyramid = () => {
                   handleActive={item.handleActive}
                 />
               ))}
+              <AchievementLegendary
+                result={result?.legendaryRivalry}
+                achievementIcons={AchievementImages.LEGENDARYRIVALRY}
+                handleActive={HandleAchievement.legendaryRivalry}
+              />
             </div>
           </div>
         )

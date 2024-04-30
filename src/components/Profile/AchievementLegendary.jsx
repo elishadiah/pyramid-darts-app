@@ -9,13 +9,13 @@ const AchievementLegendary = ({ result, achievementIcons, handleActive }) => {
     [result]
   );
   return (
-    <div className="w-full font-serif rounded-lg p-6 text-white shadow-green-900 shadow-md bg-gradient-to-br from-green-500 to-gray-900">
+    <div className="w-full lg:w-48p font-serif rounded-lg p-6 text-white shadow-green-900 shadow-md bg-gradient-to-br from-green-500 to-gray-900">
       <h2 className="font-semibold mb-4 text-3xl">
-        Challenge the same opponent multiple times
+        Legendary Rivalry
       </h2>
-      <div className="flex flex-wrap justify-center items-center text-md md:text-xl gap-x-4 mb-4">
+      <div className="flex flex-wrap justify-center items-center gap-x-4 mb-4">
         <p className="font-semibold">Achievement</p>
-        <p className="opacity-70">Legendary Rivalry</p>
+        <p className="opacity-70">Challenge the same opponent multiple times</p>
       </div>
       <div className="flex flex-col justify-center items-center gap-4">
         <div className="grid grid-cols-3 w-full text-md md:text-sm lg:text-xl gap-4">
@@ -50,7 +50,7 @@ const AchievementLegendary = ({ result, achievementIcons, handleActive }) => {
                           alt="achievement-icon"
                         />
                       </div>
-                      <p className="font-sans leading-3">{item.lifetime}%</p>
+                      <p className="font-sans leading-3">{item.lifetime}</p>
                     </div>
                   </CircularProgressbarWithChildren>
                 </div>
@@ -76,7 +76,7 @@ const AchievementLegendary = ({ result, achievementIcons, handleActive }) => {
                           alt="achievement-icon"
                         />
                       </div>
-                      <p className="font-sans leading-3">{item.season}%</p>
+                      <p className="font-sans leading-3">{item.season}</p>
                     </div>
                   </CircularProgressbarWithChildren>
                 </div>

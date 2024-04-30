@@ -51,35 +51,35 @@ const ProfileAchievementsPersonal = () => {
   const achievementItems = [
     {
       result: result?.master180,
-      title: "Maximum Score of 180",
-      achievement: "180 Master",
+      achievement: "Maximum Score of 180",
+      title: "180 Master",
       type: "both",
       max: 100,
       achievementIcons: AchievementImages.MASTER180,
       handleActive: HandleAchievement.master180,
     },
     {
-      result: result?.master26,
-      title: "Breakfast",
-      achievement: "Breakfast",
-      type: "season",
-      max: 1000,
-      achievementIcons: AchievementImages.MASTER26,
-      handleActive: HandleAchievement.breakfastActive,
-    },
-    {
       result: result?.consistentScorer,
-      title: "Score consistently over 100",
-      achievement: "Consistent Scorer",
+      achievement: "Score consistently over 100",
+      title: "Consistent Scorer",
       type: "season",
       max: 50,
       achievementIcons: AchievementImages.CONSISTENTSCORER,
       handleActive: HandleAchievement.consistentScorer,
     },
     {
+      result: result?.master26,
+      achievement: "Breakfast",
+      title: "Breakfast",
+      type: "season",
+      max: 1000,
+      achievementIcons: AchievementImages.MASTER26,
+      handleActive: HandleAchievement.breakfastActive,
+    },
+    {
       result: result?.ironDart,
-      title: "Highest Checkout Percentage",
-      achievement: "Iron Dart",
+      achievement: "Highest Checkout Percentage",
+      title: "Iron Dart",
       type: "season",
       max: 100,
       achievementIcons: AchievementImages.IRONDART,
@@ -94,18 +94,14 @@ const ProfileAchievementsPersonal = () => {
         result && (
           <div className="p-4 shadow-md rounded-md">
             <div className="flex flex-wrap gap-4">
-              {result?.grandMaster?.match >= 50 && (
-                <AchievementGrandmaster
-                  result={result?.grandMaster}
-                  achievementIcons={AchievementImages.GRANDMASTERAVERAGE}
-                  handleActive={HandleAchievement.grandMaster}
-                />
-              )}
-              {result?.maximumMarksman && (
-                <AchievementMaxMarks
-                  achievementIcon={AchievementImages.MAXIMUMMARKSMAN}
-                />
-              )}
+              <AchievementGrandmaster
+                result={result?.grandMaster}
+                achievementIcons={AchievementImages.GRANDMASTERAVERAGE}
+                handleActive={HandleAchievement.grandMaster}
+              />
+              <AchievementMaxMarks
+                achievementIcon={AchievementImages.MAXIMUMMARKSMAN}
+              />
               {achievementItems.map((item, index) => (
                 <AchievementItemComponent
                   key={index}

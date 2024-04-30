@@ -38,8 +38,8 @@ const ProfileAchievements = () => {
   const achievementItems = [
     {
       result: result?.sentTotalChallengeNo,
-      title: "Friendly Challenger",
       achievement: "Friendly Challenger",
+      title: "Friendly Challenger",
       type: "season",
       max: 100,
       achievementIcons: AchievementImages.FRIENDLYCHALLENGER,
@@ -47,8 +47,8 @@ const ProfileAchievements = () => {
     },
     {
       result: result?.readyForIt,
-      title: "Accept a certain number of challenges",
-      achievement: "Ready For It",
+      achievement: "Accept a certain number of challenges",
+      title: "Ready For It",
       type: "season",
       max: 50,
       achievementIcons: AchievementImages.READYFORIT,
@@ -56,8 +56,8 @@ const ProfileAchievements = () => {
     },
     {
       result: result?.dartEnthusiast,
-      title: "High Number of Matches or Challenges",
-      achievement: "Dart Enthusiast",
+      achievement: "High Number of Matches or Challenges",
+      title: "Dart Enthusiast",
       type: "season",
       max: 9,
       achievementIcons: AchievementImages.DARTENTHUSIAST,

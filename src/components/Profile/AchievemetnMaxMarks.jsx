@@ -1,12 +1,12 @@
 const AchievementMaxMarks = ({ achievementIcon }) => {
   return (
-    <div className="w-full font-serif rounded-lg p-6 text-white shadow-green-900 shadow-md bg-gradient-to-br from-green-500 to-gray-900">
-      <h2 className="font-semibold mb-4 text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-5xl">
-        Max Scorer
+    <div className="w-full lg:w-48p font-serif rounded-lg p-6 text-white shadow-green-900 shadow-md bg-gradient-to-br from-green-500 to-gray-900">
+      <h2 className="font-semibold mb-4 text-3xl">
+        Maximum Marksman
       </h2>
-      <div className="flex flex-wrap justify-center items-center text-lg sm:text-xl md:text-xl lg:text-2xl xl:text-3xl gap-x-4 mb-4">
+      <div className="flex flex-wrap justify-center items-center gap-x-4 mb-4">
         <p className="font-semibold">Achievement</p>
-        <p className="opacity-70">Maximum Marksman</p>
+        <p className="opacity-70">Max Scorer</p>
       </div>
       <div>
         <div className="flex justify-center items-center">
