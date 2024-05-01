@@ -19,6 +19,7 @@ import RetypePassword from "../pages/RetypePassword";
 import ProfileAchievementsPersonal from "../pages/Profile/ProfileAchievementsPersonal";
 import ProfileAchievementsPyramid from "../pages/Profile/ProfileAchievementsPyramid";
 import ProfileCalendar from "../pages/Profile/ProfileCalendar";
+import UserProfile from "../pages/Profile/UserProfile";
 
 const AppRouter = () => {
   return (
@@ -27,6 +28,7 @@ const AppRouter = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/retype-password/:id/:token" element={<RetypePassword />} />
+      <Route path="/profile/:username" element={<UserProfile />} />
       <Route element={<AuthGuard />}>
         <Route path="/home" element={<Home />} />
         <Route path="/" element={<Home />} />

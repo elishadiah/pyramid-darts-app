@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -13,7 +13,6 @@ import ProfileLayout from "../../components/Profile/ProfileLayout";
 import authService from "../../services/auth.service";
 import http from "../../helper/http-client";
 import Loading from "../../components/Loading";
-import { isVariableEmpty } from "../../helper/helper";
 import AchievementImages from "../../helper/images";
 import {
   cntAchievements,
@@ -21,6 +20,7 @@ import {
 } from "../../helper/profileSummary";
 import { Button } from "../../components/Button";
 import CustomTextAreaComponent from "../../components/TextArea";
+import { transformSummaryData } from "../../helper/helper";
 
 const ProfileSummary = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,52 +29,39 @@ const ProfileSummary = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [profile, setProfile] = useState(null);
 
-  useEffect(() => {
-    const user = authService.getAuthUser().user;
-    fetchResult(user);
-  }, []);
-
-  const fetchResult = async (data) => {
-    const { username } = data;
+  const fetchResult = useCallback(async (user) => {
+    const { username } = user;
     setIsLoading(true);
     try {
       const res = await http.post("/result/fetch", {
         username: username.trim()?.toLowerCase(),
       });
-      setResult(
-        res.data?.summary
-          ?.filter((item) => !isVariableEmpty(item))
-          ?.map((item, index) => ({
-            name: index + 1,
-            Doubles: item?.doubles,
-            First9Avg: item?.first9Avg,
-            MatchAvg: item?.matchAvg,
-            Ranking: item?.level,
-          }))
-      );
+      setResult(transformSummaryData(res.data));
       setCntAchievementsNo(cntAchievements(res.data));
-
       fetchProfile();
-
-      console.log("--------Init-profile--result-------", res.data);
     } catch (err) {
-      console.log("-------Init-profile--err---", err);
+      console.error(err);
       setResult(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const user = authService.getAuthUser().user;
       const res = await http.get(`/auth/get-profile/${user?._id}`);
       setProfile({ introduction: res.data?.profile });
     } catch (err) {
-      console.log("-------Init-profile--err---", err);
+      console.error(err);
       setProfile(null);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const user = authService.getAuthUser().user;
+    fetchResult(user);
+  }, [fetchResult]);
 
   const onSave = async () => {
     setIsEditable(false);

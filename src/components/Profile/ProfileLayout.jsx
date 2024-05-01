@@ -46,7 +46,7 @@ const ProfileLayout = ({ children }) => {
                 />
               )}
             </div>
-            <div className="text-center font-bold uppercase text-3xl lg:text-4xl">
+            <div className="text-center font-bold uppercase text-2xl md:text-sm xl:text-xl">
               {user.username}
             </div>
             <div className="py-4 flex flex-col justify-center gap-4 mt-16">

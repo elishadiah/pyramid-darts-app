@@ -501,23 +501,7 @@ export default function Header({ current }) {
           </div>
 
           <Disclosure.Panel className="lg:hidden">
-            <div className="space-y-1 px-2 pb-3 pt-2">
-              {/* {navigation.map((item) => (
-                <Disclosure.Button
-                  key={item.name}
-                  as="a"
-                  href={item.to}
-                  className={classNames(
-                    item.current === current
-                      ? "text-gray-900 bg-gray-200 dark:bg-gray-900 dark:text-white"
-                      : "text-gray-900 dark:text-gray-300 hover:bg-gray-200 hover:dark:bg-gray-900 hover:text-gray-900 hover:dark:text-white",
-                    "block rounded-md px-3 py-2 text-base font-medium"
-                  )}
-                  aria-current={item.current === current ? "page" : undefined}
-                >
-                  {item.name}
-                </Disclosure.Button>
-              ))} */}
+            <div className="flex flex-col space-y-1 px-2 pb-3 pt-2">
               {constant.navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -526,7 +510,7 @@ export default function Header({ current }) {
                     item.current === current
                       ? "bg-gray-100 dark:bg-gray-900 dark:text-white"
                       : "text-gray-900 dark:text-gray-300 hover:bg-gray-100 hover:dark:bg-gray-700 hover:text-gray-900 hover:dark:text-white",
-                    "rounded-md px-3 py-2 text-sm font-medium"
+                    "rounded-md w-full text-left px-3 py-2 text-sm font-medium"
                   )}
                   aria-current={item.current === current ? "page" : undefined}
                 >

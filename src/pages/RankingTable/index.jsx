@@ -1,35 +1,32 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Header from "../../components/Header";
 import http from "../../helper/http-client";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
+import { transformTableData } from "../../helper/helper";
 
 const RankingTable = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState([]);
-  useEffect(() => {
-    fetchResult();
-  }, []);
 
-  const fetchResult = async () => {
+  const fetchResult = useCallback(async () => {
     setIsLoading(true);
     try {
       const res = await http.get("/result/fetch-all");
-      setResult(
-        res.data.map((val, index) => ({
-          id: val._id,
-          ranking: val.level,
-          avatar: val.avatar,
-          name: val.username?.toLowerCase(),
-          breakfast: val.master26,
-          streak: val.maxVictoryStreak,
-          friendly: val.sentTotalChallengeNo,
-        }))
-      );
+      setResult(transformTableData(res.data));
+      console.log("--------Init-Ranking--table--result-------", res.data);
     } catch (err) {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchResult();
+  }, [fetchResult]);
+
+  const handleProfile = (username) => {
+    window.location.href = `/profile/${username}`;
   };
 
   const columns = [
@@ -46,7 +43,10 @@ const RankingTable = () => {
       name: "Username",
       selector: (row) => row.avatar,
       cell: (row) => (
-        <div className="flex items-center space-x-4">
+        <div
+          className="flex items-center space-x-4 cursor-pointer"
+          onClick={() => handleProfile(row.name)}
+        >
           <div className="flex items-center justify-center">
             {row.avatar ? (
               <img
@@ -81,8 +81,56 @@ const RankingTable = () => {
       },
     },
     {
+      name: "Dart Enthusiast",
+      selector: (row) => row.dart,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Consistent Scorer",
+      selector: (row) => row.consistentScorer,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Iron Dart",
+      selector: (row) => row.ironDart,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Monthly Maestro",
+      selector: (row) => row.monthlyMaestro,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Pyramid Protector",
+      selector: (row) => row.pyramidProtector,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
       name: "Friendly Challenger",
       selector: (row) => row.friendly,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Ready For It",
+      selector: (row) => row.ready,
       sortable: true,
       style: {
         fontSize: "16px",
