@@ -1,14 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import ProfileLayout from "../../components/Profile/ProfileLayout";
 import authService from "../../services/auth.service";
 import http from "../../helper/http-client";
@@ -21,6 +11,7 @@ import {
 import { Button } from "../../components/Button";
 import CustomTextAreaComponent from "../../components/TextArea";
 import { transformSummaryData } from "../../helper/helper";
+import SummaryStaticCard from "../../components/Profile/SummaryStaticCard";
 
 const ProfileSummary = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +27,7 @@ const ProfileSummary = () => {
       const res = await http.post("/result/fetch", {
         username: username.trim()?.toLowerCase(),
       });
+      console.log("--------Init-profile--result-------", res.data);
       setResult(transformSummaryData(res.data));
       setCntAchievementsNo(cntAchievements(res.data));
       fetchProfile();
@@ -128,34 +120,7 @@ const ProfileSummary = () => {
       {isLoading ? (
         <Loading />
       ) : (
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            width={500}
-            height={300}
-            data={result}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="Ranking"
-              stroke="#8884d8"
-              activeDot={{ r: 8 }}
-            />
-            <Line type="monotone" dataKey="Doubles" stroke="#82ca9d" />
-            <Line type="monotone" dataKey="First9Avg" stroke="#99ff99" />
-            <Line type="monotone" dataKey="MatchAvg" stroke="#00ff99" />
-          </LineChart>
-        </ResponsiveContainer>
+        <SummaryStaticCard result={result} />
       )}
     </ProfileLayout>
   );

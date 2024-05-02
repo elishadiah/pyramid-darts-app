@@ -291,6 +291,7 @@ const updateResult = (data) => {
       first9Avg: data.matchResult?.p1_first9_avg,
       matchAvg: data.matchResult?.p1_match_avg,
       level: user1Update.level,
+      date: new Date(data.begin),
     }),
   };
 
@@ -319,6 +320,7 @@ const updateResult = (data) => {
       first9Avg: data.matchResult?.p2_first9_avg,
       matchAvg: data.matchResult?.p2_match_avg,
       level: user2Update.level,
+      date: new Date(data.begin),
     }),
   };
 

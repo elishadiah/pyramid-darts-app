@@ -1,15 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import http from "../../helper/http-client";
 import Loading from "../../components/Loading";
 import AchievementImages from "../../helper/images";
@@ -20,6 +10,7 @@ import {
 import { Button } from "../../components/Button";
 import { transformSummaryData } from "../../helper/helper";
 import Header from "../../components/Header";
+import SummaryStaticCard from "../../components/Profile/SummaryStaticCard";
 
 const UserProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -116,34 +107,7 @@ const UserProfile = () => {
             {isLoading ? (
               <Loading />
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  width={500}
-                  height={300}
-                  data={result}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="Ranking"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                  />
-                  <Line type="monotone" dataKey="Doubles" stroke="#82ca9d" />
-                  <Line type="monotone" dataKey="First9Avg" stroke="#99ff99" />
-                  <Line type="monotone" dataKey="MatchAvg" stroke="#00ff99" />
-                </LineChart>
-              </ResponsiveContainer>
+              <SummaryStaticCard result={result} />
             )}
           </div>
         </div>
