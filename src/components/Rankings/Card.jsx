@@ -21,11 +21,29 @@ const Card = ({
   sendQuickFight,
   sendScheduledFight,
   children,
+  imgSize,
 }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
+
+  const topPosition = useMemo(() => {
+    switch (imgSize) {
+      case 16:
+        return "top-20";
+      case 14:
+        return "top-16";
+      case 12:
+        return "top-16";
+      case 10:
+        return "top-14";
+      case 8:
+        return "top-12";
+      default:
+        return "top-10";
+    }
+  }, [imgSize]);
 
   const connected = useMemo(
     () =>
@@ -36,16 +54,14 @@ const Card = ({
   );
 
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("authUser")).user);
+    const authUser = JSON.parse(localStorage.getItem("authUser"));
+    if (authUser) {
+      setUser(authUser.user);
+    }
   }, []);
 
-  const closeModal = () => {
-    setIsOpen(false);
-  };
-
-  const openModal = () => {
-    setIsOpen(true);
-  };
+  const closeModal = () => setIsOpen(false);
+  const openModal = () => setIsOpen(true);
 
   const isDateValid = (selectedDate) => {
     if (selectedDate) {
@@ -112,7 +128,6 @@ const Card = ({
     );
     navigate("/result");
   };
-
   return (
     <>
       <div
@@ -135,7 +150,12 @@ const Card = ({
           </span>
         )}
         {children}
-        <div className="absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 top-10 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100">
+        <div
+          className={classNames(
+            "absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100",
+            topPosition
+          )}
+        >
           <div className="flex flex-col h-16 p-4">
             <p className="font-bold text-xl">
               {player.username?.toLowerCase()}

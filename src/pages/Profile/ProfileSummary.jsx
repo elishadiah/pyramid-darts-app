@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import ProfileLayout from "../../components/Profile/ProfileLayout";
 import authService from "../../services/auth.service";
 import http from "../../helper/http-client";
@@ -20,44 +20,46 @@ const ProfileSummary = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [profile, setProfile] = useState(null);
 
-  const fetchResult = useCallback(async (user) => {
-    const { username } = user;
-    setIsLoading(true);
-    try {
-      const res = await http.post("/result/fetch", {
-        username: username.trim()?.toLowerCase(),
-      });
-      console.log("--------Init-profile--result-------", res.data);
-      setResult(transformSummaryData(res.data));
-      setCntAchievementsNo(cntAchievements(res.data));
-      fetchProfile();
-    } catch (err) {
-      console.error(err);
-      setResult(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const user = useMemo(() => authService.getAuthUser().user, []);
+
+  const fetchResult = useCallback(
+    async (user) => {
+      const { username } = user;
+      setIsLoading(true);
+      try {
+        const res = await http.post("/result/fetch", {
+          username: username.trim()?.toLowerCase(),
+        });
+        console.log("--------Init-profile--result-------", res.data);
+        setResult(transformSummaryData(res.data));
+        setCntAchievementsNo(cntAchievements(res.data));
+        fetchProfile();
+      } catch (err) {
+        console.error(err);
+        setResult(null);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user]
+  );
 
   const fetchProfile = useCallback(async () => {
     try {
-      const user = authService.getAuthUser().user;
       const res = await http.get(`/auth/get-profile/${user?._id}`);
       setProfile({ introduction: res.data?.profile });
     } catch (err) {
       console.error(err);
       setProfile(null);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    const user = authService.getAuthUser().user;
     fetchResult(user);
-  }, [fetchResult]);
+  }, [fetchResult, user]);
 
   const onSave = async () => {
     setIsEditable(false);
-    const user = authService.getAuthUser().user;
     try {
       const res = await http.post(`/auth/update-profile/${user?._id}`, {
         profile: profile?.introduction,
@@ -112,16 +114,20 @@ const ProfileSummary = () => {
             handleTextArea={onChange}
           />
         ) : (
-          <h5 className="w-full min-h-60 p-4 text-xl text-left border border-t-8 border-t-green-600 rounded-md cursor-pointer ">
-            {profile?.introduction}
+          <h5 className="w-full min-h-60 p-4 text-xl text-left border border-t-4 border-t-green-600 rounded-md cursor-pointer ">
+            {profile?.introduction
+              ? profile?.introduction
+              : "Introduction does not exist."}
           </h5>
         )}
       </div>
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <SummaryStaticCard result={result} />
-      )}
+      <div className="text-left text-md md:text-xl lg:text-2xl mb-8 p-4 border border-t-4 border-t-green-600 rounded-md">
+        Last Online:{" "}
+        <span className="font-bold">
+          {new Date(user?.lastLoginDate).toLocaleString()}
+        </span>
+      </div>
+      {isLoading ? <Loading /> : <SummaryStaticCard result={result} />}
     </ProfileLayout>
   );
 };

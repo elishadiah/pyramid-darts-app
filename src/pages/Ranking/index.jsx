@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import Header from "../../components/Header";
 import http from "../../helper/http-client";
 import SearchBar from "../../components/Rankings/SearchBar";
@@ -6,185 +6,83 @@ import Pyramid from "../../components/Rankings/Pyramid";
 import socket from "../../socket";
 import authService from "../../services/auth.service";
 import OnlineCheck from "../../components/OnlineCheck";
+import useFetchAllResult from "../../hooks/useFetchAllResult";
+import useSocket from "../../hooks/useSocket";
+import useSocketEvents from "../../hooks/useSocketEvents";
 
 const Ranking = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [players, setPlayers] = useState([]);
+  const sessionID = authService.getAuthUser().user._id;
+  const { isLoading, players } = useFetchAllResult();
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [imgSize, setImgSize] = useState(16);
   const [users, setUsers] = useState([]);
   const [isOnlineShow, setIsOnlineShow] = useState(false);
 
-  useEffect(() => {
-    fetchAllResult();
-
-    const sessionID = authService.getAuthUser().user._id;
-
-    if (sessionID) {
-      socket.auth = { sessionID };
-      socket.connect();
-    }
-
-    const handleErr = (err) => {
-      console.log("Socket--err-->>", err);
-    };
-
-    const handleUserID = ({ userID }) => {
-      socket.userID = userID;
-    };
-
-    socket.on("user_id", handleUserID);
-    socket.on("connect_error", handleErr);
-
-    return () => {
-      socket.off("connect_error", handleErr);
-      socket.off("user_id", handleUserID);
-      socket.disconnect();
-    };
+  const handleErr = useCallback((err) => {
+    console.log("Socket--err-->>", err);
   }, []);
 
-  useEffect(() => {
-    const handleConnect = () => {
-      users.forEach((user) => {
-        if (user.self) {
-          user.connected = true;
-          user.status = "online";
-        }
-      });
-      console.log("--connect");
-    };
+  const handleUserID = useCallback(({ userID }) => {
+    socket.userID = userID;
+  }, []);
 
-    const handleDisconnect = () => {
-      users.forEach((user) => {
-        if (user.self) {
-          user.connected = false;
-          user.status = "offline";
-        }
-      });
-      console.log("--disconnect");
-    };
+  useSocket(sessionID, handleErr, handleUserID);
 
-    const handleUsers = (receivedUsers) => {
-      console.log("--users");
-      receivedUsers.forEach((user) => {
-        const existingUserIndex = users.findIndex(
-          (existingUser) => existingUser.userID === user.userID
-        );
-        if (existingUserIndex !== -1) {
-          setUsers((prevUsers) => {
-            const updatedUsers = [...prevUsers];
-            updatedUsers[existingUserIndex].connected = user.connected;
-            updatedUsers[existingUserIndex].status = user.status;
-            return updatedUsers;
-          });
-        } else {
-          user.self = user.userID === socket.userID;
-          setUsers((prevUsers) => [...prevUsers, user]);
-        }
-      });
-    };
+  useSocketEvents(users, setUsers);
 
-    const handleUserConnected = (user) => {
-      console.log("--user connected", users);
-      setUsers((prevUsers) => {
-        const updatedUsers = prevUsers.map((existingUser) => {
-          if (existingUser.userID === user.userID) {
-            return { ...existingUser, connected: true, status: "online" };
-          }
-          return existingUser;
+  const sendQuickFight = useCallback(
+    async (username, challenger, challengerEmail) => {
+      try {
+        await http.post("/event/post", {
+          content: `${challenger?.toLowerCase()} send a quick challenge to ${username?.toLowerCase()}`,
         });
-
-        const newUser = prevUsers.find(
-          (existingUser) => existingUser.userID === user.userID
-        );
-        if (!newUser) {
-          updatedUsers.push(user);
-        }
-
-        return updatedUsers;
-      });
-    };
-
-    const handleUserDisconnected = (id) => {
-      setUsers((prevUsers) => {
-        const updatedUsers = prevUsers.map((user) => {
-          if (user.userID === id) {
-            return { ...user, connected: false, status: "offline" };
-          }
-          return user;
+        socket.emit("challenge", {
+          content: `${challenger}(Email: ${challengerEmail}) has sent you the quick challenge Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+          to: users.find(
+            (val) => val.username?.toLowerCase() === username?.toLowerCase()
+          )?.userID,
         });
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [users]
+  );
 
-        return updatedUsers;
-      });
-    };
-
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-    socket.on("users", handleUsers);
-    socket.on("user connected", handleUserConnected);
-    socket.on("user disconnected", handleUserDisconnected);
-
-    return () => {
-      console.log("BBBB");
-
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-      socket.off("users", handleUsers);
-      socket.off("user connected", handleUserConnected);
-      socket.off("user disconnected", handleUserDisconnected);
-    };
-  }, [users]);
-
-  const sendQuickFight = (username, challenger, challengerEmail) => {
-    http.post("/event/post", {
-      content: `${challenger?.toLowerCase()} send a quick challenge to ${username?.toLowerCase()}`,
-    });
-    socket.emit("challenge", {
-      content: `${challenger}(Email: ${challengerEmail}) has sent you the quick challenge Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
-      to: users.find(
-        (val) => val.username?.toLowerCase() === username?.toLowerCase()
-      )?.userID,
-    });
-  };
-
-  const sendScheduledFight = (
-    selectedDate,
-    challenger,
-    challengerEmail,
-    receiver,
-    receiverEmail
-  ) => {
-    console.log("Select--date-->>", selectedDate);
-    http.post("/event/post", {
-      content: `${challenger} send a quick challenge to ${receiver}`,
-    });
-    socket.emit("schedule-challenge", {
-      date: selectedDate,
+  const sendScheduledFight = useCallback(
+    async (
+      selectedDate,
       challenger,
       challengerEmail,
       receiver,
-      receiverEmail,
-    });
-  };
+      receiverEmail
+    ) => {
+      try {
+        console.log("Select--date-->>", selectedDate);
+        await http.post("/event/post", {
+          content: `${challenger} send a quick challenge to ${receiver}`,
+        });
+        socket.emit("schedule-challenge", {
+          date: selectedDate,
+          challenger,
+          challengerEmail,
+          receiver,
+          receiverEmail,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    []
+  );
 
-  const fetchAllResult = async () => {
-    setIsLoading(true);
-    http
-      .get("/result/fetch-all")
-      .then((res) => {
-        setPlayers(res.data);
-      })
-      .catch((err) => console.log("Res---err--->>", err))
-      .finally(() => setIsLoading(false));
-  };
-
-  const onPlayerClick = (payload) => {
+  const onPlayerClick = useCallback((payload) => {
     setSelectedPlayer(payload);
-  };
+  }, []);
 
-  const onSliderChange = (e) => {
-    setImgSize(e.target.value);
-  };
+  const onSliderChange = useCallback((event) => {
+    setImgSize(event.target.value);
+  }, []);
 
   return (
     <div className="relative sm:pb-24 dark:bg-gray-800">

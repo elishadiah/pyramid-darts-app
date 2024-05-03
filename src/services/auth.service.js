@@ -25,7 +25,7 @@ const avatarUpload = (file) => {
 
 const logout = () => {
     localStorage.removeItem('authUser');
-    window.location.reload();
+    window.location.href = "/login";
 }
 
 const getAuthUser = () => {

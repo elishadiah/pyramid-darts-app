@@ -1,4 +1,6 @@
+import { useCallback, useMemo } from "react";
 import Card from "./Card";
+import authService from "../../services/auth.service";
 
 const Pyramid = ({
   players,
@@ -9,24 +11,27 @@ const Pyramid = ({
   sendQuickFight,
   sendScheduledFight,
 }) => {
+  const currentUser = useMemo(() => authService.getAuthUser().user, []);
+
   const isAvailable = (player) => {
-    const currentUser = JSON.parse(localStorage.getItem("authUser")).user;
     const currentPlayer = players.find((val) =>
       val.username?.toLowerCase().includes(currentUser.username?.toLowerCase())
     );
     if (player.level < currentPlayer.level) return false;
     else if (player.level === currentPlayer.level + 1) return true;
     else if (player.level > currentPlayer.level + 1) return false;
-    else {
-      const availablePositionNo = Math.pow(2, 7 - currentPlayer.level);
-      const currentAbovePlayersNo = players.filter(
-        (val) => val.level === currentPlayer.level + 1
-      ).length;
-      const rowSpotNo = availablePositionNo - currentAbovePlayersNo;
-      if (rowSpotNo > 0) return true;
-      else return false;
-    }
+
+    const availablePositionNo = Math.pow(2, 7 - currentPlayer.level);
+    const currentAbovePlayersNo = players.filter(
+      (val) => val.level === currentPlayer.level + 1
+    ).length;
+    const rowSpotNo = availablePositionNo - currentAbovePlayersNo;
+    return rowSpotNo > 0;
   };
+
+  const onClick = useCallback((payload) => {
+    window.location.href = `/profile/${payload}`;
+  }, []);
 
   const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;
@@ -40,23 +45,29 @@ const Pyramid = ({
         sendScheduledFight={sendScheduledFight}
         connectedUsers={connectedUsers}
         onlineShow={onlineShow}
+        imgSize={Number(imgSize)}
         // occupied={false}
       >
-        {player.avatar ? (
-          <img
-            className={`mx-auto flex-shrink-0 rounded-full`}
-            src={player.avatar}
-            style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
-            alt="user avatar"
-          ></img>
-        ) : (
-          <div
-            className={`mx-auto flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold`}
-            style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
-          >
-            {player.username.toLocaleUpperCase().charAt(0)}
-          </div>
-        )}
+        <div
+          className="cursor-pointer"
+          onClick={() => onClick(player.username)}
+        >
+          {player.avatar ? (
+            <img
+              className={`mx-auto flex-shrink-0 rounded-full`}
+              src={player.avatar}
+              style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
+              alt="user avatar"
+            />
+          ) : (
+            <div
+              className={`mx-auto flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold`}
+              style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
+            >
+              {player.username.toLocaleUpperCase().charAt(0)}
+            </div>
+          )}
+        </div>
       </Card>
     );
   };

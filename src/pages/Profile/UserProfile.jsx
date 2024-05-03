@@ -54,7 +54,7 @@ const UserProfile = () => {
 
   const handleBack = () => {
     window.history.back();
-  }
+  };
 
   return (
     <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
@@ -83,7 +83,9 @@ const UserProfile = () => {
           </div>
           <div className="flex flex-col w-full lg:w-9/12 p-4">
             <div className="flex justify-end mb-4">
-              <Button className="py-2 px-4 rounded-md" onClick={handleBack}>Back</Button>
+              <Button className="py-2 px-4 rounded-md" onClick={handleBack}>
+                Back
+              </Button>
             </div>
             {cntAchievementsNo >= 5 && (
               <div className="flex justify-center">
@@ -101,14 +103,16 @@ const UserProfile = () => {
             )}
             <div className="mb-8">
               <h5 className="w-full min-h-60 p-4 text-xl text-left border border-t-8 border-t-green-600 rounded-md cursor-pointer ">
-                {user?.profile}
+                {user?.profile ? user?.profile : "Introduction does not exist."}
               </h5>
             </div>
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <SummaryStaticCard result={result} />
-            )}
+            <div className="text-left text-md md:text-xl lg:text-2xl mb-8 p-4 border border-t-4 border-t-green-600 rounded-md">
+              Last Online:{" "}
+              <span className="font-bold">
+                {new Date(user?.lastLoginDate).toLocaleString()}
+              </span>
+            </div>
+            {isLoading ? <Loading /> : <SummaryStaticCard result={result} />}
           </div>
         </div>
       </div>

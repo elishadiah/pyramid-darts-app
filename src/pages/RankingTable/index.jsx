@@ -73,8 +73,16 @@ const RankingTable = () => {
       },
     },
     {
-      name: "Vicotry Streak",
+      name: "Victory Streak(Lifetime)",
       selector: (row) => row.streak,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Victory Streak(Season)",
+      selector: (row) => row.seasonStreak,
       sortable: true,
       style: {
         fontSize: "16px",
@@ -131,6 +139,70 @@ const RankingTable = () => {
     {
       name: "Ready For It",
       selector: (row) => row.ready,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Grand Master(Leg)",
+      selector: (row) => row.grandMaster.leg,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Grand Master(Match)",
+      selector: (row) => row.grandMaster.match,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Challenge Conqueror(Lifetime)",
+      selector: (row) => row.challengeConqueror.lifetime,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Challenge Conqueror(Season)",
+      selector: (row) => row.challengeConqueror.lifetime,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Pyramid Climber(Lifetime)",
+      selector: (row) => row.pyramidClimber.lifetime,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Pyramid Climber(Season)",
+      selector: (row) => row.pyramidClimber.season,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Master 180(Lifetime)",
+      selector: (row) => row.master180.lifetime,
+      sortable: true,
+      style: {
+        fontSize: "16px",
+      },
+    },
+    {
+      name: "Master 180(Season)",
+      selector: (row) => row.master180.season,
       sortable: true,
       style: {
         fontSize: "16px",

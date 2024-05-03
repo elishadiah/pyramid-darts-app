@@ -118,6 +118,11 @@ const transformTableData = (data) => {
       ironDart: val.ironDart,
       monthlyMaestro: val.monthlyMaestro,
       pyramidProtector: val.pyramidProtector,
+      grandMaster: val.grandMaster,
+      challengeConqueror: val.challengeConqueror,
+      pyramidClimber: val.pyramidClimber,
+      seasonStreak: val.seasonMaxVictoryStreak,
+      master180: val.master180,
     }))
     .sort((a, b) => b.ranking - a.ranking);
 };
