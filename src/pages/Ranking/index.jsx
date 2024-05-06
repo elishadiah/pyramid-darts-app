@@ -34,7 +34,9 @@ const Ranking = () => {
     async (username, challenger, challengerEmail) => {
       try {
         await http.post("/event/post", {
-          content: `${challenger?.toLowerCase()} send a quick challenge to ${username?.toLowerCase()}`,
+          user: challenger,
+          targetUser: username,
+          eventType: "quick",
         });
         socket.emit("challenge", {
           content: `${challenger}(Email: ${challengerEmail}) has sent you the quick challenge Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
@@ -60,7 +62,9 @@ const Ranking = () => {
       try {
         console.log("Select--date-->>", selectedDate);
         await http.post("/event/post", {
-          content: `${challenger} send a quick challenge to ${receiver}`,
+          user: challenger,
+          targetUser: receiver,
+          eventType: "schedule",
         });
         socket.emit("schedule-challenge", {
           date: selectedDate,

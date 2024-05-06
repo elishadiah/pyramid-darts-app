@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 import http from "../../helper/http-client";
 import Header from "../../components/Header";
 import DataTable from "react-data-table-component";
@@ -8,6 +9,8 @@ import CustomInputComponent from "../../components/Input";
 
 const GlobalEvents = () => {
   const [events, setEvents] = useState([]);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filterStr, setFilterStr] = useState({ content: "" });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,36 +20,46 @@ const GlobalEvents = () => {
 
   const filterEvents = useMemo(
     () =>
-      events?.filter((val) =>
-        val.content.toLowerCase().includes(filterStr?.content.toLowerCase())
-      ),
+      events?.items
+        ?.sort((a, b) => new Date(b.date) - new Date(a.date))
+        .map((val) => ({
+          id: val._id,
+          date: new Date(val.date).toLocaleString(),
+          user: val?.user,
+          target: val?.targetUser,
+          link: val?.link,
+          type: val?.eventType,
+        }))
+        .filter(
+          (val) =>
+            val?.user
+              .toLowerCase()
+              .includes(filterStr?.content.toLowerCase()) ||
+            val?.target.toLowerCase().includes(filterStr?.content.toLowerCase())
+        ),
     [filterStr, events]
   );
+
+  const totalItems = useMemo(() => events?.totalItems, [events]);
 
   const getEvents = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await http.get("/event/get");
-      setEvents(
-        res.data
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .map((val) => ({
-            id: val._id,
-            date: new Date(val.createdAt).toLocaleString(),
-            content: val.content,
-          }))
+      const res = await http.get(
+        `/event/get?page=${page}&limit=${rowsPerPage}`
       );
+      setEvents(res.data);
       console.log("Events-->>", res.data);
     } catch (err) {
       console.log("Event-err-->>", err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [page, rowsPerPage]);
 
   useEffect(() => {
     getEvents();
-  }, [getEvents]);
+  }, [getEvents, page, rowsPerPage]);
 
   const columns = [
     {
@@ -60,10 +73,42 @@ const GlobalEvents = () => {
     },
     {
       name: "Content",
-      selector: (row) => row.content,
+      selector: (row) => row.id,
       sortable: true,
       grow: 4,
-      cell: (row) => <div>{row.content}</div>,
+      cell: (row) => (
+        <div>
+          {row.type === "login" ? (
+            <Link to={`/profile/${row.user}`}>
+              {row.user}&nbsp;logged&nbsp;in
+            </Link>
+          ) : row.type === "logout" ? (
+            <Link to={`/profile/${row.user}`}>
+              {row.user}&nbsp;logged&nbsp;out
+            </Link>
+          ) : row.type === "register" ? (
+            <Link to={`/profile/${row.user}`}>
+              {row.user}&nbsp;registered&nbsp;in the system
+            </Link>
+          ) : row.type === "match" ? (
+            <>
+              <Link to={`/profile/${row.user}`}>
+                {row.user}&nbsp;played against&nbsp;
+              </Link>
+              <Link to={`/profile/${row?.target}`}>{row?.target}&nbsp;</Link>
+              <a href={row?.link} target="_blank" rel="noopener noreferrer">
+                (&nbsp;match overview:&nbsp;{row?.link} )
+              </a>
+            </>
+          ) : (
+            <>
+              <Link to={`/profile/${row.user}`}>{row.user}</Link>
+              &nbsp;sent {row?.type} challenge to&nbsp;
+              <Link to={`/profile/${row?.target}`}>{row?.target}</Link>
+            </>
+          )}
+        </div>
+      ),
       style: {
         fontSize: "16px",
       },
@@ -78,12 +123,11 @@ const GlobalEvents = () => {
     },
   };
 
-  const paginationComponentOptions = {
-    rowsPerPageText: "Rows per page",
-    rangeSeparatorText: "of",
-    selectAllRowsItem: true,
-    selectAllRowsItemText: "All",
-  };
+  console.log("Total-->>", totalItems, events?.totalItems);
+
+  const handlePage = (page) => setPage(page);
+
+  const handleRowsPerPage = (page) => setRowsPerPage(page);
 
   return (
     <div>
@@ -106,7 +150,10 @@ const GlobalEvents = () => {
           customStyles={customStyles}
           progressComponent={<Loading />}
           pagination
-          paginationComponentOptions={paginationComponentOptions}
+          paginationServer
+          paginationTotalRows={totalItems}
+          onChangePage={handlePage}
+          onChangeRowsPerPage={handleRowsPerPage}
         />
       </div>
     </div>

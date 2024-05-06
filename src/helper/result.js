@@ -118,6 +118,8 @@ const updateResult = (data) => {
     },
     maxMarksman: data.matchResult.hasOwnProperty("p1_171"),
     dartEnthusiast: data.user1.init.dartEnthusiast++,
+    link: `https://lidarts.org/game/${data.matchResult?.hashid}`,
+    targetUser: data.matchResult?.p2_name?.toLowerCase()
   };
 
   let user2Update = {
@@ -217,6 +219,8 @@ const updateResult = (data) => {
     },
     maxMarksman: data.matchResult.hasOwnProperty("p2_171"),
     dartEnthusiast: data.user2.init.dartEnthusiast++,
+    link: `https://lidarts.org/game/${data.matchResult?.hashid}`,
+    targetUser: data.matchResult?.p1_name?.toLowerCase()
   };
 
   let cntBreakfast1 = 0,

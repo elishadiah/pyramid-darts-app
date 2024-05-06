@@ -54,6 +54,12 @@ const ProfileCalendar = () => {
     }
   };
 
+  const addMinutes = (date, minutes) => {
+    const dateCopy = new Date(date);
+    dateCopy.setMinutes(dateCopy.getMinutes() + minutes);
+    return dateCopy;
+  };
+
   const events = useMemo(
     () =>
       schedules?.map((val) => ({
@@ -65,6 +71,8 @@ const ProfileCalendar = () => {
     [schedules]
   );
 
+  console.log("events-->>", events);
+
   const getCurrentTimeZone = () => {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     return timeZone;
@@ -73,12 +81,6 @@ const ProfileCalendar = () => {
   const handleCalendar = (e) => {
     schedules && setCurrentSchedule(schedules.find((val) => val._id === e.id));
     setIsOpen(true);
-  };
-
-  const addMinutes = (date, minutes) => {
-    const dateCopy = new Date(date);
-    dateCopy.setMinutes(dateCopy.getMinutes() + minutes);
-    return dateCopy;
   };
 
   const closeModal = () => {
