@@ -119,7 +119,9 @@ const updateResult = (data) => {
     maxMarksman: data.matchResult.hasOwnProperty("p1_171"),
     dartEnthusiast: data.user1.init.dartEnthusiast++,
     link: `https://lidarts.org/game/${data.matchResult?.hashid}`,
-    targetUser: data.matchResult?.p2_name?.toLowerCase()
+    targetUser: data.matchResult?.p2_name?.toLowerCase(),
+    won: data.user1.won,
+    targetWon: data.user2.won,
   };
 
   let user2Update = {
@@ -220,7 +222,9 @@ const updateResult = (data) => {
     maxMarksman: data.matchResult.hasOwnProperty("p2_171"),
     dartEnthusiast: data.user2.init.dartEnthusiast++,
     link: `https://lidarts.org/game/${data.matchResult?.hashid}`,
-    targetUser: data.matchResult?.p1_name?.toLowerCase()
+    targetUser: data.matchResult?.p1_name?.toLowerCase(),
+    won: data.user2.won,
+    targetWon: data.user1.won,
   };
 
   let cntBreakfast1 = 0,
@@ -326,6 +330,15 @@ const updateResult = (data) => {
       level: user2Update.level,
       date: new Date(data.begin),
     }),
+  };
+
+  user1Update = {
+    ...user1Update,
+    earnedAchievements: handleAchievement(user1Update, data.user1.init),
+  };
+  user2Update = {
+    ...user2Update,
+    earnedAchievements: handleAchievement(user2Update, data.user2.init),
   };
 
   console.log("Update-result--->>>", user1Update, user2Update);

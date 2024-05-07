@@ -127,9 +127,20 @@ const transformTableData = (data) => {
     .sort((a, b) => b.ranking - a.ranking);
 };
 
+const debounce = (func, delay) => {
+  let debounceTimer;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func.apply(context, args), delay);
+  }
+}
+
 export {
   isVariableEmpty,
   convertStr,
+  debounce,
   transformSummaryData,
   transformTableData,
   calculateCurrentMonthAverages,
