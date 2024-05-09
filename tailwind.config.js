@@ -24,6 +24,12 @@ module.exports = {
         '80-vh': "80vh",
         '75-vh': "75vh",
         '70-vh': "70vh",
+        '65-vh': "65vh",
+        '64-vh': "64vh",
+        '63-vh': "63vh",
+        '62-vh': "62vh",
+        '61-vh': "61vh",
+        '60-vh': "60vh",
         '30-vh': "30vh",
         'achievement-card': '290px'
       },

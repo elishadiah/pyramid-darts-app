@@ -35,6 +35,7 @@ const Pyramid = ({
 
   const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;
+
     return (
       <Card
         key={player._id}

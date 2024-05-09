@@ -55,29 +55,42 @@ const Result = ({ socket }) => {
       const currentUser = authService
         .getAuthUser()
         .user.username?.toLowerCase();
-      console.log("Save--->>>", updatedResult, "::::", currentUser);
-
-      const earnedAchievement = HandleResult.handleAchievement(
+      console.log(
+        "Save--->>>",
+        updatedResult,
+        "::::",
+        currentUser,
+        "::::-->>>",
         updatedResult.find(
-          (val) => val.username?.toLowerCase() === currentUser
-        ),
-        totalResult.allResult.find(
-          (val) => val.username?.toLowerCase() === currentUser
+          (val) => val?.username?.toLowerCase() === currentUser
         )
       );
 
-      if (earnedAchievement) {
+      if (
+        updatedResult.find(
+          (val) => val?.username?.toLowerCase() === currentUser
+        )
+      ) {
+        const earnedAchievement = HandleResult.handleAchievement(
+          updatedResult.find(
+            (val) => val?.username?.toLowerCase() === currentUser
+          ),
+          totalResult.allResult.find(
+            (val) => val?.username?.toLowerCase() === currentUser
+          )
+        );
         setUpdatedAchievements(earnedAchievement);
 
         earnedAchievement.length && setIsModalOpen(true);
         const user1Init = totalResult.allResult.find(
           (val) =>
-            val.username?.toLowerCase() ===
-            totalResult.user1.name?.toLowerCase()
+            val?.username?.toLowerCase() ===
+            totalResult.user1?.name?.toLowerCase()
         );
+
         if (
-          new Date(user1Init.date).toISOString() ===
-          new Date(totalResult.begin).toISOString()
+          new Date(user1Init?.date).toISOString() <=
+          new Date(totalResult?.begin).toISOString()
         ) {
           toast("Dieses Spiel wurde bereits gespeichert.");
         } else {
@@ -95,10 +108,12 @@ const Result = ({ socket }) => {
           }
         }
       } else {
-        console.log("achievement-error-->>>");
+        toast.warning(
+          "Fight results are other players' results, so the results cannot be saved."
+        );
       }
     } else {
-      toast(
+      toast.warning(
         "Benutzername nicht gefunden. Spielergebnisse können nicht gespeichert werden."
       );
     }

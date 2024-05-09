@@ -1,29 +1,40 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import SearchComponent from "../SearchComponent";
 
-const SearchBar = ({ players, onPlayerClick }) => {
+const SearchBar = ({
+  players = [],
+  onPlayerClick,
+  connectedUsers = [],
+  isOnlineShow,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const onSearchFunc = (payload) => {
-    setSearchTerm(payload);
-  };
 
-  const filteredPlayers = players
-    ? players.filter((player) =>
-        player.username.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
+  const handleSearch = useCallback((payload) => {
+    setSearchTerm(payload);
+  }, []);
+
+  const filteredPlayers = useMemo(() => {
+    const connectedUsernames = connectedUsers.map((user) => user.username);
+    const playersToFilter = isOnlineShow
+      ? players.filter((player) => connectedUsernames.includes(player.username))
+      : players;
+    return playersToFilter.filter((player) =>
+      player.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm, players, connectedUsers, isOnlineShow]);
+
   return (
     <div className="w-full">
-      <SearchComponent onSearchFunc={onSearchFunc} />
-      <div className="py-4 overflow-y-auto max-h-30-vh sm:max-h-75-vh my-4">
+      <SearchComponent onSearchFunc={handleSearch} />
+      <div className="py-4 overflow-y-auto max-h-30-vh lg:max-h-62-vh my-4">
         <ul>
-          {filteredPlayers.map((player) => (
+          {filteredPlayers.map((player, index) => (
             <li
-              key={player._id}
+              key={index}
               className="text-left pl-2 bg-white"
               onClick={() => onPlayerClick(player)}
             >
-              <a className="font-semibold text-lg" href={`#${player._id}`}>
+              <a className="font-semibold text-lg" href={`#${player?._id}`}>
                 {player.username?.toLowerCase()}
               </a>
             </li>

@@ -105,16 +105,21 @@ const Ranking = () => {
               </div>
             </div>
           ) : (
-            <div className="flex space-x-4 flex-col sm:flex-row">
+            <div className="flex space-x-4 flex-col lg:flex-row">
               {/* mobile */}
-              <div className="flex w-full px-2 flex-col sm:hidden">
+              <div className="flex w-full px-2 flex-col lg:hidden">
                 <OnlineCheck
                   isOnlineShow={isOnlineShow}
                   setIsOnlineShow={setIsOnlineShow}
                 />
-                <SearchBar players={players} onPlayerClick={onPlayerClick} />
+                <SearchBar
+                  players={players}
+                  onPlayerClick={onPlayerClick}
+                  connectedUsers={users}
+                  isOnlineShow={isOnlineShow}
+                />
               </div>
-              <div className="flex flex-col w-full py-4 md:w-8/12 sm:w-6/12 ">
+              <div className="flex flex-col w-full py-4 lg:w-8/12">
                 <div className="flex items-center space-x-4">
                   <p className="text-gray-900 dark:text-white">Zoom&nbsp;Out</p>
                   <input
@@ -140,12 +145,17 @@ const Ranking = () => {
                   />
                 </div>
               </div>
-              <div className="hidden px-2 sm:flex sm:flex-col sm:px-6 w-6/12 md:w-4/12">
+              <div className="hidden px-2 lg:flex lg:flex-col md:px-6 w-6/12 lg:w-4/12">
                 <OnlineCheck
                   isOnlineShow={isOnlineShow}
                   setIsOnlineShow={setIsOnlineShow}
                 />
-                <SearchBar players={players} onPlayerClick={onPlayerClick} />
+                <SearchBar
+                  players={players}
+                  onPlayerClick={onPlayerClick}
+                  connectedUsers={users}
+                  isOnlineShow={isOnlineShow}
+                />
               </div>
             </div>
           )}
