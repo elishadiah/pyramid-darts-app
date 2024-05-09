@@ -153,7 +153,7 @@ const RankingTable = () => {
       },
     },
     {
-      name: "Grand Master(Match)",
+      name: "Grand Master(Fight)",
       selector: (row) => row.grandMaster.match,
       sortable: true,
       style: {

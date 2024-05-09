@@ -129,12 +129,16 @@ const transformTableData = (data) => {
 
 const debounce = (func, delay) => {
   let debounceTimer;
-  return function() {
+  return function () {
     const context = this;
     const args = arguments;
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => func.apply(context, args), delay);
-  }
+  };
+};
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
 }
 
 export {
@@ -144,4 +148,5 @@ export {
   transformSummaryData,
   transformTableData,
   calculateCurrentMonthAverages,
+  classNames,
 };

@@ -6,8 +6,9 @@ import Header from "../../components/Header";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
 import CustomInputComponent from "../../components/Input";
-import { debounce, convertStr } from "../../helper/helper";
 import AchievementImages from "../../helper/images";
+import CustomMultiSelect from "../../components/CustomMultiSelect";
+import Constant from "../../helper/constant";
 
 const columns = [
   {
@@ -154,8 +155,11 @@ const GlobalEvents = () => {
     sortField: "date",
     sortDirection: "desc",
   });
-  const [filterStr, setFilterStr] = useState({ content: "" });
+  const [isOpenFilterMenu, setIsOpenFilterMenu] = useState(false);
+  const [selectedFilterItems, setSelectedFilterItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [checkedItems, setCheckedItems] = useState({});
+  const [filterStr, setFilterStr] = useState({ user: "" });
 
   const filterEvents = useMemo(
     () =>
@@ -172,11 +176,27 @@ const GlobalEvents = () => {
 
   const totalItems = useMemo(() => events?.totalItems, [events]);
 
+  useEffect(() => {
+    setSelectedFilterItems(
+      Constant.eventFilterList.filter((item) => checkedItems[item.label])
+    );
+  }, [checkedItems]);
+
   const getEvents = useCallback(async () => {
     setIsLoading(true);
     try {
+      const searchParams = new URLSearchParams();
+      selectedFilterItems.forEach((item) => {
+        if (item.label !== "User") {
+          searchParams.append("eventType", item.value);
+        } else {
+          searchParams.append("userName", item.value);
+        }
+      });
       const res = await http.get(
-        `/event/get?page=${page}&limit=${rowsPerPage}&content=${filterStr.content}&sortDirection=${sortObj.sortDirection}`
+        `/event/get?page=${page}&limit=${rowsPerPage}&sortDirection=${
+          sortObj.sortDirection
+        }&${searchParams.toString()}`
       );
       setEvents(res.data);
       console.log("Events-->>", res.data);
@@ -185,17 +205,24 @@ const GlobalEvents = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, rowsPerPage, filterStr.content, sortObj]);
+  }, [page, rowsPerPage, sortObj, selectedFilterItems]);
 
   useEffect(() => {
     getEvents();
   }, [getEvents, page, rowsPerPage]);
 
   const handleFilter = useCallback(
-    debounce((e) => {
-      setFilterStr(e);
-    }, 500),
-    []
+    (e) =>
+      setSelectedFilterItems((prev) => {
+        const index = prev.findIndex((item) => item.label === "User");
+        if (index !== -1) {
+          prev[index].value = filterStr.user;
+        } else {
+          prev.push({ value: filterStr.user, label: "User" });
+        }
+        return [...prev];
+      }),
+    [filterStr]
   );
 
   const handlePage = useCallback((page) => {
@@ -210,18 +237,63 @@ const GlobalEvents = () => {
     setSortObj({ sortDirection });
   }, []);
 
+  const handleFilterMenu = useCallback(() => {
+    setIsOpenFilterMenu((prev) => !prev);
+  }, []);
+
+  const closeDropdown = useCallback(() => {
+    setIsOpenFilterMenu(false);
+  }, []);
+
+  const handleFilterCheck = useCallback((e) => {
+    setCheckedItems((prevState) => ({
+      ...prevState,
+      [e.target.value]: e.target.checked,
+    }));
+  }, []);
+
+  const handleFilterInput = useCallback((e) => {
+    setFilterStr(e);
+  }, []);
+
+  console.log("Filter--menu-->>", checkedItems, ":::-->>", selectedFilterItems);
+
   return (
     <div>
       <Header current={6} />
       <div className="py-4 px-8">
-        <div className="md:w-2/5 lg:w-1/5 ml-auto mb-8">
-          <CustomInputComponent
-            name="content"
-            type="text"
-            placeholder="Input search word"
-            icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-            onChange={handleFilter}
-          />
+        <div className="md:w-2/5 lg:w-1/3 ml-auto mb-8">
+          <CustomMultiSelect
+            isOpen={isOpenFilterMenu}
+            selectedValue={selectedFilterItems}
+            handleMenu={handleFilterMenu}
+            closeDropdown={closeDropdown}
+          >
+            <ul>
+              {Constant.eventFilterList.map((item, index) => (
+                <li key={index} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value={item.label}
+                    checked={checkedItems[item.label] || false}
+                    onChange={handleFilterCheck}
+                  />
+                  {item.label}
+                </li>
+              ))}
+              <li>
+                <CustomInputComponent
+                  name="user"
+                  type="text"
+                  placeholder="Input user name"
+                  disabled={!checkedItems?.User}
+                  icon={<MagnifyingGlassIcon className="h-5 w-5 cursor-pointer" onClick={handleFilter} />}
+                  onChange={handleFilterInput}
+                  onClick={handleFilter}
+                />
+              </li>
+            </ul>
+          </CustomMultiSelect>
         </div>
         <DataTable
           title={<div className="text-4xl font-bold mb-4">Events</div>}
