@@ -287,7 +287,12 @@ const GlobalEvents = () => {
                   type="text"
                   placeholder="Input user name"
                   disabled={!checkedItems?.User}
-                  icon={<MagnifyingGlassIcon className="h-5 w-5 cursor-pointer" onClick={handleFilter} />}
+                  icon={
+                    <MagnifyingGlassIcon
+                      className="h-5 w-5 cursor-pointer"
+                      onClick={handleFilter}
+                    />
+                  }
                   onChange={handleFilterInput}
                   onClick={handleFilter}
                 />
