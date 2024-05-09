@@ -294,7 +294,6 @@ const GlobalEvents = () => {
                     />
                   }
                   onChange={handleFilterInput}
-                  onClick={handleFilter}
                 />
               </li>
             </ul>
