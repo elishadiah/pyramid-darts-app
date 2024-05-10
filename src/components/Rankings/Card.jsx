@@ -7,6 +7,7 @@ import moment from "moment";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EmailNotify from "../../helper/emailjs";
+import Modal from "../Modal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -24,7 +25,8 @@ const Card = ({
   imgSize,
 }) => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenSchedule, setIsOpenSchedule] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
 
@@ -60,8 +62,8 @@ const Card = ({
     }
   }, []);
 
-  const closeModal = () => setIsOpen(false);
-  const openModal = () => setIsOpen(true);
+  const closeModalSchedule = () => setIsOpenSchedule(false);
+  const openModalSchedule = () => setIsOpenSchedule(true);
 
   const isDateValid = (selectedDate) => {
     if (selectedDate) {
@@ -74,7 +76,7 @@ const Card = ({
     return false;
   };
 
-  const onClick = () => {
+  const onSendSchedule = () => {
     const selectedDate = new Date(
       value.year,
       value.month.index,
@@ -108,7 +110,7 @@ const Card = ({
         )}.`,
         "Dart Challenge"
       );
-      closeModal();
+      closeModalSchedule();
     }
   };
 
@@ -128,6 +130,9 @@ const Card = ({
     );
     navigate("/result");
   };
+
+  const onClickModal = () => setIsOpenModal(true);
+  const onCloseModal = () => setIsOpenModal(false);
   return (
     <>
       <div
@@ -149,11 +154,72 @@ const Card = ({
             <span className="relative inline-flex rounded-full h-2 w-2 bg-gray-700"></span>
           </span>
         )}
-        {children}
-        <div
+        <div className="cursor-pointer" onClick={onClickModal}>
+          {player.avatar ? (
+            <img
+              className={`mx-auto flex-shrink-0 rounded-full`}
+              src={player.avatar}
+              style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
+              alt="user avatar"
+            />
+          ) : (
+            <div
+              className={`mx-auto flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold`}
+              style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
+            >
+              {player.username.toLocaleUpperCase().charAt(0)}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Modal isOpen={isOpenModal} onClose={onCloseModal}>
+        <div className="w-full bg-white dark:bg-gray-800">
+          <div className="flex flex-col items-center py-4">
+            {player.avatar ? (
+              <img
+                className="w-24 h-24 mb-3 rounded-full shadow-lg"
+                src={player.avatar}
+                alt="user avatar"
+              />
+            ) : (
+              <div className="w-24 h-24 mb-3 rounded-full bg-green-200 shadow-lg flex items-center justify-center text-5xl">
+                {player.username?.toUpperCase().charAt(0)}
+              </div>
+            )}
+            <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
+              {player.username?.toUpperCase()}
+            </h5>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {player.email}
+            </span>
+            <div className="flex mt-4 md:mt-6 gap-2">
+              <button
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 disabled:opacity-50"
+                disabled={
+                  player.username?.toLowerCase() ===
+                    user.username?.toLowerCase() || !available
+                }
+                onClick={sendQuick}
+              >
+                Quick Fight
+              </button>
+              <button
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 disabled:opacity-50"
+                disabled={
+                  player.username?.toLowerCase() ===
+                    user.username?.toLowerCase() || !available
+                }
+                onClick={openModalSchedule}
+              >
+                Schedule Fight
+              </button>
+            </div>
+          </div>
+        </div>
+        {/* <div
           className={classNames(
-            "absolute w-64 flex flex-col divide-y divide-gray-900 dark:divide-gray-200 shadow-md shadow-gray-400 dark:shadow-gray-700 dark:divide-gray-900 -left-20 scale-0 z-30 transition-all rounded bg-gray-200 dark:bg-gray-700 text-xs text-gray-900 dark:text-white group-hover:scale-100",
-            topPosition
+            "flex flex-col w-full items-center justify-center gap-4",
           )}
         >
           <div className="flex flex-col h-16 p-4">
@@ -181,81 +247,50 @@ const Card = ({
                   player.username?.toLowerCase() ===
                     user.username?.toLowerCase() || !available
                 }
-                onClick={openModal}
+                onClick={openModalSchedule}
               >
                 Scheduled Fight
               </button>
             </div>
           </div>
+        </div> */}
+      </Modal>
+
+      <Modal
+        title="Scheduled Fight"
+        isOpen={isOpenSchedule}
+        onClose={closeModalSchedule}
+      >
+        <div className="mt-2">
+          <p className="text-sm text-gray-500">
+            You can send the scheduled challenge to your opponent.
+          </p>
         </div>
-      </div>
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+        <div className="mt-2 flex justify-center">
+          <Calendar
+            value={value}
+            onChange={setValue}
+            plugins={[<TimePicker />]}
+          />
+        </div>
+
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            onClick={onSendSchedule}
           >
-            <div className="fixed inset-0 bg-black/25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Scheduled Fight
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      You can send the scheduled challenge to your opponent.
-                    </p>
-                  </div>
-                  <div className="mt-2 flex justify-center">
-                    <Calendar
-                      value={value}
-                      onChange={setValue}
-                      plugins={[<TimePicker />]}
-                    />
-                  </div>
-
-                  <div className="mt-4 flex justify-end gap-2">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={onClick}
-                    >
-                      Send
-                    </button>
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={closeModal}
-                    >
-                      Close
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+            Send
+          </button>
+          <button
+            type="button"
+            className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            onClick={closeModalSchedule}
+          >
+            Close
+          </button>
+        </div>
+      </Modal>
       <ToastContainer autoClose={3000} />
     </>
   );

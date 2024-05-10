@@ -49,26 +49,6 @@ const Pyramid = ({
         imgSize={Number(imgSize)}
         // occupied={false}
       >
-        <div
-          className="cursor-pointer"
-          onClick={() => onClick(player.username)}
-        >
-          {player.avatar ? (
-            <img
-              className={`mx-auto flex-shrink-0 rounded-full`}
-              src={player.avatar}
-              style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
-              alt="user avatar"
-            />
-          ) : (
-            <div
-              className={`mx-auto flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold`}
-              style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
-            >
-              {player.username.toLocaleUpperCase().charAt(0)}
-            </div>
-          )}
-        </div>
       </Card>
     );
   };
