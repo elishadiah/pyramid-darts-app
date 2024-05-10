@@ -45,7 +45,6 @@ const updateResult = (data) => {
           ? data.user1.init.seasonCurrentVictoryStreak + 1
           : 1
         : 0,
-    previousWin: data.user1.won > data.user2.won ? true : false,
     totalWinNo:
       data.user1.won > data.user2.won
         ? data.user1.init.totalWinNo + 1
@@ -138,7 +137,6 @@ const updateResult = (data) => {
           ? data.user2.init.seasonCurrentVictoryStreak + 1
           : 1
         : 0,
-    previousWin: data.user1.won > data.user2.won ? false : true,
     totalWinNo:
       data.user1.won > data.user2.won
         ? data.user2.init.totalWinNo
@@ -279,12 +277,12 @@ const updateResult = (data) => {
     maxVictoryStreak:
       user1Update.currentVictoryStreak > data.user1.init.maxVictoryStreak
         ? user1Update.currentVictoryStreak
-        : data.user1.init.maxVictoryStreak + 1,
+        : data.user1.init.maxVictoryStreak,
     seasonMaxVictoryStreak:
       user1Update.seasonCurrentVictoryStreak >
       data.user1.init.seasonMaxVictoryStreak
         ? user1Update.seasonCurrentVictoryStreak
-        : data.user1.init.seasonMaxVictoryStreak + 1,
+        : data.user1.init.seasonMaxVictoryStreak,
     sentTotalChallengeNo: Number(user1Update.sentTotalChallengeNo) + 1,
     monthlyMaestro:
       user1Update.level === 6
@@ -309,12 +307,12 @@ const updateResult = (data) => {
     maxVictoryStreak:
       user2Update.currentVictoryStreak > data.user2.init.maxVictoryStreak
         ? user2Update.currentVictoryStreak
-        : data.user2.init.maxVictoryStreak + 1,
+        : data.user2.init.previousWin,
     seasonMaxVictoryStreak:
       user2Update.seasonCurrentVictoryStreak >
       data.user2.init.seasonMaxVictoryStreak
         ? user2Update.seasonCurrentVictoryStreak
-        : data.user2.init.seasonMaxVictoryStreak + 1,
+        : data.user2.init.seasonMaxVictoryStreak,
     readyForIt: Number(user2Update.readyForIt) + 1,
     monthlyMaestro:
       user2Update.level === 6
@@ -334,10 +332,12 @@ const updateResult = (data) => {
 
   user1Update = {
     ...user1Update,
+    previousWin: data.user1.won > data.user2.won ? true : false,
     earnedAchievements: handleAchievement(user1Update, data.user1.init),
   };
   user2Update = {
     ...user2Update,
+    previousWin: data.user1.won < data.user2.won ? true : false,
     earnedAchievements: handleAchievement(user2Update, data.user2.init),
   };
 

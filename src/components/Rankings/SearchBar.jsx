@@ -14,9 +14,13 @@ const SearchBar = ({
   }, []);
 
   const filteredPlayers = useMemo(() => {
-    const connectedUsernames = connectedUsers.map((user) => user.username);
+    const connectedUsernames = connectedUsers.map((user) =>
+      user.username.toLowerCase()
+    );
     const playersToFilter = isOnlineShow
-      ? players.filter((player) => connectedUsernames.includes(player.username))
+      ? players.filter((player) =>
+          connectedUsernames.includes(player.username.toLowerCase())
+        )
       : players;
     return playersToFilter.filter((player) =>
       player.username.toLowerCase().includes(searchTerm.toLowerCase())

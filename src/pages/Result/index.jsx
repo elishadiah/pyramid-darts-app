@@ -35,9 +35,7 @@ const Result = ({ socket }) => {
     } catch (err) {
       console.log(err);
       setTotalResult(null);
-      toast(
-        "Beim Abrufen der Match-Ergebnisse ist ein Fehler aufgetreten. Bitte versuche es erneut"
-      );
+      toast.warning(err.data);
     } finally {
       setIsLoading(false);
     }
@@ -88,10 +86,7 @@ const Result = ({ socket }) => {
             totalResult.user1?.name?.toLowerCase()
         );
 
-        if (
-          new Date(user1Init?.date).toISOString() <=
-          new Date(totalResult?.begin).toISOString()
-        ) {
+        if (new Date(user1Init?.date) >= new Date(totalResult?.begin)) {
           toast("Dieses Spiel wurde bereits gespeichert.");
         } else {
           setIsLoading(true);
