@@ -39,7 +39,7 @@ const Ranking = () => {
           eventType: "quick",
         });
         socket.emit("challenge", {
-          content: `${challenger}(Email: ${challengerEmail}) has sent you the quick challenge Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org`,
+          message: `${challenger}(Email: ${challengerEmail}) has sent you the quick challenge.`,
           to: users.find(
             (val) => val.username?.toLowerCase() === username?.toLowerCase()
           )?.userID,
@@ -66,18 +66,23 @@ const Ranking = () => {
           targetUser: receiver,
           eventType: "schedule",
         });
+
         socket.emit("schedule-challenge", {
+          message: `${challenger}(Email: ${challengerEmail}) has sent you the scheduled challenge. Challenge date: ${selectedDate}.`,
+          to: users.find(
+            (val) => val.username?.toLowerCase() === receiver?.toLowerCase()
+          )?.userID,
           date: selectedDate,
           challenger,
-          challengerEmail,
           receiver,
           receiverEmail,
+          challengerEmail,
         });
       } catch (err) {
         console.error(err);
       }
     },
-    []
+    [users]
   );
 
   const onPlayerClick = useCallback((payload) => {
@@ -89,7 +94,7 @@ const Ranking = () => {
   }, []);
 
   return (
-    <div className="relative sm:pb-24 dark:bg-gray-800">
+    <div className="relative dark:bg-gray-800">
       <div className="relative">
         <Header current={2} />
         <div className="flex px-6 lg:px-12 justify-center">

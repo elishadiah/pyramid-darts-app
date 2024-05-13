@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, useMemo } from "react";
+import { Fragment, useEffect, useState, useMemo, useCallback } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link, redirect } from "react-router-dom";
@@ -17,8 +17,9 @@ function classNames(...classes) {
 
 export default function Header({ current }) {
   const navigate = useNavigate();
+  const sessionID = authService.getAuthUser().user._id;
+  const user = authService.getAuthUser().user;
   const [userAvatar, setUserAvatar] = useState(null);
-  const [user, setUser] = useState(null);
   const [notifications, setNotifications] = useState(null);
   const [scheduleNotification, setScheduleNotification] = useState(null);
   const [users, setUsers] = useState([]);
@@ -28,64 +29,29 @@ export default function Header({ current }) {
     [users]
   );
 
-  useEffect(() => {
-    const tmp = authService.getAuthUser().user;
-    if (
-      tmp.hasOwnProperty("avatar") === false ||
-      tmp.avatar === null ||
-      tmp.avatar === ""
-    )
-      setUserAvatar(null);
-    else setUserAvatar(tmp.avatar);
-    setUser(tmp);
-
-    const sessionID = authService.getAuthUser().user._id;
-    const username = authService.getAuthUser().user.username?.toLowerCase();
-    if (sessionID) {
-      socket.auth = { sessionID, username };
-      socket.connect();
-    }
-
-    const handleErr = (err) => {
-      console.log("Socket--err-->>", err);
-    };
-
-    const handleUserID = ({ userID }) => {
-      socket.userID = userID;
-    };
-
-    socket.on("session_id", handleUserID);
-    socket.on("connect_error", handleErr);
-
-    return () => {
-      socket.off("connect_error", handleErr);
-      socket.off("session_id", handleUserID);
-    };
+  const handleErr = useCallback((err) => {
+    console.log("Socket--err-->>", err);
   }, []);
 
+  const handleUserID = useCallback(({ userID }) => {
+    socket.userID = userID;
+  }, []);
+
+  console.log("notifications--->>>", notifications);
+
   useEffect(() => {
-    const handleConnect = () => {
-      users.forEach((user) => {
-        if (user.self) {
-          user.connected = true;
-          user.status = "online";
-        }
-      });
-      console.log("--connect");
+    const updateUsersStatus = (status) => {
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => {
+          if (user.self) {
+            return { ...user, connected: status === "online", status };
+          }
+          return user;
+        })
+      );
     };
 
-    const handleDisconnect = () => {
-      users.forEach((user) => {
-        if (user.self) {
-          user.connected = false;
-          user.status = "offline";
-        }
-      });
-      console.log("--disconnect");
-    };
-
-    const handleUsers = (receivedUsers) => {
-      console.log("--users");
+    const updateUsers = (receivedUsers) => {
       receivedUsers.forEach((user) => {
         const existingUserIndex = users.findIndex(
           (existingUser) => existingUser.userID === user.userID
@@ -106,12 +72,15 @@ export default function Header({ current }) {
       });
     };
 
-    const handleUserConnected = (user) => {
-      console.log("--user connected", users);
+    const updateUserConnectionStatus = (isConnected) => (user) => {
       setUsers((prevUsers) => {
         const updatedUsers = prevUsers.map((existingUser) => {
           if (existingUser.userID === user.userID) {
-            return { ...existingUser, connected: true, status: "online" };
+            return {
+              ...existingUser,
+              connected: isConnected,
+              status: isConnected ? "online" : "offline",
+            };
           }
           return existingUser;
         });
@@ -127,20 +96,7 @@ export default function Header({ current }) {
       });
     };
 
-    const handleUserDisconnected = (id) => {
-      setUsers((prevUsers) => {
-        const updatedUsers = prevUsers.map((user) => {
-          if (user.userID === id) {
-            return { ...user, connected: false, status: "offline" };
-          }
-          return user;
-        });
-
-        return updatedUsers;
-      });
-    };
-
-    const handleChallenge = ({ content, from, to }) => {
+    const updateChallenge = ({ content, from, to }) => {
       setUsers((prevUsers) => {
         const updatedUsers = [...prevUsers];
         const userIndex = updatedUsers.findIndex(
@@ -165,9 +121,29 @@ export default function Header({ current }) {
       });
     };
 
+    const handleNotifications = (notifications) => {
+      setNotifications(notifications);
+    };
+
+    const handleNotification = (notification) => {
+      setNotifications((prevNotifications) => [
+        ...prevNotifications,
+        notification,
+      ]);
+    };
+
+    const handleConnect = () => updateUsersStatus("online");
+    const handleDisconnect = () => updateUsersStatus("offline");
+    const handleUsers = updateUsers;
+    const handleUserConnected = updateUserConnectionStatus(true);
+    const handleUserDisconnected = updateUserConnectionStatus(false);
+    const handleChallenge = updateChallenge;
+
     socket.on("connect", handleConnect);
     socket.on("disconnect", handleDisconnect);
     socket.on("users", handleUsers);
+    socket.on("notifications", handleNotifications);
+    socket.on("notification", handleNotification);
     socket.on("user connected", handleUserConnected);
     socket.on("user disconnected", handleUserDisconnected);
     socket.on("challenge", handleChallenge);
@@ -176,11 +152,36 @@ export default function Header({ current }) {
       socket.off("connect", handleConnect);
       socket.off("disconnect", handleDisconnect);
       socket.off("users", handleUsers);
+      socket.off("notifications", handleNotifications);
+      socket.off("notification", handleNotification);
       socket.off("user connected", handleUserConnected);
       socket.off("user disconnected", handleUserDisconnected);
       socket.off("challenge", handleChallenge);
     };
-  }, [socket, users]);
+  }, [users, selectedUser]);
+
+  useEffect(() => {
+    if (
+      user.hasOwnProperty("avatar") === false ||
+      user.avatar === null ||
+      user.avatar === ""
+    )
+      setUserAvatar(null);
+    else setUserAvatar(user.avatar);
+
+    if (sessionID) {
+      socket.auth = { sessionID, username: user?.username };
+      socket.connect();
+    }
+
+    socket.on("session_id", handleUserID);
+    socket.on("connect_error", handleErr);
+
+    return () => {
+      socket.off("connect_error", handleErr);
+      socket.off("session_id", handleUserID);
+    };
+  }, [user, handleErr, handleUserID, sessionID]);
 
   const handleLogout = () => {
     authService.logout();
@@ -216,8 +217,6 @@ export default function Header({ current }) {
   const acceptScheduleNotification = async () => {
     try {
       http.post("/schedule/save", scheduleNotification);
-    } catch (err) {
-      console.log(err);
     } finally {
       setScheduleNotification(null);
     }
@@ -233,27 +232,22 @@ export default function Header({ current }) {
     return timeZone;
   };
 
-  const handleBell = () => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => {
-        if (user.userID === socket.userID) {
-          const updatedUser = {
-            ...user,
-            hasNewMessages: false,
-          };
-          return updatedUser;
-        }
-        return user;
-      })
+  const handleNotificationClick = (notification) => {
+    // Mark the notification as read
+    socket.emit("notificationRead", notification._id);
+
+    // Remove the notification from the state
+    setNotifications((prevNotifications) =>
+      prevNotifications.filter((n) => n._id !== notification._id)
     );
-    console.log(
-      "-=-=-=-=-=-=->>>",
-      selectedUser,
-      "::::",
-      users,
-      ":::",
-      socket.userID
-    );
+  };
+
+  const handleAllNotificationsRead = () => {
+    // Mark all notifications as read
+    socket.emit("allNotificationsRead");
+
+    // Remove all notifications from the state
+    setNotifications([]);
   };
 
   return (
@@ -301,18 +295,17 @@ export default function Header({ current }) {
                   {/* Bell notification */}
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button
-                        onClick={handleBell}
-                        className="relative flex rounded-full text-gray-600 dark:bg-gray-800 dark:text-gray-400 text-sm focus:outline-none "
-                      >
+                      <Menu.Button className="relative flex rounded-full text-gray-600 dark:bg-gray-800 dark:text-gray-400 text-sm">
                         <span className="absolute -inset-1.5" />
                         <span className="sr-only">Open user menu</span>
                         <BellIcon className="h-6 w-6" aria-hidden="true" />
-                        {selectedUser?.hasNewMessages && (
+                        {notifications?.filter((val) => !val.read).length ? (
                           <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-600 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-700"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-700"></span>
                           </span>
+                        ) : (
+                          <span></span>
                         )}
                       </Menu.Button>
                     </div>
@@ -325,43 +318,43 @@ export default function Header({ current }) {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {selectedUser?.messages?.length && (
+                      <Menu.Items className="absolute -right-10 z-10 mt-2 w-56 max-h-56 origin-top-right rounded-md overflow-auto bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        {notifications?.filter((val) => !val.read).length && (
                           <Menu.Item>
                             {({ active }) => (
                               <div
+                                onClick={handleAllNotificationsRead}
                                 className={classNames(
                                   active ? "bg-gray-100 dark:bg-gray-900" : "",
-                                  "block h-40 overflow-auto px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                  "block h-fit overflow-auto px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200 cursor-pointer"
                                 )}
                               >
-                                {selectedUser?.messages.map((item, index) => (
-                                  <div key={index}>
-                                    <p className="mb-4">{item.content}</p>
-                                    <div className="flex gap-2 justify-center">
-                                      <Disclosure.Button
-                                        className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
-                                        onClick={acceptNotification}
-                                      >
-                                        <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
-                                          Accept
-                                        </p>
-                                      </Disclosure.Button>
-                                      <Disclosure.Button
-                                        className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
-                                        onClick={removeNotification}
-                                      >
-                                        <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
-                                          Decline
-                                        </p>
-                                      </Disclosure.Button>
-                                    </div>
-                                  </div>
-                                ))}
+                                <p className="border py-2 rounded-md font-semibold text-white cursor-pointer bg-green-500 hover:bg-green-600">
+                                  Mark all as read
+                                </p>
                               </div>
                             )}
                           </Menu.Item>
                         )}
+                        {notifications
+                          ?.filter((val) => !val.read)
+                          ?.map((item, index) => (
+                            <Menu.Item key={index}>
+                              {({ active }) => (
+                                <div
+                                  onClick={() => handleNotificationClick(item)}
+                                  className={classNames(
+                                    active
+                                      ? "bg-gray-100 dark:bg-gray-900"
+                                      : "",
+                                    "block h-fit overflow-auto px-4 py-2 text-sm border border-t-green-500 border-b-green-500 text-gray-700 dark:bg-gray-800 dark:text-gray-200 cursor-pointer"
+                                  )}
+                                >
+                                  {item.message}
+                                </div>
+                              )}
+                            </Menu.Item>
+                          ))}
                         {scheduleNotification && (
                           <Menu.Item>
                             {({ active }) => (
@@ -546,14 +539,124 @@ export default function Header({ current }) {
                 <div className="relative ml-auto mr-2">
                   <Switcher />
                 </div>
-                <button
-                  type="button"
-                  className="relative rounded-full p-1 ml-2 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:text-gray-900 hover:dark:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                <Menu as="div" className="relative ml-3">
+                  <div>
+                    <Menu.Button className="relative flex rounded-full text-gray-600 dark:bg-gray-800 dark:text-gray-400 text-sm">
+                      <span className="absolute -inset-1.5" />
+                      <span className="sr-only">Open user menu</span>
+                      <BellIcon className="h-6 w-6" aria-hidden="true" />
+                      {notifications?.filter((val) => !val.read).length ? (
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-700"></span>
+                        </span>
+                      ) : (
+                        <span></span>
+                      )}
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute -right-10 z-10 mt-2 w-56 max-h-56 origin-top-right rounded-md overflow-auto bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      {notifications?.filter((val) => !val.read).length && (
+                        <Menu.Item>
+                          {({ active }) => (
+                            <div
+                              onClick={handleAllNotificationsRead}
+                              className={classNames(
+                                active ? "bg-gray-100 dark:bg-gray-900" : "",
+                                "block h-fit overflow-auto px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200 cursor-pointer"
+                              )}
+                            >
+                              <p className="border py-2 rounded-md font-semibold text-white cursor-pointer bg-green-500 hover:bg-green-600">
+                                Mark all as read
+                              </p>
+                            </div>
+                          )}
+                        </Menu.Item>
+                      )}
+                      {notifications
+                        ?.filter((val) => !val.read)
+                        ?.map((item, index) => (
+                          <Menu.Item key={index}>
+                            {({ active }) => (
+                              <div
+                                onClick={() => handleNotificationClick(item)}
+                                className={classNames(
+                                  active ? "bg-gray-100 dark:bg-gray-900" : "",
+                                  "block h-fit overflow-auto px-4 py-2 text-sm border border-t-green-500 border-b-green-500 text-gray-700 dark:bg-gray-800 dark:text-gray-200 cursor-pointer"
+                                )}
+                              >
+                                {item.message}
+                              </div>
+                            )}
+                          </Menu.Item>
+                        ))}
+                      {scheduleNotification && (
+                        <Menu.Item>
+                          {({ active }) => (
+                            <div
+                              className={classNames(
+                                active ? "bg-gray-100 dark:bg-gray-900" : "",
+                                "block px-4 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                              )}
+                            >
+                              <p className="mb-4">
+                                {scheduleNotification.username?.toLowerCase()}{" "}
+                                hat Ihnen eine geplante Herausforderung
+                                gesendet.
+                              </p>
+                              <p>
+                                Wenn Sie zustimmen, können Sie das Spiel in den
+                                nächsten 8 Stunden nicht abbrechen, ohne zu
+                                verlieren.
+                              </p>
+                              <p>
+                                Challenge-Datum:{" "}
+                                {new Date(
+                                  scheduleNotification.date
+                                ).toLocaleString("en-US", {
+                                  timeZone: getCurrentTimeZone(),
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                  hour: "numeric",
+                                  minute: "numeric",
+                                  second: "numeric",
+                                })}
+                              </p>
+                              <div className="flex gap-2 justify-center">
+                                <Disclosure.Button
+                                  className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
+                                  onClick={acceptScheduleNotification}
+                                >
+                                  <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
+                                    Accept
+                                  </p>
+                                </Disclosure.Button>
+                                <Disclosure.Button
+                                  className="relative inline-flex items-center justify-center rounded-md text-white hover:bg-green-500 hover:text-white focus:outline-none"
+                                  onClick={removeScheduleNotification}
+                                >
+                                  <p className="p-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-500">
+                                    Decline
+                                  </p>
+                                </Disclosure.Button>
+                              </div>
+                            </div>
+                          )}
+                        </Menu.Item>
+                      )}
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
               </div>
               <div className="mt-3 space-y-1 px-2">
                 {constant.userMenuItems.map((item, index) => (

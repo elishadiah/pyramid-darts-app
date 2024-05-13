@@ -26,7 +26,7 @@ const ProfileLayout = ({ children }) => {
   }, []);
 
   return (
-    <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
+    <div className="relative bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
       <Header current={4} />
       <div className="p-8">
         <div className="flex flex-col md:flex-row bg-white p-4 mb-4 rounded-md">

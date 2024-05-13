@@ -39,13 +39,13 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="relative sm:pb-24 text-gray-900 dark:text-gray-100 dark:bg-gray-800 h-screen">
+    <div className="relative text-gray-900 dark:text-gray-100 dark:bg-gray-800">
       <div className="relative">
         <Header current={1} />
         {isLoading ? (
           <Loading />
         ) : (
-          <div className="mx-auto max-w-2xl px-4 lg:max-w-4xl lg:px-12">
+          <div className="mx-auto max-w-2xl px-4 pb-4 lg:max-w-4xl lg:px-12">
             <div className="flex flex-col items-center mb-12 mt-24">
               <img className="w-80" src={logoImg} alt="logo-img" />
             </div>
