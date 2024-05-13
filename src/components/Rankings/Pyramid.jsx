@@ -29,10 +29,6 @@ const Pyramid = ({
     return rowSpotNo > 0;
   };
 
-  const onClick = useCallback((payload) => {
-    window.location.href = `/profile/${payload}`;
-  }, []);
-
   const renderPlayer = (player, available) => {
     const isHighlighted = player === selectedPlayer;
 

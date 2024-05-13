@@ -41,7 +41,7 @@ const ProfileSummary = () => {
         setIsLoading(false);
       }
     },
-    [user]
+    []
   );
 
   const fetchProfile = useCallback(async () => {

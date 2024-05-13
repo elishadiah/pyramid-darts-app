@@ -1,5 +1,4 @@
-import { Fragment, useState, useEffect, useMemo } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { useCallback, useState, useEffect, useMemo, useRef } from "react";
 import { DateObject, Calendar } from "react-multi-date-picker";
 import TimePicker from "react-multi-date-picker/plugins/time_picker";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EmailNotify from "../../helper/emailjs";
 import Modal from "../Modal";
+import authService from "../../services/auth.service";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -21,7 +21,6 @@ const Card = ({
   isHighlighted,
   sendQuickFight,
   sendScheduledFight,
-  children,
   imgSize,
 }) => {
   const navigate = useNavigate();
@@ -29,23 +28,7 @@ const Card = ({
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
-
-  const topPosition = useMemo(() => {
-    switch (imgSize) {
-      case 16:
-        return "top-20";
-      case 14:
-        return "top-16";
-      case 12:
-        return "top-16";
-      case 10:
-        return "top-14";
-      case 8:
-        return "top-12";
-      default:
-        return "top-10";
-    }
-  }, [imgSize]);
+  const loggedInUserRef = useRef(null);
 
   const connected = useMemo(
     () =>
@@ -56,14 +39,20 @@ const Card = ({
   );
 
   useEffect(() => {
-    const authUser = JSON.parse(localStorage.getItem("authUser"));
+    const authUser = authService.getAuthUser();
     if (authUser) {
       setUser(authUser.user);
     }
-  }, []);
+
+    loggedInUserRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [player?.username, user?.username]);
 
   const closeModalSchedule = () => setIsOpenSchedule(false);
   const openModalSchedule = () => setIsOpenSchedule(true);
+
+  const handleClickProfile = useCallback((payload) => {
+    window.location.href = `/profile/${payload}`;
+  }, []);
 
   const isDateValid = (selectedDate) => {
     if (selectedDate) {
@@ -134,12 +123,20 @@ const Card = ({
   const onClickModal = () => setIsOpenModal(true);
   const onCloseModal = () => setIsOpenModal(false);
   return (
-    <>
+    <div>
       <div
         id={player._id}
+        ref={
+          player?.username?.toLowerCase() === user?.username?.toLowerCase()
+            ? loggedInUserRef
+            : null
+        }
         className={classNames(
-          "group relative flex shadow h-full p-2 m-2",
+          "group relative flex shadow p-2 m-2",
           isHighlighted ? "border border-2 border-green-500 bg-green-100" : "",
+          player?.username?.toLowerCase() === user?.username?.toLowerCase()
+            ? "border border-2 border-green-500 bg-green-100"
+            : "",
           onlineShow && !connected && "hidden"
         )}
       >
@@ -181,9 +178,13 @@ const Card = ({
                 className="w-24 h-24 mb-3 rounded-full shadow-lg"
                 src={player.avatar}
                 alt="user avatar"
+                onClick={() => handleClickProfile(player.username)}
               />
             ) : (
-              <div className="w-24 h-24 mb-3 rounded-full bg-green-200 shadow-lg flex items-center justify-center text-5xl">
+              <div
+                className="w-24 h-24 mb-3 rounded-full bg-green-200 shadow-lg flex items-center justify-center text-5xl"
+                onClick={() => handleClickProfile(player?.username)}
+              >
                 {player.username?.toUpperCase().charAt(0)}
               </div>
             )}
@@ -217,43 +218,6 @@ const Card = ({
             </div>
           </div>
         </div>
-        {/* <div
-          className={classNames(
-            "flex flex-col w-full items-center justify-center gap-4",
-          )}
-        >
-          <div className="flex flex-col h-16 p-4">
-            <p className="font-bold text-xl">
-              {player.username?.toLowerCase()}
-            </p>
-          </div>
-          <div className="flex items-center justify-center divide-x divide-gray-900 dark:divide-gray-200 dark:divide-gray-900">
-            <div className="w-6/12 p-2">
-              <button
-                className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={
-                  player.username?.toLowerCase() ===
-                    user.username?.toLowerCase() || !available
-                }
-                onClick={sendQuick}
-              >
-                Quick Fight
-              </button>
-            </div>
-            <div className="w-6/12 p-2">
-              <button
-                className="text-center font-semibold bg-green-500 text-white rounded-md p-2 disabled:opacity-50"
-                disabled={
-                  player.username?.toLowerCase() ===
-                    user.username?.toLowerCase() || !available
-                }
-                onClick={openModalSchedule}
-              >
-                Scheduled Fight
-              </button>
-            </div>
-          </div>
-        </div> */}
       </Modal>
 
       <Modal
@@ -292,7 +256,7 @@ const Card = ({
         </div>
       </Modal>
       <ToastContainer autoClose={3000} />
-    </>
+    </div>
   );
 };
 

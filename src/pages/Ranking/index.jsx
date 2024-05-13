@@ -14,7 +14,7 @@ const Ranking = () => {
   const sessionID = authService.getAuthUser().user._id;
   const { isLoading, players } = useFetchAllResult();
   const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [imgSize, setImgSize] = useState(16);
+  const [imgSize, setImgSize] = useState(10);
   const [users, setUsers] = useState([]);
   const [isOnlineShow, setIsOnlineShow] = useState(false);
 
@@ -128,6 +128,7 @@ const Ranking = () => {
                     min={6}
                     max={16}
                     step={2}
+                    value={imgSize}
                     className="w-full h-2 bg-gray-200 text-green-600 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                     onChange={onSliderChange}
                   />
