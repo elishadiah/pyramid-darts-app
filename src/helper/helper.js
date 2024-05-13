@@ -68,11 +68,11 @@ const calculateCurrentMonthAverages = (objArray) => {
 };
 
 const transformSummaryData = (data) => {
-  console.log(
-    "--------Init-********profile--result-------",
-    calculateCurrentMonthAverages(data?.summary)
+  const filteredData = data?.summary.filter(
+    (item) => item.doubles !== 0 && item.first9Avg !== 0 && item.matchAvg !== 0
   );
-  if (data?.summary.length === 0)
+
+  if (filteredData.length === 0)
     return {
       overall: { Doubles: 0, First9Avg: 0, MatchAvg: 0 },
       season: { Doubles: 0, First9Avg: 0, MatchAvg: 0 },
@@ -82,15 +82,15 @@ const transformSummaryData = (data) => {
     avgFirst9Avg = 0,
     avgMatchAvg = 0;
 
-  for (let i = 0; i < data?.summary.length; i++) {
-    avgDoubles += data?.summary[i]?.doubles;
-    avgFirst9Avg += data?.summary[i]?.first9Avg;
-    avgMatchAvg += data?.summary[i]?.matchAvg;
-  }
+  filteredData.map((item) => {
+    avgDoubles += item.doubles;
+    avgFirst9Avg += item.first9Avg;
+    avgMatchAvg += item.matchAvg;
+  });
 
-  avgDoubles = parseFloat(avgDoubles / data?.summary.length).toFixed(2);
-  avgFirst9Avg = parseFloat(avgFirst9Avg / data?.summary.length).toFixed(2);
-  avgMatchAvg = parseFloat(avgMatchAvg / data?.summary.length).toFixed(2);
+  avgDoubles = parseFloat(avgDoubles / filteredData.length).toFixed(2);
+  avgFirst9Avg = parseFloat(avgFirst9Avg / filteredData.length).toFixed(2);
+  avgMatchAvg = parseFloat(avgMatchAvg / filteredData.length).toFixed(2);
 
   return {
     overall: {
@@ -98,7 +98,7 @@ const transformSummaryData = (data) => {
       First9Avg: avgFirst9Avg,
       MatchAvg: avgMatchAvg,
     },
-    season: calculateCurrentMonthAverages(data?.summary),
+    season: calculateCurrentMonthAverages(filteredData),
   };
 };
 
