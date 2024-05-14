@@ -10,6 +10,7 @@ import http from "../helper/http-client";
 import EmailNotify from "../helper/emailjs";
 import socket from "../socket";
 import constant from "../helper/constant";
+import notificationSound from "../assets/audio/notification.mp3";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -23,6 +24,8 @@ export default function Header({ current }) {
   const [notifications, setNotifications] = useState(null);
   const [scheduleNotification, setScheduleNotification] = useState(null);
   const [users, setUsers] = useState([]);
+
+  const audio = new Audio(notificationSound);
 
   const selectedUser = useMemo(
     () => users.find((val) => val.userID === socket.userID),
@@ -126,6 +129,7 @@ export default function Header({ current }) {
     };
 
     const handleNotification = (notification) => {
+      audio.play();
       setNotifications((prevNotifications) => [
         ...prevNotifications,
         notification,
@@ -202,11 +206,6 @@ export default function Header({ current }) {
       `${user.username?.toLowerCase()} declined your challenge.`,
       "Dart Challenge"
     );
-  };
-
-  const removeNotification = () => {
-    setNotifications(null);
-    declineChallenge("quick");
   };
 
   const removeScheduleNotification = () => {
