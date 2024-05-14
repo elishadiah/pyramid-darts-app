@@ -206,6 +206,12 @@ import hunter_15 from "../assets/img/hunter/here_to_stay_15.png";
 import hunter_20 from "../assets/img/hunter/hunter_20.png";
 import hunter_25 from "../assets/img/hunter/hunter_25.png";
 
+// ranking images
+import ranking_1 from "../assets/img/first.png";
+import ranking_2 from "../assets/img/second.png";
+import ranking_3 from "../assets/img/third.png";
+import ranking_4 from "../assets/img/fourth.png";
+
 // Breakfast image
 const MASTER26 = [
   master26_10,
@@ -434,6 +440,9 @@ const CHALLENGECONQUEROR = [
 
 const FINISHINGACE = [...FINISHING_ACE.reverse()];
 
+// ranking
+const RANKINGMARK = [ranking_1, ranking_2, ranking_3, ranking_4];
+
 // Hunter
 const HUNTER = {
   hunter_5,
@@ -462,6 +471,7 @@ const images = {
   CHAMPIONCHALLENGER,
   CHALLENGECONQUEROR,
   HUNTER,
+  RANKINGMARK
 };
 
 export default images;

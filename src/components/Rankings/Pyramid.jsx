@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import Card from "./Card";
 import authService from "../../services/auth.service";
+import images from "../../helper/images";
 
 const Pyramid = ({
   players,
@@ -44,8 +45,7 @@ const Pyramid = ({
         onlineShow={onlineShow}
         imgSize={Number(imgSize)}
         // occupied={false}
-      >
-      </Card>
+      ></Card>
     );
   };
 
@@ -68,9 +68,15 @@ const Pyramid = ({
     }
     return (
       <div className="flex flex-wrap relative space-x-2 justify-center my-4">
-        <div className="absolute inline-flex items-center justify-center w-6 h-6 font-bold text-white bg-green-600 border-white rounded-full p-2 -top-8 end-2">
-          {8 - rowNumber}
-        </div>
+        {rowNumber < 4 ? (
+          <div className="absolute inline-flex items-center justify-center w-6 h-6 font-bold text-white bg-green-600 border-white rounded-full p-2 -top-8 end-2">
+            {8 - rowNumber}
+          </div>
+        ) : (
+          <div className="absolute inline-flex items-center justify-center w-8 h-8 font-bold text-white border-white rounded-full -top-8 end-2">
+            <img src={images.RANKINGMARK[7 - rowNumber]} alt="ranking-mark" />
+          </div>
+        )}
         {renderedPlayers}
       </div>
     );
