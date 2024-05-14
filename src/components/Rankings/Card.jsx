@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import EmailNotify from "../../helper/emailjs";
 import Modal from "../Modal";
 import authService from "../../services/auth.service";
+import images from "../../helper/images";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -171,7 +172,7 @@ const Card = ({
       </div>
 
       <Modal isOpen={isOpenModal} onClose={onCloseModal}>
-        <div className="w-full bg-white dark:bg-gray-800">
+        <div className="relative w-full bg-white dark:bg-gray-800">
           <div className="flex flex-col items-center py-4">
             {player.avatar ? (
               <img
@@ -217,6 +218,21 @@ const Card = ({
               </button>
             </div>
           </div>
+          {player?.level === 6 ? (
+            <div className="absolute top-0 right-0">
+              <img className="w-8 h-8" src={images.GOLDCROWN} alt="badge" />
+            </div>
+          ) : player?.level === 5 ? (
+            <div className="absolute top-0 right-0">
+              <img className="w-8 h-8" src={images.SNDBADGE} alt="badge" />
+            </div>
+          ) : (
+            player?.level === 0 && (
+              <div className="absolute top-0 right-0">
+                <img className="w-8 h-8" src={images.BEGINNER} alt="badge" />
+              </div>
+            )
+          )}
         </div>
       </Modal>
 

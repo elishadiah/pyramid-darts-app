@@ -212,6 +212,17 @@ import ranking_2 from "../assets/img/second.png";
 import ranking_3 from "../assets/img/third.png";
 import ranking_4 from "../assets/img/fourth.png";
 
+// crown
+import GOLDCROWN from "../assets/img/gold_crown.png";
+import SILVERCROWN from "../assets/img/silver_crown.png";
+
+import SNDBADGE from "../assets/img/snd_badge.png";
+
+import TROPHY from "../assets/img/trophy.png";
+import TROPHY2 from "../assets/img/trophy2.png";
+
+import BEGINNER from "../assets/img/new.png";
+
 // Breakfast image
 const MASTER26 = [
   master26_10,
@@ -471,7 +482,13 @@ const images = {
   CHAMPIONCHALLENGER,
   CHALLENGECONQUEROR,
   HUNTER,
-  RANKINGMARK
+  RANKINGMARK,
+  GOLDCROWN,
+  SILVERCROWN,
+  TROPHY,
+  TROPHY2,
+  BEGINNER,
+  SNDBADGE
 };
 
 export default images;
