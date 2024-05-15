@@ -25,8 +25,6 @@ export default function Header({ current }) {
   const [scheduleNotification, setScheduleNotification] = useState(null);
   const [users, setUsers] = useState([]);
 
-  const audio = new Audio(notificationSound);
-
   const selectedUser = useMemo(
     () => users.find((val) => val.userID === socket.userID),
     [users]
@@ -39,8 +37,6 @@ export default function Header({ current }) {
   const handleUserID = useCallback(({ userID }) => {
     socket.userID = userID;
   }, []);
-
-  console.log("notifications--->>>", notifications);
 
   useEffect(() => {
     const updateUsersStatus = (status) => {
@@ -127,6 +123,8 @@ export default function Header({ current }) {
     const handleNotifications = (notifications) => {
       setNotifications(notifications);
     };
+
+    const audio = new Audio(notificationSound);
 
     const handleNotification = (notification) => {
       audio.play();

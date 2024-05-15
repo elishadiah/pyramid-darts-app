@@ -9,9 +9,12 @@ import CustomInputComponent from "../../components/Input";
 import AchievementImages from "../../helper/images";
 import CustomMultiSelect from "../../components/CustomMultiSelect";
 import Constant from "../../helper/constant";
+import ToolTip from "../../components/ToolTip/ToolTip";
+import { convertAchievementName } from "../../helper/helper";
 
 const columns = [
   {
+    id: "date",
     name: "Date",
     selector: (row) => row.date,
     sortable: true,
@@ -65,18 +68,20 @@ const columns = [
                     )
                 )
                 .map((val, index) => (
-                  <div key={index} className="flex gap-2 my-2">
-                    <div className="flex items-center">
-                      <img
-                        className="w-8 h-6"
-                        src={
-                          AchievementImages[
-                            val?.name.toUpperCase().split(".")[0]
-                          ][val?.index]
-                        }
-                        alt="achievement-icon"
-                      />
-                    </div>
+                  <div key={index} className="flex relative gap-2 my-2">
+                    <ToolTip text={convertAchievementName(val?.name)}>
+                      <div className="flex items-center">
+                        <img
+                          className="w-8 h-6"
+                          src={
+                            AchievementImages[
+                              val?.name.toUpperCase().split(".")[0]
+                            ][val?.index]
+                          }
+                          alt="achievement-icon"
+                        />
+                      </div>
+                    </ToolTip>
                     <p className="flex items-center">&#x2715;</p>
                     <p className="flex items-center">{val?.value}</p>
                   </div>
@@ -85,17 +90,19 @@ const columns = [
                 .filter((val) => val?.name.includes("lifetime"))
                 .map((val, index) => (
                   <div key={index} className="flex gap-2 my-2">
-                    <div className="flex items-center">
-                      <img
-                        className="w-8 h-6"
-                        src={
-                          AchievementImages[
-                            val?.name.toUpperCase().split(".")[0]
-                          ][val?.index]
-                        }
-                        alt="achievement-icon"
-                      />
-                    </div>
+                    <ToolTip text={convertAchievementName(val?.name)}>
+                      <div className="flex items-center">
+                        <img
+                          className="w-8 h-6"
+                          src={
+                            AchievementImages[
+                              val?.name.toUpperCase().split(".")[0]
+                            ][val?.index]
+                          }
+                          alt="achievement-icon"
+                        />
+                      </div>
+                    </ToolTip>
                     <p className="flex items-center">&#x2715;</p>
                     <p className="flex items-center">{val?.value}</p>
                   </div>
@@ -104,20 +111,23 @@ const columns = [
                 .filter((val) => val?.name.includes("season"))
                 .map((val, index) => (
                   <div key={index} className="flex gap-2 my-2">
-                    <div className="flex items-center">
-                      <img
-                        className="w-8 h-6"
-                        src={
-                          AchievementImages[
-                            val?.name
-                              .toUpperCase()
-                              .replace("SEASON", "")
-                              .split(".")[0]
-                          ][val?.index]
-                        }
-                        alt="achievement-icon"
-                      />
-                    </div>
+                    <ToolTip text={convertAchievementName(val?.name)}>
+                      <div className="flex items-center">
+                        <img
+                          className="w-8 h-6"
+                          src={
+                            AchievementImages[
+                              val?.name
+                                .toUpperCase()
+                                .replace("SEASON", "")
+                                .split(".")[0]
+                            ][val?.index]
+                          }
+                          alt="achievement-icon"
+                          title={convertAchievementName(val?.name)}
+                        />
+                      </div>
+                    </ToolTip>
                     <p className="flex items-center">&#x2715;</p>
                     <p className="flex items-center">{val?.value}</p>
                   </div>
@@ -173,6 +183,8 @@ const GlobalEvents = () => {
       })),
     [events]
   );
+
+  console.log("Filter--Events-->>", filterEvents);
 
   const totalItems = useMemo(() => events?.totalItems, [events]);
 
@@ -234,7 +246,8 @@ const GlobalEvents = () => {
   }, []);
 
   const handleSort = useCallback((columns, sortDirection) => {
-    setSortObj({ sortDirection });
+    console.log("Sort--columns-->>", columns, ":::-->>", sortDirection);
+    setSortObj((prevState) => ({ ...prevState, sortDirection }));
   }, []);
 
   const handleFilterMenu = useCallback(() => {
@@ -255,8 +268,6 @@ const GlobalEvents = () => {
   const handleFilterInput = useCallback((e) => {
     setFilterStr(e);
   }, []);
-
-  console.log("Filter--menu-->>", checkedItems, ":::-->>", selectedFilterItems);
 
   return (
     <div>
@@ -305,6 +316,8 @@ const GlobalEvents = () => {
           data={filterEvents}
           progressPending={isLoading}
           customStyles={customStyles}
+          defaultSortFieldId="date"
+          defaultSortAsc={false}
           progressComponent={<Loading />}
           pagination
           paginationServer
@@ -312,7 +325,7 @@ const GlobalEvents = () => {
           onChangePage={handlePage}
           onChangeRowsPerPage={handleRowsPerPage}
           sortServer
-          onSort={handleSort}
+          onSort={(columns, sortOrder) => handleSort(columns, sortOrder)}
         />
       </div>
     </div>

@@ -26,6 +26,24 @@ const convertStr = (str) => {
   return str.replace(/([A-Z])/g, " $1").toUpperCase();
 };
 
+const convertAchievementName = (str) => {
+  if (
+    str.includes("master") ||
+    str.includes("maestro") ||
+    str.includes("protector") ||
+    str.includes("conqueror") ||
+    str.includes("climber") ||
+    str.includes("grand")
+  ) {
+    return str
+      .split(/(?=[A-Z])/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  } else {
+    return str.replace(/([A-Z])/g, " $1").toUpperCase();
+  }
+};
+
 const calculateCurrentMonthAverages = (objArray) => {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1; // getMonth() returns zero-based month (0-11)
@@ -156,4 +174,5 @@ export {
   calculateCurrentMonthAverages,
   classNames,
   getRandomInt,
+  convertAchievementName
 };
