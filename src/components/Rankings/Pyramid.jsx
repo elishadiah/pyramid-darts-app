@@ -67,7 +67,7 @@ const Pyramid = ({
       );
     }
     return (
-      <div className="flex flex-wrap relative space-x-2 justify-center my-4">
+      <div className="flex flex-wrap relative space-x-2 justify-center items-center my-4">
         {rowNumber < 4 ? (
           <div className="absolute inline-flex items-center justify-center w-6 h-6 font-bold text-white bg-green-600 border-white rounded-full p-2 -top-8 end-2">
             {8 - rowNumber}

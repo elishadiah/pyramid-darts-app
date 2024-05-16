@@ -9,6 +9,7 @@ import EmailNotify from "../../helper/emailjs";
 import Modal from "../Modal";
 import authService from "../../services/auth.service";
 import images from "../../helper/images";
+import { transformSummaryData } from "../../helper/helper";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -30,6 +31,8 @@ const Card = ({
   const [value, setValue] = useState(new DateObject());
   const [user, setUser] = useState({});
   const loggedInUserRef = useRef(null);
+
+  console.log("player", player);
 
   const connected = useMemo(
     () =>
@@ -154,12 +157,32 @@ const Card = ({
         )}
         <div className="cursor-pointer" onClick={onClickModal}>
           {player.avatar ? (
-            <img
-              className={`mx-auto flex-shrink-0 rounded-full`}
-              src={player.avatar}
-              style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
-              alt="user avatar"
-            />
+            <div className="relative">
+              <img
+                className={`mx-auto flex-shrink-0 rounded-full z-30 ${
+                  player?.level === 6 && "absolute"
+                }`}
+                src={player.avatar}
+                style={{
+                  width: `${imgSize * 4}px`,
+                  height: `${imgSize * 4}px`,
+                  top: "20%",
+                  left: "50%",
+                  transform: `translateX(-${player?.level === 6 ? 50 : 0}%)`,
+                }}
+                alt="user avatar"
+              />
+              {player?.level === 6 && (
+                <img
+                  style={{
+                    width: `${imgSize * 7}px`,
+                    height: `${imgSize * 7}px`,
+                  }}
+                  src={images.TOPPLACE}
+                  alt="top-place"
+                />
+              )}
+            </div>
           ) : (
             <div
               className={`mx-auto flex items-center justify-center flex-shrink-0 bg-green-200 rounded-full text-xl font-bold`}
@@ -195,6 +218,27 @@ const Card = ({
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {player.email}
             </span>
+            <div className="mt-2">
+              {player?.createdAt && (
+                <p className="text-sm text-center text-gray-500 dark:text-gray-400">
+                  Register: {new Date(player?.createdAt).toDateString()}
+                </p>
+              )}
+              <div className="flex gap-2 justify-center">
+                <p className="text-sm text-gray-500 dart:text-gray-400">
+                  Fight: {player?.sentTotalChallengeNo + player?.readyForIt}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Doubles: {transformSummaryData(player)?.overall?.Doubles}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Average: {transformSummaryData(player)?.overall?.MatchAvg}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  First 9 Avg: {transformSummaryData(player)?.overall?.First9Avg}
+                </p>
+              </div>
+            </div>
             <div className="flex mt-4 md:mt-6 gap-2">
               <button
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 disabled:opacity-50"

@@ -35,10 +35,15 @@ module.exports = {
       },
       animation: {
         shine: "shine 1s",
+        'glow': 'glow 2s infinite'
       },
       keyframes: {
         shine: {
           "100%": { left: "125%" },
+        },
+        glow: {
+          "0%, 100%": { boxShadow: "0 0 10px 0 #FEF08A" },
+          "50%": { boxShadow: "0 0 20px 10px #FEFCE8" },
         },
       },
     },

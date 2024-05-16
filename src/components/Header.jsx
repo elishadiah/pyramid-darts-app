@@ -475,67 +475,8 @@ export default function Header({ current }) {
                   </Menu>
                 </div>
               </div>
-              <div className="-mr-2 flex lg:hidden">
-                {/* Mobile menu button */}
-                <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                  <span className="absolute -inset-0.5" />
-                  <span className="sr-only">Open main menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
-              </div>
-            </div>
-          </div>
-
-          <Disclosure.Panel className="lg:hidden">
-            <div className="flex flex-col space-y-1 px-2 pb-3 pt-2">
-              {constant.navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.to}
-                  className={classNames(
-                    item.current === current
-                      ? "bg-gray-100 dark:bg-gray-900 dark:text-white"
-                      : "text-gray-900 dark:text-gray-300 hover:bg-gray-100 hover:dark:bg-gray-700 hover:text-gray-900 hover:dark:text-white",
-                    "rounded-md w-full text-left px-3 py-2 text-sm font-medium"
-                  )}
-                  aria-current={item.current === current ? "page" : undefined}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-            <div className="border-t border-gray-700 pb-3 pt-4">
-              <div className="flex items-center px-5">
-                <div className="flex-shrink-0">
-                  {userAvatar === null ? (
-                    <img
-                      className="h-8 w-8 rounded-full"
-                      src="https://www.f-cdn.com/assets/main/en/assets/unknown.png?image-optimizer=force&format=webply&width=336 1x"
-                      alt=""
-                    />
-                  ) : (
-                    <img
-                      src={userAvatar}
-                      alt=""
-                      className="h-8 w-8 flex-none rounded-lg dark:bg-gray-800 object-cover"
-                    />
-                  )}
-                </div>
-                <div className="ml-3">
-                  <div className="text-base font-medium text-gray-600 dark:text-white">
-                    {user?.firstname + " " + user?.lastname}
-                  </div>
-                  <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                    {user?.email}
-                  </div>
-                </div>
-                <div className="relative ml-auto mr-2">
-                  <Switcher />
-                </div>
+              {/* Mobile menu button */}
+              <div className="ml-auto lg:hidden">
                 <Menu as="div" className="relative ml-3">
                   <div>
                     <Menu.Button className="relative flex rounded-full text-gray-600 dark:bg-gray-800 dark:text-gray-400 text-sm">
@@ -654,6 +595,68 @@ export default function Header({ current }) {
                     </Menu.Items>
                   </Transition>
                 </Menu>
+              </div>
+              <div className="-mr-2 flex lg:hidden">
+                {/* Mobile menu button */}
+                <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                  <span className="absolute -inset-0.5" />
+                  <span className="sr-only">Open main menu</span>
+                  {open ? (
+                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                  ) : (
+                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                  )}
+                </Disclosure.Button>
+              </div>
+            </div>
+          </div>
+
+          <Disclosure.Panel className="lg:hidden">
+            <div className="flex flex-col space-y-1 px-2 pb-3 pt-2">
+              {constant.navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.to}
+                  className={classNames(
+                    item.current === current
+                      ? "bg-gray-100 dark:bg-gray-900 dark:text-white"
+                      : "text-gray-900 dark:text-gray-300 hover:bg-gray-100 hover:dark:bg-gray-700 hover:text-gray-900 hover:dark:text-white",
+                    "rounded-md w-full text-left px-3 py-2 text-sm font-medium"
+                  )}
+                  aria-current={item.current === current ? "page" : undefined}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+            <div className="border-t border-gray-700 pb-3 pt-4">
+              <div className="flex items-center px-5">
+                <div className="flex-shrink-0">
+                  {userAvatar === null ? (
+                    <img
+                      className="h-8 w-8 rounded-full"
+                      src="https://www.f-cdn.com/assets/main/en/assets/unknown.png?image-optimizer=force&format=webply&width=336 1x"
+                      alt=""
+                    />
+                  ) : (
+                    <img
+                      src={userAvatar}
+                      alt=""
+                      className="h-8 w-8 flex-none rounded-lg dark:bg-gray-800 object-cover"
+                    />
+                  )}
+                </div>
+                <div className="ml-3">
+                  <div className="text-base font-medium text-gray-600 dark:text-white">
+                    {user?.firstname + " " + user?.lastname}
+                  </div>
+                  <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    {user?.email}
+                  </div>
+                </div>
+                <div className="relative ml-auto mr-2">
+                  <Switcher />
+                </div>
               </div>
               <div className="mt-3 space-y-1 px-2">
                 {constant.userMenuItems.map((item, index) => (

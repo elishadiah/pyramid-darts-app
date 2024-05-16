@@ -223,6 +223,16 @@ import TROPHY2 from "../assets/img/trophy2.png";
 
 import BEGINNER from "../assets/img/new.png";
 
+import TOPPLACE from "../assets/img/top_place.png";
+import TOPPLACE2 from "../assets/img/top_place2.png";
+
+import BOARD1 from "../assets/img/dart_board/board1.png";
+import BOARD2 from "../assets/img/dart_board/board_2.png";
+import BOARD3 from "../assets/img/dart_board/board_3.png";
+import BOARD4 from "../assets/img/dart_board/board_4.png";
+
+import LOGO from "../assets/img/fc_logo.png";
+
 // Breakfast image
 const MASTER26 = [
   master26_10,
@@ -488,7 +498,14 @@ const images = {
   TROPHY,
   TROPHY2,
   BEGINNER,
-  SNDBADGE
+  SNDBADGE,
+  TOPPLACE,
+  TOPPLACE2,
+  BOARD1,
+  BOARD2,
+  BOARD3,
+  BOARD4,
+  LOGO
 };
 
 export default images;
