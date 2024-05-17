@@ -188,7 +188,7 @@ const ProfileCalendar = () => {
           <Loading />
         ) : (
           events && (
-            <div className="p-8 bg-white mt-8 rounded-md">
+            <div className="p-8 bg-white dark:bg-gray-800 dark:text-white mt-8 rounded-md">
               <Calendar
                 localizer={localizer}
                 events={events}

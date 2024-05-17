@@ -61,7 +61,7 @@ const Pyramid = ({
       renderedPlayers.push(
         <div
           key={`spot-${rowNumber}-${i}`}
-          className={`bg-gray-300 rounded-full m-2`}
+          className={`bg-gray-300 dark:bg-gray-900 rounded-full m-2`}
           style={{ width: `${imgSize * 4}px`, height: `${imgSize * 4}px` }}
         />
       );

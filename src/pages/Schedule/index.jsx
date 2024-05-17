@@ -5,6 +5,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import http from "../../helper/http-client";
 import Loading from "../../components/Loading";
+import Layout from "../../components/Layout";
 
 const Schedule = () => {
   // const [schedules, setSchedules] = useState([]);
@@ -48,17 +49,18 @@ const Schedule = () => {
   const localizer = momentLocalizer(moment);
 
   return (
-    <div className="relative sm:pb-24 dark:bg-gray-800">
-      <div className="relative">
-        <Header current={5} />
+    <Layout currentNo={5}>
+      <div className="my-20">
         {isLoading ? (
           <div className="flex flex-col space-y-4">
             <Loading />
             <Loading />
             <Loading />
+            <Loading />
+            <Loading />
           </div>
         ) : (
-          <div className="py-8 lg:px-12">
+          <div className="py-8 dark:text-white lg:px-12">
             <Calendar
               localizer={localizer}
               events={events}
@@ -69,7 +71,7 @@ const Schedule = () => {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 };
 

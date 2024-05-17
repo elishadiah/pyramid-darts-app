@@ -134,7 +134,7 @@ const Ranking = () => {
               />
               <p className="text-gray-900 dark:text-white">Zoom&nbsp;In</p>
             </div>
-            <div className="overflow-y-auto py-4 max-h-70-vh divide-y divide-green-300 dark:divide-gray-400">
+            <div className="overflow-y-auto custom-scrollbar py-4 max-h-70-vh divide-y divide-green-300 dark:divide-gray-400">
               {isLoading ? (
                 <div className="flex flex-col gap-4">
                   <Loading />

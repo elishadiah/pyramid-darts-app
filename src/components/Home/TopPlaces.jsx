@@ -3,7 +3,18 @@ import useFetchAllResult from "../../hooks/useFetchAllResult";
 import images from "../../helper/images";
 import Loading from "../Loading";
 
-const TopPlaces = () => {
+const lastMonth = new Date();
+lastMonth.setMonth(lastMonth.getMonth() - 1);
+lastMonth.setHours(0, 0, 0, 0);
+lastMonth.setDate(1);
+
+const firstDayOfMonth = new Date(
+  lastMonth.getFullYear(),
+  lastMonth.getMonth(),
+  1
+);
+
+const TopPlaces = ({ current }) => {
   const { isLoading, players } = useFetchAllResult();
 
   const topPlayers = useMemo(
@@ -11,17 +22,38 @@ const TopPlaces = () => {
     [players]
   );
 
+  const topPlayersLastMonth = useMemo(
+    () =>
+      players?.filter((val) => {
+        const playerDate = new Date(val.date.$date);
+        return (
+          val.level === 6 &&
+          playerDate >= lastMonth &&
+          playerDate < firstDayOfMonth
+        );
+      }),
+    [players]
+  );
+
+  const displayData = current ? topPlayers : topPlayersLastMonth;
+
   return (
     <div>
       {isLoading ? (
         <Loading />
-      ) : topPlayers.length ? (
+      ) : displayData.length ? (
         <div>
-          <h3 className="text-5xl font-bold my-8">
-            Top Players in Last Season
-          </h3>
+          {current ? (
+            <h3 className="text-5xl font-bold my-8">
+              Top Players in Current Season
+            </h3>
+          ) : (
+            <h3 className="text-5xl font-bold my-8">
+              Top Players in Last Season
+            </h3>
+          )}
           <div className="flex flex-wrap justify-center gap-4">
-            {topPlayers?.map((player) => {
+            {displayData?.map((player) => {
               return (
                 <div
                   key={player._id}
@@ -61,7 +93,7 @@ const TopPlaces = () => {
                   </div>
                   <div className="w-3/5 flex flex-col items-start sm:justify-center sm:items-center">
                     <p className="text-3xl lg:text-2xl font-semibold mb-2">
-                      John Doe
+                      {player.username}
                     </p>
                     <button className="border px-2 py-1 rounded-lg">
                       Challenge

@@ -35,7 +35,8 @@ const Home = () => {
           <p className="w-4/5">{quote.additive}</p>
         </div>
       </div>
-      <TopPlaces />
+      <TopPlaces current={true} />
+      <TopPlaces current={false} />
     </Layout>
   );
 };

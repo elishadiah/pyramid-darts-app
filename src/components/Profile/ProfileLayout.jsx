@@ -7,6 +7,7 @@ import FacebookIcon from "../Icons/FacebookIcon";
 import TwitterIcon from "../Icons/TwitterIcon";
 import InstagramIcon from "../Icons/InstagramIcon";
 import constant from "../../helper/constant";
+import Layout from "../Layout";
 
 const ProfileLayout = ({ children }) => {
   const [user, setUser] = useState({ username: "", email: "", avatar: "" });
@@ -26,10 +27,9 @@ const ProfileLayout = ({ children }) => {
   }, []);
 
   return (
-    <div className="relative bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
-      <Header current={4} />
-      <div className="p-8">
-        <div className="flex flex-col md:flex-row bg-white p-4 mb-4 rounded-md">
+    <Layout currentNo={4}>
+      <div>
+        <div className="flex flex-col md:flex-row bg-white dark:bg-gray-800 p-4 mb-4 rounded-md">
           <div className="flex flex-col w-full lg:w-3/12 p-4">
             <div className="flex justify-center items-center p-2">
               {user.avatar === "" ? (
@@ -78,7 +78,7 @@ const ProfileLayout = ({ children }) => {
           <div className="flex flex-col w-full lg:w-9/12 p-4">{children}</div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

@@ -36,7 +36,7 @@ const CustomInputComponent = ({
           required={required}
           disabled={disabled}
           onChange={onInputChange}
-          className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 dark:bg-white/5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6 focus-border-none focus-outline-none"
+          className="block w-full rounded-md bg-white dark:bg-gray-800 dark:text-white border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 dark:bg-white/5 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6 focus-border-none focus-outline-none"
         />
         <div className="form-text text-danger">{errors && <p>{errors}</p>}</div>
         {type === "password" && (

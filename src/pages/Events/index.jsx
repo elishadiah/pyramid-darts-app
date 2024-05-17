@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import http from "../../helper/http-client";
-import Header from "../../components/Header";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
 import CustomInputComponent from "../../components/Input";
@@ -11,6 +10,7 @@ import CustomMultiSelect from "../../components/CustomMultiSelect";
 import Constant from "../../helper/constant";
 import ToolTip from "../../components/ToolTip/ToolTip";
 import { convertAchievementName } from "../../helper/helper";
+import Layout from "../../components/Layout";
 
 const columns = [
   {
@@ -270,10 +270,9 @@ const GlobalEvents = () => {
   }, []);
 
   return (
-    <div>
-      <Header current={6} />
+    <Layout currentNo={6}>
       <div className="py-4 px-8">
-        <div className="md:w-2/5 lg:w-1/3 ml-auto mb-8">
+        <div className="md:w-2/5 lg:w-1/3 bg-white dark:bg-gray-800 ml-auto mb-8">
           <CustomMultiSelect
             isOpen={isOpenFilterMenu}
             selectedValue={selectedFilterItems}
@@ -282,7 +281,10 @@ const GlobalEvents = () => {
           >
             <ul>
               {Constant.eventFilterList.map((item, index) => (
-                <li key={index} className="flex items-center gap-2">
+                <li
+                  key={index}
+                  className="flex items-center bg-white dark:bg-gray-800 gap-2"
+                >
                   <input
                     type="checkbox"
                     value={item.label}
@@ -318,7 +320,15 @@ const GlobalEvents = () => {
           customStyles={customStyles}
           defaultSortFieldId="date"
           defaultSortAsc={false}
-          progressComponent={<Loading />}
+          progressComponent={
+            <div className="w-full flex flex-col gap-4">
+              <Loading />
+              <Loading />
+              <Loading />
+              <Loading />
+              <Loading />
+            </div>
+          }
           pagination
           paginationServer
           paginationTotalRows={totalItems}
@@ -328,7 +338,7 @@ const GlobalEvents = () => {
           onSort={(columns, sortOrder) => handleSort(columns, sortOrder)}
         />
       </div>
-    </div>
+    </Layout>
   );
 };
 

@@ -32,8 +32,6 @@ const Card = ({
   const [user, setUser] = useState({});
   const loggedInUserRef = useRef(null);
 
-  console.log("player", player);
-
   const connected = useMemo(
     () =>
       connectedUsers.find(

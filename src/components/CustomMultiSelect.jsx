@@ -11,14 +11,14 @@ const CustomMultiSelect = ({
 }) => {
   const node = useRef(null);
 
-  const handleClickOutside = (e) => {
-    if (node.current.contains(e.target)) {
-      return;
-    }
-    closeDropdown();
-  };
-
   useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (node.current.contains(e.target)) {
+        return;
+      }
+      closeDropdown();
+    };
+
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
@@ -28,13 +28,13 @@ const CustomMultiSelect = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, closeDropdown]);
 
   return (
-    <div className="relative" ref={node}>
+    <div className="relative bg-white dark:bg-gray-800" ref={node}>
       <div
         className={classNames(
-          "relative w-full py-2 px-4 text-left border border-green-400 dark:bg-gray-900 dark:border-gray-200 rounded-md cursor-pointer",
+          "relative w-full py-2 px-4 text-left border border-green-400 dark:bg-gray-800 dark:border-gray-200 rounded-md cursor-pointer",
           selectedValue.length ? "h-fit" : "h-10"
         )}
         onClick={handleMenu}
@@ -51,7 +51,9 @@ const CustomMultiSelect = ({
         {selectedValue.length ? (
           <div className="flex flex-wrap items-center gap-2">
             {selectedValue?.map((item, index) => (
-              <div key={index} className="p-1 border rounded-md">{item?.label}</div>
+              <div key={index} className="p-1 border rounded-md">
+                {item?.label}
+              </div>
             ))}
           </div>
         ) : (
@@ -61,7 +63,7 @@ const CustomMultiSelect = ({
       {isOpen && (
         <div
           className={classNames(
-            "border absolute top-full mt-2 z-10 p-4 bg-white w-full rounded-md"
+            "border absolute bg-white dark:bg-gray-800 top-full mt-2 z-10 p-4 bg-white w-full rounded-md"
           )}
         >
           {children}
