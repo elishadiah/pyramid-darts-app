@@ -2,7 +2,7 @@ const SummaryStaticCard = ({result}) => {
     console.log('profile--card-->>>', result)
   return (
     <div className="flex flex-wrap gap-4 lg:justify-between">
-      <div className="border border-t-4 border-t-green-600 p-4 rounded-md w-full lg:w-48p">
+      <div className="border dark:bg-black border-t-4 border-t-green-600 dark:border-yellow-600 dark:border-t-green-600 p-4 rounded-md w-full lg:w-48p">
         <p className="font-bold text-left text-2xl border border-0 border-b-2 pb-2">
           Overall
         </p>
@@ -21,7 +21,7 @@ const SummaryStaticCard = ({result}) => {
           </div>
         </div>
       </div>
-      <div className="border border-t-4 border-t-green-600 p-4 rounded-md w-full lg:w-48p">
+      <div className="dark:bg-black border border-t-4 border-t-green-600 dark:border-yellow-600 dark:border-t-green-600 p-4 rounded-md w-full lg:w-48p">
         <p className="font-bold text-left text-2xl border border-0 border-b-2 pb-2">
           Current Month
         </p>

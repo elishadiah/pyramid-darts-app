@@ -4,6 +4,7 @@ import http from "../../helper/http-client";
 import DataTable from "react-data-table-component";
 import Loading from "../../components/Loading";
 import { transformTableData } from "../../helper/helper";
+import Layout from "../../components/Layout";
 
 const RankingTable = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -226,8 +227,7 @@ const RankingTable = () => {
   };
 
   return (
-    <div className="relative sm:pb-24 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
-      <Header current={7} />
+    <Layout currentNo={7}>
       <div className="p-8">
         <DataTable
           title={<div className="text-4xl font-bold mb-4">Ranking</div>}
@@ -235,13 +235,21 @@ const RankingTable = () => {
           data={result}
           progressPending={isLoading}
           customStyles={customStyles}
-          progressComponent={<Loading />}
+          progressComponent={
+            <div className="flex flex-col w-full gap-4">
+              <Loading />
+              <Loading />
+              <Loading />
+              <Loading />
+              <Loading />
+            </div>
+          }
           pagination
           highlightOnHover
           paginationComponentOptions={paginationComponentOptions}
         />
       </div>
-    </div>
+    </Layout>
   );
 };
 

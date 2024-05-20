@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Header from "../../components/Header";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -8,7 +7,6 @@ import Loading from "../../components/Loading";
 import Layout from "../../components/Layout";
 
 const Schedule = () => {
-  // const [schedules, setSchedules] = useState([]);
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,8 +21,6 @@ const Schedule = () => {
       console.log(
         "Schedule-->>",
         res.data,
-        "::",
-        new Date(res.data[0].date).toLocaleString()
       );
       const tmp = res.data.map((val) => ({
         id: val._id,

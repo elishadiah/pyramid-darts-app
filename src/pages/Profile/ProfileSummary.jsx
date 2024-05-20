@@ -114,14 +114,14 @@ const ProfileSummary = () => {
             handleTextArea={onChange}
           />
         ) : (
-          <h5 className="w-full min-h-60 p-4 text-xl text-left border border-t-4 border-t-green-600 rounded-md cursor-pointer ">
+          <h5 className="w-full min-h-60 p-4 text-xl text-left dark:bg-black border border-t-4 border-t-green-600 dark:border-yellow-600 dark:border-t-green-600 rounded-md cursor-pointer ">
             {profile?.introduction
               ? profile?.introduction
               : "Introduction does not exist."}
           </h5>
         )}
       </div>
-      <div className="text-left text-md md:text-xl lg:text-2xl mb-8 p-4 border border-t-4 border-t-green-600 rounded-md">
+      <div className="text-left text-md md:text-xl lg:text-2xl dark:bg-black mb-8 p-4 border border-t-4 border-t-green-600 dark:border-yellow-600 dark:border-t-green-600 rounded-md">
         Last Online:{" "}
         <span className="font-bold">
           {new Date(user?.lastLoginDate).toLocaleString()}

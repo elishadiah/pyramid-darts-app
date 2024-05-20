@@ -213,9 +213,6 @@ const Card = ({
             <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
               {player.username?.toUpperCase()}
             </h5>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {player.email}
-            </span>
             <div className="mt-2">
               {player?.createdAt && (
                 <p className="text-sm text-center text-gray-500 dark:text-gray-400">

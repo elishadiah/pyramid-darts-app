@@ -233,6 +233,8 @@ import BOARD4 from "../assets/img/dart_board/board_4.png";
 
 import LOGO from "../assets/img/fc_logo.png";
 
+import MOVIE from "../assets/img/movie.png";
+
 // Breakfast image
 const MASTER26 = [
   master26_10,
@@ -505,7 +507,8 @@ const images = {
   BOARD2,
   BOARD3,
   BOARD4,
-  LOGO
+  LOGO,
+  MOVIE,
 };
 
 export default images;
