@@ -346,9 +346,10 @@ export default function Header({ current }) {
                                       : "",
                                     "block h-fit overflow-auto px-4 py-2 text-sm border border-t-green-500 border-b-green-500 text-gray-700 dark:bg-gray-800 dark:text-gray-200 cursor-pointer"
                                   )}
-                                >
-                                  {item.message}
-                                </div>
+                                  dangerouslySetInnerHTML={{
+                                    __html: item?.message,
+                                  }}
+                                />
                               )}
                             </Menu.Item>
                           ))}

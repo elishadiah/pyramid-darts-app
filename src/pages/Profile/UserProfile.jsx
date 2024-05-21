@@ -57,10 +57,10 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-gray-900 dark:bg-gray-800">
+    <div className="relative sm:pb-24 bg-indigo-50 text-gray-900 dark:text-white dark:bg-gray-800">
       <Header current={4} />
       <div className="p-8">
-        <div className="flex flex-col md:flex-row bg-white p-4 mb-4 rounded-md">
+        <div className="flex flex-col md:flex-row bg-white dark:bg-gray-800 p-4 mb-4 rounded-md">
           <div className="flex flex-col w-full lg:w-3/12 p-4">
             <div className="flex justify-center items-center p-2">
               {user?.avatar === "" || user?.avatar === null ? (
@@ -102,11 +102,11 @@ const UserProfile = () => {
               </div>
             )}
             <div className="mb-8">
-              <h5 className="w-full min-h-60 p-4 text-xl text-left border border-t-8 border-t-green-600 rounded-md cursor-pointer ">
+              <h5 className="w-full min-h-60 dark:bg-black p-4 text-xl text-left border border-t-8 border-t-green-600 dark:border-yellow-600 dark:border-t-green-600 rounded-md cursor-pointer ">
                 {user?.profile ? user?.profile : "Introduction does not exist."}
               </h5>
             </div>
-            <div className="text-left text-md md:text-xl lg:text-2xl mb-8 p-4 border border-t-4 border-t-green-600 rounded-md">
+            <div className="dark:bg-black text-left text-md md:text-xl lg:text-2xl mb-8 p-4 border border-t-4 border-t-green-600 dark:border-yellow-600 dark:border-t-green-600 rounded-md">
               Last Online:{" "}
               <span className="font-bold">
                 {new Date(user?.lastLoginDate).toLocaleString()}

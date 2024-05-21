@@ -20,6 +20,7 @@ import ProfileAchievementsPersonal from "../pages/Profile/ProfileAchievementsPer
 import ProfileAchievementsPyramid from "../pages/Profile/ProfileAchievementsPyramid";
 import ProfileCalendar from "../pages/Profile/ProfileCalendar";
 import UserProfile from "../pages/Profile/UserProfile";
+import TopChallengeResult from "../pages/Result/TopChallengeResult";
 
 const AppRouter = () => {
   return (
@@ -56,6 +57,7 @@ const AppRouter = () => {
         <Route path="/result" element={<Result />} />
         <Route path="/events" element={<GlobalEvents />} />
         <Route path="/ranking-table" element={<RankingTable />} />
+        <Route path="/top-challenge-result" element={<TopChallengeResult />} />
       </Route>
     </Routes>
   );

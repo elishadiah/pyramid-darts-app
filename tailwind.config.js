@@ -10,7 +10,11 @@ module.exports = {
         'main-color': '#319447',
         'main-bg-color': 'rgb(48, 48, 48)',
         'divider-color': 'rgb(73, 73, 73)',
-        'form-color': '#2196f3'
+        'form-color': '#2196f3',
+        'light-card-start': "#0c0c0c",
+        'light-card-end': "#0f971c",
+        'dark-card-start': "#0e1c26",
+        'dark-card-end': "#000000",
       },
       maxWidth: {
         "32p": "32%",

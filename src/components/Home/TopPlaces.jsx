@@ -1,7 +1,13 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router";
 import useFetchAllResult from "../../hooks/useFetchAllResult";
 import images from "../../helper/images";
 import Loading from "../Loading";
+import EmailNotify from "../../helper/emailjs";
+import socket from "../../socket";
+import authService from "../../services/auth.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const lastMonth = new Date();
 lastMonth.setMonth(lastMonth.getMonth() - 1);
@@ -15,7 +21,38 @@ const firstDayOfMonth = new Date(
 );
 
 const TopPlaces = ({ current }) => {
+  const navigate = useNavigate();
+  const user = authService.getAuthUser()?.user;
   const { isLoading, players } = useFetchAllResult();
+
+  useEffect(() => {
+    const handleFoundUser = (data) => {
+      if (data) {
+        socket.emit("challenge", {
+          message: `<a target="_blank" href="https://lidarts.org">
+          ${user?.username}(Email: ${
+            user?.email
+          }) has sent you the challenge. The
+          result of this challenge will not affect your ranking. It is just for
+          fun. Enjoy!
+          <br />
+          ${new Date().toLocaleString()}
+        </a>`,
+          to: data?.userID,
+        });
+        window.open(
+          `https://lidarts.org/game/create?opponent_name=${data?.username?.toLowerCase()}`,
+          "_blank"
+        );
+        navigate("/top-challenge-result");
+      } else toast.warning("User is not online.");
+    };
+
+    socket.on("foundUser", handleFoundUser);
+    return () => {
+      socket.off("foundUser");
+    };
+  }, [user, navigate]);
 
   const topPlayers = useMemo(
     () => players?.filter((val) => val.level === 6),
@@ -37,6 +74,23 @@ const TopPlaces = ({ current }) => {
 
   const displayData = current ? topPlayers : topPlayersLastMonth;
 
+  const handleChallenge = useCallback(
+    (player) => {
+      socket.emit("findUserByName", {
+        username: player.username,
+      });
+      // EmailNotify.sendNotificationEmail(
+      //   user.username,
+      //   user.email,
+      //   player.username,
+      //   player.email,
+      //   `${user?.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org. The result of this challenge will not affect your ranking. It is just for fun. Enjoy!`,
+      //   "Fun Challenge"
+      // );
+    },
+    [user]
+  );
+
   return (
     <div>
       {isLoading ? (
@@ -57,7 +111,7 @@ const TopPlaces = ({ current }) => {
               return (
                 <div
                   key={player._id}
-                  className="w-full sm:w-48p lg:flex-1 relative flex max-w-sm lg:max-w-72 border border-2 border-yellow-600 p-4 bg-gray-800 text-white rounded-lg"
+                  className="w-full sm:w-48p lg:flex-1 relative flex max-w-sm lg:max-w-72 border border-2 border-yellow-600 p-4 bg-gradient-to-tl from-light-card-start to-light-card-end dark:from-dark-card-start dark:to-dark-card-end dark:bg-gray-800 text-white rounded-lg"
                 >
                   <img
                     className="w-6 h-6 lg:w-4 lg:h-4 absolute top-2 right-2"
@@ -95,7 +149,14 @@ const TopPlaces = ({ current }) => {
                     <p className="text-3xl lg:text-2xl font-semibold mb-2">
                       {player.username}
                     </p>
-                    <button className="border px-2 py-1 rounded-lg">
+                    <button
+                      className="border px-2 py-1 rounded-lg disabled:opacity-50"
+                      disabled={
+                        player?.username.toLowerCase() ===
+                        user?.username.toLowerCase()
+                      }
+                      onClick={() => handleChallenge(player)}
+                    >
                       Challenge
                     </button>
                   </div>
@@ -103,6 +164,7 @@ const TopPlaces = ({ current }) => {
               );
             })}
           </div>
+          <ToastContainer />
         </div>
       ) : (
         <div></div>
