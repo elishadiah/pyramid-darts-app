@@ -1,4 +1,15 @@
 import Loading from "../Loading";
+import HandleResult from "../../helper/result";
+
+const ResultBoard = ({ data1, data2, kind }) => {
+  return (
+    <div className="flex text-white py-2">
+      <p className="font-semibold w-1/3">{data1 || 0}</p>
+      <p className="w-1/3">{kind}</p>
+      <p className="font-semibold w-1/3">{data2 || 0}</p>
+    </div>
+  );
+};
 
 const TopFightResult = ({ isLoading, result }) => {
   return (
@@ -45,21 +56,14 @@ const TopFightResult = ({ isLoading, result }) => {
               <span className="font-semibold">Match start: </span>
               {new Date(result?.begin).toLocaleString()}
             </p>
-            <div className="flex justify-around text-white p-2">
-                <p className="font-semibold">{result?.user1?.avg}</p>
-                <p>Avg</p>
-                <p className="font-semibold">{result?.user2?.avg}</p>
-            </div>
-            <div className="flex justify-around text-white p-2">
-                <p className="font-semibold">{result?.user1?.avg}</p>
-                <p>Avg</p>
-                <p className="font-semibold">{result?.user2?.avg}</p>
-            </div>
-            <div className="flex justify-around text-white p-2">
-                <p className="font-semibold">{result?.user1?.avg}</p>
-                <p>Avg</p>
-                <p className="font-semibold">{result?.user2?.avg}</p>
-            </div>
+            {HandleResult.topBriefResult(result)?.map((item, index) => (
+              <ResultBoard
+                key={index}
+                data1={item.data1}
+                data2={item.data2}
+                kind={item.title}
+              />
+            ))}
           </div>
         </div>
       )}

@@ -230,13 +230,13 @@ const RankingTable = () => {
     <Layout currentNo={7}>
       <div className="p-8">
         <DataTable
-          title={<div className="text-4xl font-bold mb-4">Ranking</div>}
+          title={<div className="text-4xl font-bold mb-4 dark:text-white">Ranking</div>}
           columns={columns}
           data={result}
           progressPending={isLoading}
           customStyles={customStyles}
           progressComponent={
-            <div className="flex flex-col w-full gap-4">
+            <div className="flex flex-col w-full gap-4 bg-white dark:bg-gray-800">
               <Loading />
               <Loading />
               <Loading />

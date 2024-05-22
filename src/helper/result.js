@@ -1,5 +1,3 @@
-import AchievementVariables from "./variables";
-
 let newAchievements = [];
 
 const getHighMarks = () => {
@@ -8,11 +6,6 @@ const getHighMarks = () => {
     highMarks.push(i);
   }
   return highMarks;
-};
-
-const isEmpty = (data) => {
-  if (data.length === 0 || data === null || data === undefined) return true;
-  else return false;
 };
 
 const updateResult = (data) => {
@@ -94,8 +87,10 @@ const updateResult = (data) => {
           season: 1,
         }),
     ironDart:
-      data.user1.init.ironDart < data.matchResult.p1_doubles
-        ? data.matchResult.p1_doubles
+      data.user1.won > data.user2.won
+        ? data.user1.init.ironDart < data.matchResult.p1_doubles
+          ? data.matchResult.p1_doubles
+          : data.user1.init.ironDart
         : data.user1.init.ironDart,
     master180: {
       lifetime: data.matchResult.hasOwnProperty("p1_180")
@@ -196,8 +191,10 @@ const updateResult = (data) => {
           season: 1,
         }),
     ironDart:
-      data.user2.init.ironDart < data.matchResult.p2_doubles
-        ? data.matchResult.p2_doubles
+      data.user1.won < data.user2.won
+        ? data.user2.init.ironDart < data.matchResult.p2_doubles
+          ? data.matchResult.p2_doubles
+          : data.user2.init.ironDart
         : data.user2.init.ironDart,
     master180: {
       lifetime: data.matchResult.hasOwnProperty("p2_180")
@@ -470,9 +467,73 @@ const handleAchievement = (data, origin) => {
   return newAchievements;
 };
 
+const topBriefResult = (result) => [
+  {
+    title: "Avg",
+    data1: result?.user1?.avg,
+    data2: result?.user2?.avg,
+  },
+  {
+    title: "First 9 Avg",
+    data1: result?.matchResult?.p1_first9_avg,
+    data2: result?.matchResult?.p2_first9_avg,
+  },
+  {
+    title: "Doubles",
+    data1: result?.matchResult?.p1_doubles,
+    data2: result?.matchResult?.p2_doubles,
+  },
+  {
+    title: "Highest Finish",
+    data1: result?.matchResult?.p1_high_finish,
+    data2: result?.matchResult?.p2_high_finish,
+  },
+  {
+    title: "180",
+    data1: result?.matchResult?.p1_180,
+    data2: result?.matchResult?.p2_180,
+  },
+  {
+    title: "171",
+    data1: result?.matchResult?.p1_171,
+    data2: result?.matchResult?.p2_171,
+  },
+  {
+    title: "140",
+    data1: result?.matchResult?.p1_140,
+    data2: result?.matchResult?.p2_140,
+  },
+  {
+    title: "100",
+    data1: result?.matchResult?.p1_100,
+    data2: result?.matchResult?.p2_100,
+  },
+  {
+    title: "80",
+    data1: result?.matchResult?.p1_80,
+    data2: result?.matchResult?.p2_80,
+  },
+  {
+    title: "60",
+    data1: result?.matchResult?.p1_60,
+    data2: result?.matchResult?.p2_60,
+  },
+  {
+    title: "40",
+    data1: result?.matchResult?.p1_40,
+    data2: result?.matchResult?.p2_40,
+  },
+  {
+    title: "20",
+    data1: result?.matchResult?.p1_40,
+    data2: result?.matchResult?.p2_40,
+  },
+];
+
 const handleResult = {
   updateResult,
   handleAchievement,
+  topBriefResult,
 };
 
 export default handleResult;

@@ -91,12 +91,12 @@ const quotes = [
 
 const navigation = [
   { name: "Home", to: "/", current: 1 },
-  { name: "Pyramid", to: "/pyramid", current: 2 },
   { name: "Infos", to: "/infos", current: 3 },
-  { name: "Profile", to: "/profile-summary", current: 4 },
-  { name: "Calendar", to: "/schedule", current: 5 },
+  { name: "Pyramid", to: "/pyramid", current: 2 },
   { name: "Events", to: "/events", current: 6 },
+  { name: "Calendar", to: "/schedule", current: 5 },
   { name: "Ranking", to: "/ranking-table", current: 7 },
+  { name: "Profile", to: "/profile-summary", current: 4 },
 ];
 
 const userMenuItems = [
@@ -167,8 +167,8 @@ const eventFilterList = [
   { label: "User", value: "" },
 ];
 
-// const URL = "http://localhost:4000";
-const URL = 'https://backend.dartsfightclub.de';
+const URL = "http://localhost:4000";
+// const URL = 'https://backend.dartsfightclub.de';
 
 const constant = {
   quotes,

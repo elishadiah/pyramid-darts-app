@@ -321,7 +321,7 @@ const GlobalEvents = () => {
           defaultSortFieldId="date"
           defaultSortAsc={false}
           progressComponent={
-            <div className="w-full flex flex-col gap-4">
+            <div className="w-full flex flex-col gap-4 bg-white dark:bg-gray-800">
               <Loading />
               <Loading />
               <Loading />

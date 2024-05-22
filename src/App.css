@@ -64,3 +64,70 @@
   display: flex;
   align-items: center;
 }
+
+.dark .evaFvq {
+  padding-top: 8px;
+  color: white;
+  background-color: rgb(31 41 55);
+  border: 1px solid rgb(202 138 4);
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  border-bottom: none;
+}
+
+.dark .fpBGKh {
+  border: 1px solid rgb(202 138 4);
+  border-bottom: none;
+  border-top: none;
+}
+
+.dark .fpBGKh::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dark .fpBGKh::-webkit-scrollbar-track {
+  background: rgb(31 41 55);
+}
+
+.dark .fpBGKh::-webkit-scrollbar-thumb {
+  background: rgb(17 24 39);
+  border-radius: 10px;
+}
+
+.dark .fpBGKh::-webkit-scrollbar-thumb:hover {
+  background: rgb(17 24 39);
+}
+
+.dark .mHisf {
+  color: white;
+  background-color: rgb(31 41 55);
+}
+
+.dark .kUMlDB {
+  color: white;
+  background-color: rgb(31 41 55);
+}
+
+.dark .fNLvxm  {
+  color: white;
+  background-color: rgb(31 41 55);
+}
+
+.dark .sc-khjJXkk {
+  color: white;
+  background-color: rgb(31 41 55);
+}
+
+.dark .kgOwiN {
+  color: white;
+  background-color: rgb(31 41 55);
+}
+
+.dark .hVPalX {
+  color: white;
+  background-color: rgb(31 41 55);
+  border: 1px solid rgb(202 138 4);
+  border-top: none;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+}

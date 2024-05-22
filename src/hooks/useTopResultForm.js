@@ -1,11 +1,17 @@
 import { useState } from "react";
-import http from "../helper/http-client";
 import { toast } from "react-toastify";
+import http from "../helper/http-client";
+import HandleResult from "../helper/result";
+import authService from "../services/auth.service";
 
 const useFormSubmit = (initialUrl = "") => {
   const [isLoading, setIsLoading] = useState(false);
   const [resultUrl, setResultUrl] = useState(initialUrl);
   const [result, setResult] = useState({});
+  // const [briefResult, setBriefResult] = useState([]);
+  // const [updateResult, setUpdateResult] = useState(null);
+
+  const currentUser = authService.getAuthUser().user.username?.toLowerCase();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +24,15 @@ const useFormSubmit = (initialUrl = "") => {
         headers: { "Access-Control-Allow-Origin": "*" },
       });
       setResult(res.data);
-      console.log("res", res.data);
+      const earnedAchievement = HandleResult.handleAchievement(
+        HandleResult.updateResult(res.data).find(
+          (val) => val?.username?.toLowerCase() === currentUser
+        ),
+        res.data?.allResult.find(
+          (val) => val?.username?.toLowerCase() === currentUser
+        )
+      );
+      console.log('Earned-achievements---------------->>>', earnedAchievement);
     } catch (err) {
       console.log(err);
       toast.warning(err.data);
