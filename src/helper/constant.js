@@ -167,8 +167,8 @@ const eventFilterList = [
   { label: "User", value: "" },
 ];
 
-const URL = "http://localhost:4000";
-// const URL = 'https://backend.dartsfightclub.de';
+// const URL = "http://localhost:4000";
+const URL = 'https://backend.dartsfightclub.de';
 
 const constant = {
   quotes,
