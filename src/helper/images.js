@@ -235,6 +235,10 @@ import LOGO from "../assets/img/fc_logo.png";
 
 import MOVIE from "../assets/img/movie.png";
 
+import FIRSTMEDAL from "../assets/img/first_medal.png";
+
+import BGSUMMARY from "../assets/img/bg_summary.jpg";
+
 // Breakfast image
 const MASTER26 = [
   master26_10,
@@ -509,6 +513,8 @@ const images = {
   BOARD4,
   LOGO,
   MOVIE,
+  BGSUMMARY,
+  FIRSTMEDAL,
 };
 
 export default images;
