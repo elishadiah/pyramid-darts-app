@@ -1,34 +1,9 @@
-import React, { useMemo } from "react";
+import React from "react";
 import images from "../helper/images";
-import useFetchAllUsers from "../hooks/useFetchAllUsers";
+import useFetchAllSeasons from "../hooks/useFetchAllSeasons";
 
 const Footer = () => {
-  const { players } = useFetchAllUsers();
-
-  const activePlayersNumber = useMemo(() => {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    return players.filter((player) => {
-      const lastActive = new Date(player.lastLoginDate);
-      return lastActive > thirtyDaysAgo;
-    }).length;
-  }, [players]);
-
-  const seasonNo = useMemo(() => {
-    const dates = players?.map((val) => val.createdAt);
-    const oldestDate = dates.reduce((oldest, current) => {
-      return current < oldest ? current : oldest;
-    }, dates[0]);
-
-    const currentMonth = new Date().getMonth();
-    const oldestMonth = new Date(oldestDate).getMonth();
-    return ((currentMonth - oldestMonth + 12) % 12) + 1;
-  }, [players]);
-
-  const date = new Date();
-  const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const { currentSeason } = useFetchAllSeasons();
 
   return (
     <footer>
@@ -45,14 +20,15 @@ const Footer = () => {
               <div>
                 <div className="flex flex-col items-start">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Active players in the last 30 days: {activePlayersNumber}
+                    Active players in the last 30 days:{" "}
+                    {currentSeason?.activeUsers}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Season: {seasonNo}
+                    Season: {currentSeason?.season}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {firstDayOfMonth.toLocaleDateString()} -{" "}
-                    {lastDayOfMonth.toLocaleDateString()}
+                    {new Date(currentSeason?.seasonStart).toLocaleDateString()}{" "}
+                    - {new Date(currentSeason?.seasonEnd).toLocaleDateString()}
                   </p>
                 </div>
               </div>

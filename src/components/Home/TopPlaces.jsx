@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router";
-import useFetchAllResult from "../../hooks/useFetchAllResult";
 import images from "../../helper/images";
 import Loading from "../Loading";
 import EmailNotify from "../../helper/emailjs";
@@ -8,26 +7,16 @@ import socket from "../../socket";
 import authService from "../../services/auth.service";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const lastMonth = new Date();
-lastMonth.setMonth(lastMonth.getMonth() - 1);
-lastMonth.setHours(0, 0, 0, 0);
-lastMonth.setDate(1);
-
-const firstDayOfMonth = new Date(
-  lastMonth.getFullYear(),
-  lastMonth.getMonth(),
-  1
-);
+import useFetchAllSeasons from "../../hooks/useFetchAllSeasons";
 
 const TopPlaces = ({ current }) => {
   const navigate = useNavigate();
   const user = authService.getAuthUser()?.user;
-  const { isLoading, players } = useFetchAllResult();
+  const { isLoading, currentSeason, lastSeason } = useFetchAllSeasons();
 
   useEffect(() => {
     const handleFoundUser = (data) => {
-      if (data) {
+      // if (data) {
         socket.emit("challenge", {
           message: `<a target="_blank" href="https://lidarts.org">
           ${user?.username}(Email: ${
@@ -45,7 +34,7 @@ const TopPlaces = ({ current }) => {
           "_blank"
         );
         navigate("/top-challenge-result");
-      } else toast.warning("User is not online.");
+      // } else toast.warning("User is not online.");
     };
 
     socket.on("foundUser", handleFoundUser);
@@ -54,39 +43,24 @@ const TopPlaces = ({ current }) => {
     };
   }, [user, navigate]);
 
-  const topPlayers = useMemo(
-    () => players?.filter((val) => val.level === 6),
-    [players]
+  const displayData = useMemo(
+    () => (current ? currentSeason?.topMembers : lastSeason?.topMembers),
+    [current, currentSeason, lastSeason]
   );
-
-  const topPlayersLastMonth = useMemo(
-    () =>
-      players?.filter((val) => {
-        const playerDate = new Date(val.date.$date);
-        return (
-          val.level === 6 &&
-          playerDate >= lastMonth &&
-          playerDate < firstDayOfMonth
-        );
-      }),
-    [players]
-  );
-
-  const displayData = current ? topPlayers : topPlayersLastMonth;
 
   const handleChallenge = useCallback(
     (player) => {
       socket.emit("findUserByName", {
         username: player.username,
       });
-      // EmailNotify.sendNotificationEmail(
-      //   user.username,
-      //   user.email,
-      //   player.username,
-      //   player.email,
-      //   `${user?.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org. The result of this challenge will not affect your ranking. It is just for fun. Enjoy!`,
-      //   "Fun Challenge"
-      // );
+      EmailNotify.sendNotificationEmail(
+        user.username,
+        user.email,
+        player.username,
+        player.email,
+        `${user?.username} sent you a challenge. Please login https://lidarts.org and accept the challenge. Your username must be same with username of lidarts.org. The result of this challenge will not affect your ranking. It is just for fun. Enjoy!`,
+        "Fun Challenge"
+      );
     },
     [user]
   );
@@ -95,7 +69,7 @@ const TopPlaces = ({ current }) => {
     <div>
       {isLoading ? (
         <Loading />
-      ) : displayData.length ? (
+      ) : displayData?.length ? (
         <div>
           {current ? (
             <h3 className="text-5xl font-bold my-8">
@@ -152,8 +126,8 @@ const TopPlaces = ({ current }) => {
                     <button
                       className="border px-2 py-1 rounded-lg disabled:opacity-50"
                       disabled={
-                        player?.username.toLowerCase() ===
-                        user?.username.toLowerCase()
+                        player?.username?.toLowerCase() ===
+                        user?.username?.toLowerCase()
                       }
                       onClick={() => handleChallenge(player)}
                     >
