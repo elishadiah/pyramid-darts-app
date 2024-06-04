@@ -20,7 +20,7 @@ const Footer = () => {
               <div>
                 <div className="flex flex-col items-start">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Active players in the last 30 days:{" "}
+                    Active players in the last 30 days:{"  "}
                     {currentSeason?.activeUsers}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
